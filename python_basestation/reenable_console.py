@@ -3,7 +3,7 @@ import asyncio
 
 done = False
 # attempt a connection to the bluetooth device
-async def callback(sender,data:bytearray):
+def callback(sender,data:bytearray):
     global done
     print(data)
     # if data[0] == 2:
@@ -22,20 +22,13 @@ async def run():
             print("discovered")
             async with BleakClient(d) as client:
                 
-                await client.start_notify("0000ABC2-0000-1000-8000-00805F9B34FB",callback)
-                data = bytearray([1])
+                data = bytearray([7])
                 await asyncio.sleep(1)
                 print("writing packet")
                 await client.write_gatt_char("0000ABC3-0000-1000-8000-00805F9B34FB",data,False)
-                while not done:
-                    await asyncio.sleep(1)
+                await asyncio.sleep(1)
                 
-                # done = False
-                # data = bytearray([2])
-                # print("writing erase packet")
-                # await client.write_gatt_char("0000ABC3-0000-1000-8000-00805F9B34FB",data,False)
-                # while not done:
-                #     await asyncio.sleep(1)
+
 
 asyncio.run(run())
 

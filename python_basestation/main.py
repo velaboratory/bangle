@@ -1,12 +1,55 @@
-import base64
-import datetime
-data = "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"
-print(data)
-decoded = base64.b64decode(data)
-print(decoded)
+import asyncio
 import struct
+import datetime
+from bleak import discover
+from bleak import BleakClient, BleakScanner
+import base64
+address = "dd:0c:e4:29:32:ab"
+UUID_NORDIC_TX = "6e400002-b5a3-f393-e0a9-e50e24dcca9e"
+UUID_NORDIC_RX = "6e400003-b5a3-f393-e0a9-e50e24dcca9e"
 
-for dt,steps in struct.iter_unpack(">IH",decoded):
-    utc_dt = datetime.datetime.utcfromtimestamp(dt)
 
-    print(f"{utc_dt}:{steps}")
+
+from bleak import BleakClient, BleakScanner # get button state from the m5stickc
+import asyncio
+
+done = False
+buffer = ""
+
+def callback(sender,data:bytearray):
+    global buffer
+    s = data.decode()
+    if "\n" in s:
+        parts = s.split("\n")
+        buffer += parts[0]
+        packet = base64.b64decode(buffer)
+        for dt,steps in struct.iter_unpack(">IH",packet):
+            utc_dt = datetime.datetime.utcfromtimestamp(dt)
+            print(f"{utc_dt}:{steps}")
+        buffer = parts[1]
+    else:
+        buffer += s
+        print(".",end="",flush=True)
+
+async def run():
+    while True:
+        try:
+            devices = await BleakScanner.discover(5) # short discovery time so it starts quickly
+            for d in devices:
+                if d.name == "Bangle.js e4d1": # this approach should work on windows or mac
+                    
+                    print("discovered")
+                    async with BleakClient(d) as client:
+                        
+                        await client.start_notify(UUID_NORDIC_RX,callback)
+                        data = bytearray([1])
+                        await asyncio.sleep(1)
+                        print("writing packet")
+                        await client.write_gatt_char(UUID_NORDIC_TX,data,False)
+                        await asyncio.sleep(10)
+                        
+        except:
+            pass
+
+asyncio.run(run())
+
