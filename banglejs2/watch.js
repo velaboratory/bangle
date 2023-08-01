@@ -8,7 +8,8 @@ Graphics.prototype.setFontAnton = function(scale) {
 let drawTimeout;
 let syncing = false;
 let last_steps = 0;
-let getHealthArrayBytesB64 =function() {
+let writeNextLog =function() {
+    var file = require("Storage").open("healthlog"+version+".csv","a");
     var arr2 = new ArrayBuffer(6); // an Int32 takes 4 bytes and Int16 takes 2 bytes
     var time = Math.floor(Date.now() / 1000);
     var steps = Bangle.getStepCount();
@@ -17,19 +18,19 @@ let getHealthArrayBytesB64 =function() {
     view = new DataView(arr2);
     view.setUint32(0, time, false); // byteOffset = 0; litteEndian = false
     view.setUint16(4, delta, false);
-    return btoa(arr2);
+    file.write(btoa(arr2));
 };
 
 let version = "6";
 
 let locale = require("locale");
 
-let file = require("Storage").open("healthlog"+version+".csv","a");
-
 // Actually draw the watch face
 let draw = function() {
-  //get the latest steps
-  file.write(getHealthArrayBytesB64());
+
+  if(!syncing){
+    writeNextLog()
+  }
   //open the file and write the data
 
   var x = g.getWidth() / 2;
@@ -52,49 +53,74 @@ let draw = function() {
 };
 
 
-let arr = new ArrayBuffer(20); // an Int32 takes 4 bytes
-let writePacket = function(){
+let writePacket = function(arr){
     NRF.updateServices({
             0xABC1: {
                 0xABC2: {
-                value : arr
+                    value : arr,
+                    notify: true
+                }
             }
-        }
     });
 };
 
+let sendData = function(storageFile){
+
+    var dataLeft = true;
+    s = storageFile.read(126);
+    packet = "";
+    if(s == undefined){
+        packet = "0"
+        dataLeft = false;
+    }else if(s.length < 126){
+        packet = "0" + s;
+        dataLeft = false;
+    }else{
+        packet = "1" + s;
+    }
+    writePacket(packet);
+
+    if(dataLeft){
+        setTimeout(sendData, 20, storageFile);
+    }
+}
 let handleIncomingPacket=function(b){
     if(b[0] == 1){
-        E.showAlert("syncing").then(draw); 
-        arr[0] = 1; //write data
         syncing = true;
-        writePacket();
-        arr[0] = 0; //done writing data
-        writePacket();
-        syncing = false;
+        //E.showAlert("syncing").then(draw); 
+
+        
+        //read the file
+        var healthlog = require("Storage").open("healthlog"+version+".csv","r");
+        sendData(healthlog);
+        
+        
     }else if(b[0] == 2){
         E.showAlert("deleting").then(draw);
+        require("Storage").open("healthlog"+version+".csv","r").erase();
+        arr = new Uint8Array(1);
         arr[0] = 2; //done commiting
-        writePacket();
+        writePacket(arr.buffer);
     }
 };
 let setupServer = function(){
     NRF.on('disconnect', function(reason) { 
         //probably want to clean any lingering buffers up.
+        syncing = false;
         Bangle.buzz();
     });
     NRF.setServices({
         0xABC1: {
             0xABC2: { //tx, write to send data from thew atch
                 value : [0], 
-                maxLen : 20,
+                maxLen : 128,
                 readable: true,
                 writable : false,
                 notify: true
             },
             0xABC3: { //rx, handle data in onWRite
                 value: [0],
-                maxLen: 20,
+                maxLen: 128,
                 writable: true,
                 onWrite : function(evt){
                     handleIncomingPacket(evt.data);
@@ -113,3 +139,5 @@ Bangle.loadWidgets();
 draw();
 setTimeout(Bangle.drawWidgets,0);
 }
+
+
