@@ -9,8 +9,11 @@ Graphics.prototype.setFontAnton = function(scale) {
   let drawTimeout;
   let syncing = false;
   let last_steps = 0;
+  let lastHRMReading = 0;
+
+
   let writeNextLog =function() {
-      var file = require("Storage").open("healthlog"+version+".csv","a");
+      var file = require("Storage").open(movementFilename,"a");
       var arr2 = new ArrayBuffer(6); // an Int32 takes 4 bytes and Int16 takes 2 bytes
       var time = Math.floor(Date.now() / 1000);
       var steps = Bangle.getStepCount();
@@ -23,15 +26,34 @@ Graphics.prototype.setFontAnton = function(scale) {
   };
   
   let version = "6";
-  
+  let movementFilename = "healthlog"+version;
+  let hrmFilename = "hrmlog"+version;
   let locale = require("locale");
   
+  Bangle.on("HRM", function(hrm) {
+        if(!syncing){
+            var file = require("Storage").open(hrmFilename,"a");
+            var time = Math.floor(Date.now() / 1000);
+            file.write(time+":"+hrm.bpm+":"+hrm.confidence + "\n");
+        }
+  });
   // Actually draw the watch face
   let draw = function() {
   
     if(!syncing){
       writeNextLog();
     }
+
+    var time = Math.floor(Date.now() / 1000);
+    if(time - lastHRMReading > 60*20){
+        Bangle.setHRMPower(true,"myapp");
+        lastHRMReading = time;
+    }
+    if(Bangle.isHRMOn() && (time-lastHRMReading) > 60*3){
+        Bangle.setHRMPower(false,"myapp");
+    }
+
+
     //open the file and write the data
   
     var x = g.getWidth() / 2;
@@ -50,20 +72,10 @@ Graphics.prototype.setFontAnton = function(scale) {
     drawTimeout = setTimeout(function() {
       drawTimeout = undefined;
       draw();
-    }, 60000 - (Date.now() % 60000));
+    }, 60000 - (Date.now() % 60000)); //force update on the minute
   };
   
-  
-  let writePacket = function(arr){
-      NRF.updateServices({
-              0xABC1: {
-                  0xABC2: {
-                      value : arr,
-                      notify: true
-                  }
-              }
-      });
-  };
+
   
   let sendData = function(storageFile){
   
@@ -77,63 +89,15 @@ Graphics.prototype.setFontAnton = function(scale) {
         }
        
     }
-    Bluetooth.write(10); 
-    //   var dataLeft = true;
-    //   s = storageFile.read(126);
-    //   packet = "";
-    //   if(s == undefined){
-    //       packet = "0";
-    //       dataLeft = false;
-    //   }else if(s.length < 126){
-    //       packet = "0" + s;
-    //       dataLeft = false;
-    //   }else{
-    //       packet = "1" + s;
-    //   }
-    //   writePacket(packet);
-  
-    //   if(dataLeft){
-    //       setTimeout(sendData, 20, storageFile);
-    //   }
+    Bluetooth.write(10); //new line
   };
-  let handleIncomingPacket=function(b){
-      if(b[0] == 1){
-          syncing = true;
-          //E.showAlert("syncing").then(draw); 
-  
-          
-          //read the file
-          var healthlog = require("Storage").open("healthlog"+version+".csv","r");
-          sendData(healthlog);
-          
-          
-      }else if(b[0] == 2){
-          E.showAlert("deleting").then(draw);
-          require("Storage").open("healthlog"+version+".csv","r").erase();
-          Bluetooth.write("deleted storage")
-      }else if(b[0] == 7){
-        E.setConsole("Bluetooth");
-      }
-  };
+
   let setupServer = function(){
       NRF.on('disconnect', function(reason) { 
-          //probably want to clean any lingering buffers up.
           syncing = false;
           Bangle.buzz();
       });
       NRF.setTxPower(8);
-      NRF.setServices({
-          0xABC1: {
-              0xABC3: { //rx, handle data in onWRite
-                  value: [0],
-                  maxLen: 128,
-                  writable: true,
-                  onWrite : function(evt){
-                      handleIncomingPacket(evt.data);
-                  }
-              }
-          }
-      }, { uart : true }); //uart: true is important, otherwise you can't do regular bangle things (must put in bootloader mode to fix)
       // Change the name that's advertised
       //NRF.setAdvertising({}, {name:"Bangle.js"});
   };
@@ -141,8 +105,7 @@ Graphics.prototype.setFontAnton = function(scale) {
   E.setConsole(null, {force: true});
   Bluetooth.on('data', function(data) {
     if(data.charCodeAt(0) == 1){
-        sendData(require("Storage").open("healthlog"+version+".csv","r"));
-        Bluetooth.write("sent file" + require("Storage").open("healthlog"+version+".csv","r").getLength())
+        sendData(require("Storage").open(movementFilename,"r"));
     }
 
   });
@@ -154,4 +117,3 @@ Graphics.prototype.setFontAnton = function(scale) {
   setTimeout(Bangle.drawWidgets,0);
   }
   
-
