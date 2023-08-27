@@ -10,9 +10,14 @@ Graphics.prototype.setFontAnton = function(scale) {
   let syncing = false;
   let last_steps = 0;
   let lastHRMReading = 0;
+  let version = "6";
+  let movementFilename = "healthlog"+version;
+  let hrmFilename = "hrmlog"+version;
+  let configFilename = "config"+version;
+  let locale = require("locale");
+  let reading_config = false;
 
-
-  let writeNextLog =function() {
+  let writeMovementLog =function() {
       var file = require("Storage").open(movementFilename,"a");
       var arr2 = new ArrayBuffer(6); // an Int32 takes 4 bytes and Int16 takes 2 bytes
       var time = Math.floor(Date.now() / 1000);
@@ -25,10 +30,7 @@ Graphics.prototype.setFontAnton = function(scale) {
       file.write(btoa(arr2));
   };
   
-  let version = "6";
-  let movementFilename = "healthlog"+version;
-  let hrmFilename = "hrmlog"+version;
-  let locale = require("locale");
+
   
   Bangle.on("HRM", function(hrm) {
         if(!syncing){
@@ -41,7 +43,7 @@ Graphics.prototype.setFontAnton = function(scale) {
   let draw = function() {
   
     if(!syncing){
-      writeNextLog();
+        writeMovementLog();
     }
 
     var time = Math.floor(Date.now() / 1000);
@@ -95,6 +97,7 @@ Graphics.prototype.setFontAnton = function(scale) {
   let setupServer = function(){
       NRF.on('disconnect', function(reason) { 
           syncing = false;
+          reading_config = false;
           Bangle.buzz();
       });
       NRF.setTxPower(8);
@@ -103,10 +106,43 @@ Graphics.prototype.setFontAnton = function(scale) {
   };
   
   E.setConsole(null, {force: true});
+  let config_buffer = "";
   Bluetooth.on('data', function(data) {
-    if(data.charCodeAt(0) == 1){
-        sendData(require("Storage").open(movementFilename,"r"));
+    if(reading_config){
+      
+        for(var i=0;i<data.length;i++){
+
+
+           if(data.charAt(i)=="\n"){
+               //decode the config buffer (in theory)
+               require("Storage").open(configFilename, "w").erase();
+               require("Storage").open(configFilename, "w").write(config_buffer);
+               reading_config = false;
+               Bluetooth.write(3); //got all data
+               load(); //restart
+           }
+           else{
+               config_buffer += data[i];
+           }
+       }
+
+    }else{
+        if(data.charCodeAt(0) == 1){ 
+            //send data
+            sendData(require("Storage").open(movementFilename,"r"));
+        }
+        if(data.charCodeAt(0) == 2){
+            Bangle.buzz();
+            require("Storage").open(movementFilename, "w").erase();
+            Bluetooth.write(2); //confirm delete
+        }
+        if(data.charCodeAt(0) == 3){
+            config_buffer = ""; 
+            Bangle.buzz();
+            reading_config = true;
+        }
     }
+    
 
   });
   setupServer();

@@ -101,7 +101,7 @@ def discovered():
             now = datetime.utcnow()
             if (now-last_sync).total_seconds() > 15*60:
                 return success({"sync": 1})
-
+            return success({"sync":0}) #sync not needed
 
 @app.route("/sync", methods=["POST"])
 def sync():
@@ -138,7 +138,7 @@ def sync():
             return success({"sync_id": insert_id})
 
 
-@app.route("/confirm")
+@app.route("/confirm", methods=["POST"])
 def confirm():
     station_id = request.values.get("station_id", None)
     sync_id = request.values.get("sync_id", None)
@@ -146,8 +146,10 @@ def confirm():
         return failure("Invalid request")
 
     with dbConnection() as con:
-        con.execute("update data_sync set confirmed=1 where id=?", (sync_id,))
-
+        con.execute("update data_sync set confirmed=1 where uuid=?", (sync_id,))
+        cur = con.execute("select device_id from data_sync where uuid=?",(sync_id,))
+        device_id = cur.fetchone()[0]
+        con.execute("update device set last_data_sync = ? where id=?",(datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),device_id))
     return success({})
 
 
