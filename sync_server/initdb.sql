@@ -33,10 +33,10 @@ CREATE TABLE data_sync (
     device_id text, -- the device doing the syncing
     station_id text, -- the station doing the syncing
     data text, -- the data (json) from the device syncing
-    config_id text, -- the config that describe the data
+    config_id int, -- the config that describe the data
     confirmed int default 0, -- 0 until the sync is confirmed
     foreign key (station_id) references station(id) on delete cascade on update cascade,
-    foreign key (config_id) references config(rowid) on delete cascade on update cascade,
+    foreign key (config_id) references config(id) on delete cascade on update cascade,
     foreign key (device_id) references device(id) on delete cascade on update cascade
 );
 
