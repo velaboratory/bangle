@@ -1,26 +1,10 @@
 
 PRAGMA foreign_keys=ON;
 
-CREATE TABLE firmware (
-    uuid text PRIMARY KEY, 
-    type text, -- this is likely something like bangle_vfb
-    version int, -- this is a version number of the firmware
-    data text -- this is probably the js code
-);
-
---this table holds a target setting data for a device with a specific firmware
-CREATE TABLE config (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    device_id text,
-    firmware_uuid text,
-    data text, -- json data for the configuration
-    foreign key (firmware_uuid) references firmware(uuid) on delete cascade on update cascade,
-    foreign key (device_id) references device(id) on delete cascade on update cascade
-);
-
 CREATE TABLE device (
     id text PRIMARY KEY, -- probably a mac address
-    last_data_sync text -- a date time of the last upload from the device
+    last_data_sync text, -- a date time of the last upload from the device
+    target_config_json text -- a configuration string to update the device to
 );
 
 CREATE TABLE station (
@@ -33,10 +17,10 @@ CREATE TABLE data_sync (
     device_id text, -- the device doing the syncing
     station_id text, -- the station doing the syncing
     data text, -- the data (json) from the device syncing
-    config_id int, -- the config that describe the data
+    config_json text, -- the configuration of this device when data was uploaded
     confirmed int default 0, -- 0 until the sync is confirmed
+    complete int default 0, -- 0 until the sync is complete (comes in chunks)
     foreign key (station_id) references station(id) on delete cascade on update cascade,
-    foreign key (config_id) references config(id) on delete cascade on update cascade,
     foreign key (device_id) references device(id) on delete cascade on update cascade
 );
 

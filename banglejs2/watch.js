@@ -16,9 +16,12 @@ Graphics.prototype.setFontAnton = function(scale) {
   let configFilename = "config"+version;
   let locale = require("locale");
   let reading_config = false;
-
+  let timezone = -4;
+  let movement_buffer = [];
+  let max_chunk = 5000;
+  let ble_mtu = 128;
   let writeMovementLog =function() {
-      var file = require("Storage").open(movementFilename,"a");
+      
       var arr2 = new ArrayBuffer(6); // an Int32 takes 4 bytes and Int16 takes 2 bytes
       var time = Math.floor(Date.now() / 1000);
       var steps = Bangle.getStepCount();
@@ -27,7 +30,15 @@ Graphics.prototype.setFontAnton = function(scale) {
       view = new DataView(arr2);
       view.setUint32(0, time, false); // byteOffset = 0; litteEndian = false
       view.setUint16(4, delta, false);
-      file.write(btoa(arr2));
+      movement_buffer.push(btoa(arr2));
+
+      if(!syncing){
+        var file = require("Storage").open(movementFilename,"a");
+        for(var i=0;i<movement_buffer.length;i++){
+            file.write(movement_buffer[i]);
+        }
+        movement_buffer = [];
+      }
   };
   
 
@@ -42,9 +53,8 @@ Graphics.prototype.setFontAnton = function(scale) {
   // Actually draw the watch face
   let draw = function() {
   
-    if(!syncing){
-        writeMovementLog();
-    }
+
+    writeMovementLog();
 
     var time = Math.floor(Date.now() / 1000);
     if(time - lastHRMReading > 60*20){
@@ -77,24 +87,32 @@ Graphics.prototype.setFontAnton = function(scale) {
     }, 60000 - (Date.now() % 60000)); //force update on the minute
   };
   
-
+  let storageFile = null;
   
-  let sendData = function(storageFile){
-  
+  let sendData = function(){
+    var bytesSent = 0;
     while(true){
-        s = storageFile.read(128);
+        s = storageFile.read(ble_mtu);
         if(s!=undefined){
             Bluetooth.write(s);
-           
+            bytesSent += s.length;
+
+            if(bytesSent + ble_mtu > max_chunk){
+                Bluetooth.write(1); //packet available
+                break;
+            }
         }else{
+            Bluetooth.write(2); //done
             break;
         }
        
     }
-    Bluetooth.write(10); //new line
+    
+    
   };
 
   let setupServer = function(){
+      
       NRF.on('disconnect', function(reason) { 
           syncing = false;
           reading_config = false;
@@ -114,9 +132,10 @@ Graphics.prototype.setFontAnton = function(scale) {
 
 
            if(data.charAt(i)=="\n"){
-               //decode the config buffer (in theory)
+               
+               config_json = atob(config_buffer);
                require("Storage").open(configFilename, "w").erase();
-               require("Storage").open(configFilename, "w").write(config_buffer);
+               require("Storage").open(configFilename, "w").write(config_json);
                reading_config = false;
                Bluetooth.write(3); //got all data
                load(); //restart
@@ -128,19 +147,35 @@ Graphics.prototype.setFontAnton = function(scale) {
 
     }else{
         if(data.charCodeAt(0) == 1){ 
-            //send data
-            sendData(require("Storage").open(movementFilename,"r"));
+            
+            //read the next 4 bytes of data as an int
+
+            if(!syncing) {
+                storageFile = require("Storage").open(movementFilename,"r");
+                syncing = true;
+            }
+            sendData();
         }
         if(data.charCodeAt(0) == 2){
-            Bangle.buzz();
             require("Storage").open(movementFilename, "w").erase();
             Bluetooth.write(2); //confirm delete
         }
         if(data.charCodeAt(0) == 3){
             config_buffer = ""; 
-            Bangle.buzz();
             reading_config = true;
         }
+        if(data.charCodeAt(0) == 4){
+
+        }
+        if(data.charCodeAt(0) == 7){
+            var dv = new DataView(E.toArrayBuffer(data.slice(-4)));
+            var timestamp = dv.getInt32(0,false);
+            E.setTimeZone(0); //set to utc before setting a utc time
+            setTime(timestamp);
+            E.setTimeZone(timezone); //now set to timezone
+
+        }
+
     }
     
 
@@ -148,8 +183,8 @@ Graphics.prototype.setFontAnton = function(scale) {
   setupServer();
   
   // Load widgets
-  Bangle.loadWidgets();
+  //Bangle.loadWidgets(); No widgets
   draw();
-  setTimeout(Bangle.drawWidgets,0);
+  //setTimeout(Bangle.drawWidgets,0);
   }
   

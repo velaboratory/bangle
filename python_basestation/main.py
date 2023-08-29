@@ -14,32 +14,37 @@ done = False
 buffer = ""
 server = "http://localhost:5000/"
 packet = []
-config_id = 2
+config_id = 1
+packet_available = False
 def callback(sender,data:bytearray):
-    global reading_sync_packet
+    
     global uploading_config
     global confirming_delete
     global buffer
     global packet
+    global packet_available
+    global sync_complete
 
-    if reading_sync_packet:
+   
+    if not sync_complete: 
         s = data.decode()
-        if "\n" in s:
-            parts = s.split("\n")
+        #tack the message onto the buffer
+        if "\x02" in s: #end of upload
+            parts = s.split("\x02")
             buffer += parts[0]
             packet = buffer
-            
-            # for dt,steps in struct.iter_unpack(">IH",packet):
-            #     utc_dt = datetime.datetime.utcfromtimestamp(dt)
-            #     print(f"{utc_dt}:{steps}")
-            buffer = parts[1]
-            reading_sync_packet = False
+            packet_available = True
+            sync_complete = True
+        elif "\x01" in s: #end of packet
+            parts = s.split("\x01")
+            buffer += parts[0]
+            packet = buffer
+            packet_available = True
         else:
             buffer += s
             print(".",end="",flush=True)
 
     elif confirming_delete:
-        
         if data[0] == 2:
             print("delete confirmed")
             confirming_delete = False
@@ -52,7 +57,8 @@ def callback(sender,data:bytearray):
 
 
 async def run():
-    global reading_sync_packet
+    global packet_available
+    global sync_complete
     global uploading_config
     global confirming_delete
     global packet
@@ -65,39 +71,57 @@ async def run():
                     data={"station_id":get_mac_address().lower(),"device_id":d.address.lower(),"config_id":config_id}
                     print(data)
                     res = requests.post(server+"discovered",data=data).json()
-                    reading_sync_packet = False
+                    sync_complete = False
                     confirming_delete = False
                     uploading_config = False
+                    packet_available = False
                     if not res["success"]:
                         print("failed to check id")
                         continue
                     if res["sync"] == 0:
                         print("sync not needed")
-                        continue
+                        #continue
                     
                     # we should sync
                     async with BleakClient(d) as client:
                         print("starting sync")
                         await client.start_notify(UUID_NORDIC_RX,callback)
-                        now = int(datetime.datetime.utcnow().timestamp())
-                        data = bytearray([1])+struct.pack('<I', now)
+                        now = res["server_unixtime"]
+                        print(now)
+                        data = bytearray([1])+struct.pack('>I', now)
                         print("writing start data:",data)
-                        #await asyncio.sleep(1)
-
-                        reading_sync_packet = True;
                         await client.write_gatt_char(UUID_NORDIC_TX,data,False)
                         print("waiting for data")
-                        
-                        
-                        while reading_sync_packet:
+                        #await asyncio.sleep(1)
+
+                        # make a connection to the server to upload data
+                        failure = False
+                        sync_id = None
+                        while True:
+                            if packet_available:
+                                print("packet downloaded, uploading to server")
+                                # packet downloaded, let's upload to the server
+                                data = {"station_id":get_mac_address().lower(),"config_id":config_id,"data":packet}
+                                if sync_id:
+                                    data["sync_id"] = sync_id
+                                res = requests.post(server+"sync",data=data).json()
+                                if not res["success"]:
+                                    print("failed to upload:", res["reason"])
+                                    failure = True
+                                    break
+                                sync_id = res["sync_id"]
+                                packet_available = False
+                                if sync_complete:
+                                    break
+                                
+                                print("waiting for more data")
+                                await client.write_gatt_char(UUID_NORDIC_TX,data,False) #send more data
+                                    
                             await asyncio.sleep(.1)
-                        print("packet downloaded, uploading to server:",packet)
-                        # packet downloaded, let's upload to the server
-                        data = {"station_id":get_mac_address().lower(),"config_id":config_id,"data":packet}
-                        res = requests.post(server+"sync",data=data).json()
-                        if not res["success"]:
-                            print("failed to upload:", res["reason"])
-                            continue
+
+                        if failure:
+                            continue;            
+                        
                         #server has the data, tell the device to delete
                         data = bytearray([2])
                         confirming_delete = True
@@ -109,12 +133,10 @@ async def run():
 
                         if "config" in res:
                             print("configurating")
-                            data = bytearray([3])
+                            data = bytearray([3])+struct.pack('<I', res["config"]["id"])
                             uploading_config = True
                             await client.write_gatt_char(UUID_NORDIC_TX, data, False)
                             print("writing config")
-                            #write out the data
-                            print(res["config"]["id"],res["config"]["data"])
                             data = (res["config"]["data"]+"\n").encode()
                             await client.write_gatt_char(UUID_NORDIC_TX, data, False)
                             print("wrote config data")
