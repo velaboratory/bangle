@@ -252,7 +252,7 @@ void setup() {
   pBLEScan->setActiveScan(false); // Set active scanning, this will get more data from the advertiser.
   pBLEScan->setInterval(0x80); // How often the scan occurs / switches channels; in milliseconds,
   pBLEScan->setWindow(0x20);  // How long to scan during the interval; in milliseconds.
-  pBLEScan->setMaxResults(10); // do not store the scan results, use callback only.
+  pBLEScan->setMaxResults(0xFF); // do not store the scan results, use callback only.
 }
 
 bool connectWifi(){
@@ -471,7 +471,7 @@ void loop() {
         continue;  //recently synced, just continue
       }
       //connect to the bangle
-      NimBLEClient *pClient = NimBLEDevice::createClient();
+      NimBLEClient *pClient = NimBLEDevice::createClient(); //must be deleted after this point!
         
       if(pClient->connect(&device)) {
         M5.Lcd.println("connected");
@@ -481,11 +481,11 @@ void loop() {
         rx->subscribe(true,onRX);
         NimBLERemoteCharacteristic *tx = pService->getCharacteristic(UUID_NORDIC_TX);
 
-        uint8_t TIME[] = {7,0,0,0,0};
+        uint8_t TIME[] = {7,0,0,0,0}; //probably a more efficient way to do this
         long v = res.timestamp;
         uint8_t* temp = (uint8_t*)&v;
         for(int b =0;b<4;b++){
-          TIME[b+1] = temp[3-b];
+          TIME[b+1] = temp[3-b]; //big endian is needed
         }
         tx->writeValue(TIME,5);
 
@@ -496,6 +496,7 @@ void loop() {
         confirming = false;
         sync_success = false;
         configurating = false;
+
         while(syncing && pClient->isConnected()){
           if(send_next_packet){
               uint8_t SYNC[1] = {1};
@@ -528,6 +529,7 @@ void loop() {
         ServerResponseConfig config = getConfigFromServer();
 
         if(!config.success){
+          NimBLEDevice::deleteClient(pClient);
           continue;
         }
 
@@ -551,7 +553,7 @@ void loop() {
           tx->writeValue(buffer, buffer_index);
         }
         
-        buffer[0] = 10;
+        buffer[0] = 10; //send a newline to indicate the end
         tx->writeValue(buffer,1);
         
         while(configurating && pClient->isConnected()){
