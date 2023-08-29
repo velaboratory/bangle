@@ -57,13 +57,6 @@ class ServerResponseDiscovered {
     bool sync;
 };
 
-class ServerResponseConfig {
-  public:
-    bool success;
-    String reason;
-    String config_json;
-};
-
 static CharacteristicCallbacks chrCallbacks;
 
 //this is called if you want to launch bluetooth-based wifi setup.  It'll restart when complete.
@@ -304,7 +297,7 @@ uint8_t buffer[BUFF_LEN];
 int buffer_index = 0;
 String sync_id="";
 String device_mac="";
-
+String config_to_upload = "";
 ServerResponseDiscovered sendServerDiscovered(){
   
   http.begin(discover_route.c_str());
@@ -367,7 +360,14 @@ void sendSyncDataToServer(bool complete){
         StaticJsonDocument<1000> doc;
         deserializeJson(doc, payload);
         const char * sid = doc["sync_id"];
+        
         sync_id = String(sid);
+        if(complete){
+            const char * config = doc["config_json"];
+            config_to_upload = String(config);
+            sync_success = true;
+        }
+       
   }
   else {
     Serial.print("Error code: ");
@@ -376,10 +376,9 @@ void sendSyncDataToServer(bool complete){
   }
   // Free resources
   http.end();
+  
   if(complete){
-    Serial.println("done syncing");
     syncing = false;
-    sync_success = true;
   }else{
     send_next_packet = true; //signal that the packet has been uploaded
   }
@@ -397,25 +396,6 @@ void sendConfirmToServer(){
     Serial.println("failed");
   }
   http.end();
-}
-
-ServerResponseConfig getConfigFromServer(){
-  http.begin(config_route.c_str());
-  http.addHeader("Content-Type", "application/x-www-form-urlencoded", false, true);
-  String urlEncoded = "device_id="+device_mac;
-  int httpResponseCode= http.POST(urlEncoded);
-  ServerResponseConfig res;
-  res.success=false;
-  res.reason="unknown";
-  if(httpResponseCode==200){
-    StaticJsonDocument<1000> doc;
-    deserializeJson(doc, http.getString());
-    res.success = doc["success"];
-    const char * config_json = doc["config_json"];
-    res.config_json = String(config_json);
-  }
-  http.end();
-  return res;
 }
 
 
@@ -495,7 +475,6 @@ void loop() {
         send_next_packet = true;
         confirming = false;
         sync_success = false;
-        configurating = false;
 
         while(syncing && pClient->isConnected()){
           if(send_next_packet){
@@ -511,7 +490,6 @@ void loop() {
           continue;
         }
 
-
         confirming = true;
         uint8_t CONFIRM[] = {2};
         tx->writeValue(CONFIRM,1);
@@ -525,28 +503,17 @@ void loop() {
           continue;
         }
 
-        sendConfirmToServer();
-        ServerResponseConfig config = getConfigFromServer();
-
-        if(!config.success){
-          NimBLEDevice::deleteClient(pClient);
-          continue;
-        }
-
         configurating = true;
         uint8_t CONFIGURE[] = {3};
         tx->writeValue(CONFIGURE,1);
-
-        Serial.println(config.config_json);
-
-        const char * config_json = config.config_json.c_str();
+        Serial.println(config_to_upload);
+        const char * config_json = config_to_upload.c_str();
         buffer_index = 0;
-        for(int b=0;b < config.config_json.length();b++){
+        for(int b=0;b < config_to_upload.length();b++){
            buffer[buffer_index++] = config_json[b];
            if(buffer_index == 20){
               tx->writeValue(buffer,20);
-              buffer_index = 0;
-              
+              buffer_index = 0; 
            }
         }
         if(buffer_index > 0){ //send whatever is left

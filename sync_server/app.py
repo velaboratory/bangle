@@ -125,39 +125,15 @@ def sync():
             print(params)
             con.execute("insert into data_sync (uuid, dt,device_id,station_id,data,config_json,complete) values (?,?,?,?,?,?,?)",
                     params)
-
-
-        return success({"sync_id": insert_id})
-    
-
-@app.route("/confirm", methods=["POST"])
-def confirm():
-    station_id = request.values.get("station_id", None)
-    sync_id = request.values.get("sync_id", None)
-    if not all([station_id, sync_id]):
-        return failure("Invalid request")
-    station_id = station_id.lower()
-    with dbConnection() as con:
-        con.execute("update data_sync set confirmed=1 where uuid=?", (sync_id,))
-        cur = con.execute("select device_id from data_sync where uuid=?",(sync_id,))
-        device_id = cur.fetchone()[0]
-        con.execute("update device set last_data_sync = ? where id=?",(datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),device_id))
-    return success({})
-
-@app.route("/update_config", methods=["POST"])
-def updates():
-    device_id = request.values.get("device_id", None)
-    if not all([device_id]):
-        return failure("Invalid request")
-    device_id = device_id.lower()
-
-    with dbConnection() as con:
-        device_df = pd.read_sql("select target_config_json from device where id=?",
+        if complete == 1:
+            #update the last sync for the device
+            con.execute("update device set last_data_sync = ? where id=?",(datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),device_id))
+            #retrieve the new configuration for the watch
+            device_df = pd.read_sql("select target_config_json from device where id=?",
                                 con, params=(device_id,))
-        if len(device_df) == 0:
-            return failure("no device by that name")
-        
-        return success({"config_json": base64.b64encode(device_df.iloc[0].target_config_json.encode()).decode()})
+            return success({"sync_id": insert_id, "config_json": base64.b64encode(device_df.iloc[0].target_config_json.encode()).decode()})
+        else:
+            return success({"sync_id": insert_id})
 
 if __name__ == "__main__":
     app.run(host = "0.0.0.0",port=5000, debug=True)
