@@ -243,7 +243,7 @@ void setup() {
   pBLEScan = NimBLEDevice::getScan(); //create new scan
 
   pBLEScan->setActiveScan(false); // Set active scanning, this will get more data from the advertiser.
-  pBLEScan->setInterval(0x80); // How often the scan occurs / switches channels; in milliseconds,
+  pBLEScan->setInterval(0x20); // How often the scan occurs / switches channels; in milliseconds,
   pBLEScan->setWindow(0x20);  // How long to scan during the interval; in milliseconds.
   pBLEScan->setMaxResults(0xFF); // do not store the scan results, use callback only.
 }
@@ -287,22 +287,26 @@ bool connectWifi(){
 }
 
 
+bool waiting_for_time = false;
 bool syncing = false;
 bool confirming = false;
 bool configurating = false;
 bool send_next_packet = true;
 bool sync_success = false;
+long from_time = 0;
 #define BUFF_LEN 10000
 uint8_t buffer[BUFF_LEN]; 
 int buffer_index = 0;
 String sync_id="";
 String device_mac="";
 String config_to_upload = "";
+int device_rssi = 0;
+
 ServerResponseDiscovered sendServerDiscovered(){
   
   http.begin(discover_route.c_str());
   http.addHeader("Content-Type", "application/x-www-form-urlencoded", false, true);
-  String urlEncoded = "station_id="+station_mac+"&device_id="+device_mac; //todo, set station id correctly
+  String urlEncoded = "rssi="+String(device_rssi)+"&station_id="+station_mac+"&device_id="+device_mac; //todo, set station id correctly
   int httpResponseCode = http.POST(urlEncoded);
   ServerResponseDiscovered res;
   res.success=false;
@@ -345,7 +349,7 @@ void sendSyncDataToServer(bool complete){
   String data = urlEncode((char*)buffer);
   String config_json = urlEncode("{}"); //todo, get from watch
   Serial.println(data);
-  String urlEncoded = "station_id="+station_mac+"&device_id="+device_mac+"&config_json="+ config_json + "&data="+data+"&complete=" + (complete?"1":"0");
+  String urlEncoded = "from_time="+String(from_time)+"&station_id="+station_mac+"&device_id="+device_mac+"&config_json="+ config_json + "&data="+data+"&complete=" + (complete?"1":"0");
   if(sync_id != ""){
     urlEncoded += "&sync_id="+sync_id;
   } 
@@ -404,7 +408,15 @@ void onRX(NimBLERemoteCharacteristic* pRemoteCharacteristic, uint8_t* pData, siz
   Serial.println("Got data");
 
   
-  if(syncing){
+  if(waiting_for_time){
+    if(pData[0] == 7){
+      uint8_t converter[4] = {pData[4],pData[3],pData[2],pData[1]};
+      long * t = (long*)converter;
+      from_time = *t;
+      waiting_for_time = false;
+    }
+
+  }else if(syncing){
     for(int i=0;i<length;i++){
       if(pData[i] == 1){  //packet to send, but there's more
         sendSyncDataToServer(false);
@@ -446,6 +458,7 @@ void loop() {
     if(strstr(device.getName().c_str(),"Bangle.js")){
       M5.Lcd.println(device.getName().c_str());
       device_mac = String(device.getAddress().toString().c_str());
+      device_rssi = device.getRSSI();
       ServerResponseDiscovered res = sendServerDiscovered(); //get back sync data
       if(!res.sync){
         continue;  //recently synced, just continue
@@ -460,6 +473,13 @@ void loop() {
         NimBLERemoteCharacteristic *rx = pService->getCharacteristic(UUID_NORDIC_RX);
         rx->subscribe(true,onRX);
         NimBLERemoteCharacteristic *tx = pService->getCharacteristic(UUID_NORDIC_TX);
+        waiting_for_time = false;
+        sync_id = "";
+        buffer_index = 0;
+        syncing = false;
+        send_next_packet = false;
+        confirming = false;
+        sync_success = false;
 
         uint8_t TIME[] = {7,0,0,0,0}; //probably a more efficient way to do this
         long v = res.timestamp;
@@ -469,12 +489,20 @@ void loop() {
         }
         tx->writeValue(TIME,5);
 
-        sync_id = "";
-        buffer_index = 0;
+        waiting_for_time = true;
+        while(waiting_for_time && pClient->isConnected()){
+          delay(1);
+        }
+
+
+        if(!pClient->isConnected()){
+          NimBLEDevice::deleteClient(pClient);
+          continue;
+        }
+
+      
         syncing = true;
-        send_next_packet = true;
-        confirming = false;
-        sync_success = false;
+        send_next_packet=true;
 
         while(syncing && pClient->isConnected()){
           if(send_next_packet){
@@ -506,7 +534,6 @@ void loop() {
         configurating = true;
         uint8_t CONFIGURE[] = {3};
         tx->writeValue(CONFIGURE,1);
-        Serial.println(config_to_upload);
         const char * config_json = config_to_upload.c_str();
         buffer_index = 0;
         for(int b=0;b < config_to_upload.length();b++){

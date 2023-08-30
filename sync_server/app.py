@@ -73,12 +73,12 @@ def discovered():
     with dbConnection() as con:
         station_id = request.values.get("station_id", None) # probably add to the list if found
         device_id = request.values.get("device_id", None) 
-
-        if not all([station_id, device_id]):
+        rssi = request.values.get("rssi", None)
+        if not all([station_id, device_id, rssi]):
              return failure("Invalid Request")
         station_id = station_id.lower()
         device_id = device_id.lower()
-
+        print(rssi)
         df_station = pd.read_sql("select * from station where id=?",con, params=(station_id,))
         if len(df_station) == 0:
             con.execute("insert into station (id) values (?)", (station_id,))
@@ -101,14 +101,16 @@ def discovered():
 
 @app.route("/sync", methods=["POST"])
 def sync():
+    from_time = request.values.get("from_time", None) #the combo of this and the device_id must be unique.  
     station_id = request.values.get("station_id", None)
     device_id = request.values.get("device_id", None)
     data = request.values.get("data", None)
     sync_id = request.values.get("sync_id", None)
     complete = request.values.get("complete", 0, type=int)
     config_json = request.values.get("config_json", None)
-    if not all([station_id, device_id, data, config_json]):
+    if not all([station_id, device_id, data, config_json, from_time]):
         return {"success": False, "reason": "Invalid request"}
+    print(from_time)
     station_id = station_id.lower()
 
     with dbConnection() as con:
@@ -121,9 +123,9 @@ def sync():
             print("appended data")
         else:
             insert_id = uuid.uuid4().hex
-            params = (insert_id, now, device_id, station_id, data, config_json, complete)
-            print(params)
-            con.execute("insert into data_sync (uuid, dt,device_id,station_id,data,config_json,complete) values (?,?,?,?,?,?,?)",
+            params = (insert_id, from_time, now, device_id, station_id, data, config_json, complete)
+            
+            con.execute("insert into data_sync (uuid, from_time, dt,device_id,station_id,data,config_json,complete) values (?,?,?,?,?,?,?,?)",
                     params)
         if complete == 1:
             #update the last sync for the device

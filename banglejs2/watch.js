@@ -14,13 +14,14 @@ Graphics.prototype.setFontAnton = function(scale) {
   let movementFilename = "healthlog"+version;
   let hrmFilename = "hrmlog"+version;
   let configFilename = "config"+version;
-  let locale = require("locale");
   let reading_config = false;
   let timezone = -4;
   let movement_buffer = [];
   let max_chunk = 5000;
   let ble_mtu = 128;
   let from_time = require("Storage").read("from_time");
+  E.setTimeZone(timezone);
+  Bangle.setOptions({"wakeOnBTN1":true,"wakeOnBTN2":true,"wakeOnBTN3":true,"wakeOnFaceUp":false,"wakeOnTouch":false,"wakeOnTwist":false});
   if(from_time === undefined){
     from_time = ""+Math.floor(Date.now() / 1000);
     require("Storage").write("from_time",from_time);
@@ -78,11 +79,19 @@ Graphics.prototype.setFontAnton = function(scale) {
     var y = g.getHeight() / 2;
     g.reset().clearRect(Bangle.appRect); // clear whole background (w/o widgets)
     var date = new Date();
-    var timeStr = locale.time(date, 1); // Hour and minute
+    var hour = date.getHours() % 12;
+    var minuteStr = (""+date.getMinutes()).padStart(2,"0");
+
+    var timeStr = (hour == 0?"12":(""+hour)) + ":"+minuteStr;
+    //var timeStr = locale.time(date, 1); // Hour and minute
     g.setFontAlign(0, 0).setFont("Anton").drawString(timeStr, x, y);
     // Show date and day of week
-    var dateStr = locale.date(date, 0).toUpperCase()+"\n"+
-                  locale.dow(date, 0).toUpperCase();
+    var dow = date.getDay();
+    days_of_week = ["Sun","Mon","Tues","Wednes","Thurs","Fri","Satur"];
+    var dateStringFull = date.toString();
+    var parts = dateStringFull.split(" ");
+    var dateStr = parts[2]+" " + parts[1] + " " + parts[3]+"\n"+
+                  days_of_week[dow].toUpperCase()+"DAY";
     g.setFontAlign(0, 0).setFont("6x8", 2).drawString(dateStr, x, y+48);
   
     // queue next draw
