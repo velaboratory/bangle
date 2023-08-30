@@ -20,6 +20,12 @@ Graphics.prototype.setFontAnton = function(scale) {
   let movement_buffer = [];
   let max_chunk = 5000;
   let ble_mtu = 128;
+  let from_time = require("Storage").read("from_time");
+  if(from_time === undefined){
+    from_time = ""+Math.floor(Date.now() / 1000);
+    require("Storage").write("from_time",from_time);
+  }
+
   let writeMovementLog =function() {
       
       var arr2 = new ArrayBuffer(6); // an Int32 takes 4 bytes and Int16 takes 2 bytes
@@ -159,6 +165,8 @@ Graphics.prototype.setFontAnton = function(scale) {
         if(data.charCodeAt(0) == 2){
             require("Storage").open(movementFilename, "w").erase();
             Bluetooth.write(2); //confirm delete
+            from_time = ""+Math.floor(Date.now() / 1000); //we need to calculate a new from time
+            require("Storage").write("from_time",from_time);
         }
         if(data.charCodeAt(0) == 3){
             config_buffer = ""; 
@@ -173,6 +181,14 @@ Graphics.prototype.setFontAnton = function(scale) {
             E.setTimeZone(0); //set to utc before setting a utc time
             setTime(timestamp);
             E.setTimeZone(timezone); //now set to timezone
+
+            //send back the from_time
+            timestamp = parseInt(from_time);
+            var message = new ArrayBuffer(5); // an Int32 takes 4 bytes and Int16 takes 2 bytes
+            view = new DataView(message);
+            view.setUint32(1, timestamp, false); // byteOffset = 0; litteEndian = false
+            message[0] = 7;
+            Bluetooth.write(message);
 
         }
 
