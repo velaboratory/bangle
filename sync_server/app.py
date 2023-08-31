@@ -95,7 +95,7 @@ def discovered():
             last_sync = datetime.strptime(device.last_data_sync, 
                                           "%Y-%m-%d %H:%M:%S")  # stored in Y:m:d H:M:S
             last_sync = pytz.utc.localize(last_sync)
-            if (now-last_sync).total_seconds() > 15*60:
+            if (now-last_sync).total_seconds() > 3*60:
                 return success({"sync": 1, "server_unixtime":int(now.timestamp())})
             return success({"sync":0, "server_unixtime":int(now.timestamp())}) #sync not needed
 

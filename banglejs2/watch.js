@@ -13,11 +13,11 @@ Graphics.prototype.setFontAnton = function(scale) {
   let version = "6";
   let movementFilename = "healthlog"+version;
   let hrmFilename = "hrmlog"+version;
+  let hrmRawFilename="hrmrawlog"+version;
   let configFilename = "config"+version;
   let reading_config = false;
   let timezone = -4;
-  let movement_buffer = [];
-  let max_chunk = 5000;
+  let max_chunk = 10000;
   let ble_mtu = 128;
   let from_time = require("Storage").read("from_time");
   E.setTimeZone(timezone);
@@ -28,7 +28,7 @@ Graphics.prototype.setFontAnton = function(scale) {
   }
 
   let writeMovementLog =function() {
-      
+      if(syncing) return;
       var arr2 = new ArrayBuffer(6); // an Int32 takes 4 bytes and Int16 takes 2 bytes
       var time = Math.floor(Date.now() / 1000);
       var steps = Bangle.getStepCount();
@@ -37,26 +37,43 @@ Graphics.prototype.setFontAnton = function(scale) {
       view = new DataView(arr2);
       view.setUint32(0, time, false); // byteOffset = 0; litteEndian = false
       view.setUint16(4, delta, false);
-      movement_buffer.push(btoa(arr2));
 
-      if(!syncing){
-        var file = require("Storage").open(movementFilename,"a");
-        for(var i=0;i<movement_buffer.length;i++){
-            file.write(movement_buffer[i]);
-        }
-        movement_buffer = [];
-      }
+      
+    var file = require("Storage").open(movementFilename,"a");
+    file.write(btoa(arr2));
+      
   };
   
 
   
-  Bangle.on("HRM", function(hrm) {
-        if(!syncing){
-            var file = require("Storage").open(hrmFilename,"a");
-            var time = Math.floor(Date.now() / 1000);
-            file.write(time+":"+hrm.bpm+":"+hrm.confidence + "\n");
-        }
+  Bangle.on("HRM", function(hrm) { //12 bytes / s, 9 minutes / hour
+        if(syncing) return;
+        var file = require("Storage").open(hrmFilename,"a");
+        var arr = new ArrayBuffer(9);
+        var view = new DataView(arr);
+        var time = Math.floor(Date.now() / 1000);
+        view.setUint32(0,time);
+        view.setUint16(4,hrm.bpm);
+        view.setUint16(6,hrm.confidence);
+        view.setInt8(8,0);
+        file.write(btoa(arr));
   });
+
+  Bangle.on("HRM-raw", function(hrm) { //16 *40 bytes / s 9 minutes / hour
+        if(syncing) return;
+        var file = require("Storage").open(hrmRawFilename,"a");
+        var arr = new ArrayBuffer(12);
+        var view = new DataView(arr);
+        var time = Math.floor(Date.now() / 1000);
+        var acc = Bangle.getAccel();
+        view.setUint32(0,time);
+        view.setUint16(4,hrm.raw);
+        view.setInt16(6,acc.x*1000);
+        view.setInt16(8,acc.y*1000);
+        view.setInt16(10,acc.z*1000);
+        file.write(btoa(arr));
+  });
+
   // Actually draw the watch face
   let draw = function() {
   
@@ -103,27 +120,29 @@ Graphics.prototype.setFontAnton = function(scale) {
   };
   
   let storageFile = null;
-  
   let sendData = function(){
-    var bytesSent = 0;
-    while(true){
-        s = storageFile.read(ble_mtu);
-        if(s!=undefined){
-            Bluetooth.write(s);
-            bytesSent += s.length;
+        //write the filename
+        var bytesSent = 0;
 
-            if(bytesSent + ble_mtu > max_chunk){
-                Bluetooth.write(1); //packet available
-                break;
+        while(true){
+            s = storageFile.read(ble_mtu);
+            if(s!=undefined){
+                Bluetooth.write(s);
+                bytesSent += s.length;
+
+                if(bytesSent + ble_mtu > max_chunk){
+                    return false;
+                }
+            }else{
+                return true;
             }
-        }else{
-            Bluetooth.write(2); //done
-            break;
+        
         }
-       
-    }
-    
-    
+  };
+
+  let sendFile = function(filename){
+    Bluetooth.write(filename+":");
+    storageFile = require("Storage").open(filename,"r");
   };
 
   let setupServer = function(){
@@ -140,6 +159,8 @@ Graphics.prototype.setFontAnton = function(scale) {
   
   E.setConsole(null, {force: true});
   let config_buffer = "";
+  sync_files = [movementFilename,hrmFilename,hrmRawFilename];
+  currentFileIndex = 0;
   Bluetooth.on('data', function(data) {
     if(reading_config){
       
@@ -162,17 +183,31 @@ Graphics.prototype.setFontAnton = function(scale) {
 
     }else{
         if(data.charCodeAt(0) == 1){ 
-            
-            //read the next 4 bytes of data as an int
 
             if(!syncing) {
-                storageFile = require("Storage").open(movementFilename,"r");
                 syncing = true;
+                currentFileIndex = 0;
+                sendFile(sync_files[currentFileIndex]);
             }
-            sendData();
+            if(sendData()){
+                //if we are done, go on to the next file
+                currentFileIndex++;
+                if(currentFileIndex >= sync_files.length){ //we are completely done, so write a 2
+                    Bluetooth.write(2);
+                }else{ 
+                    Bluetooth.write(10); //write a new line to indicate we are moving to the next file
+                    sendFile(sync_files[currentFileIndex]); //open the next one
+                    Bluetooth.write(1); //write a 1 to indicate that this packet is done
+                }
+            }else{
+                Bluetooth.write(1); //indicate a packet, but not a new file yet
+            }
+            
         }
         if(data.charCodeAt(0) == 2){
-            require("Storage").open(movementFilename, "w").erase();
+            for(var i=0;i<sync_files.length;i++){
+                require("Storage").open(sync_files[i], "w").erase();
+            }
             Bluetooth.write(2); //confirm delete
             from_time = ""+Math.floor(Date.now() / 1000); //we need to calculate a new from time
             require("Storage").write("from_time",from_time);
@@ -180,9 +215,6 @@ Graphics.prototype.setFontAnton = function(scale) {
         if(data.charCodeAt(0) == 3){
             config_buffer = ""; 
             reading_config = true;
-        }
-        if(data.charCodeAt(0) == 4){
-
         }
         if(data.charCodeAt(0) == 7){
             var dv = new DataView(E.toArrayBuffer(data.slice(-4)));
