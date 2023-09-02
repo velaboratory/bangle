@@ -8,70 +8,119 @@ Graphics.prototype.setFontAnton = function(scale) {
 
   let drawTimeout;
   let syncing = false;
-  let last_steps = 0;
-  let lastHRMReading = 0;
-  let version = "6";
-  let movementFilename = "healthlog"+version;
-  let hrmFilename = "hrmlog"+version;
-  let hrmRawFilename="hrmrawlog"+version;
+  let last_steps = Bangle.getStepCount();
+  let hrm_buffer = [];  //we aren't going to log hrm readings immediately, because they will be written in chunks
+  let hrm_raw_first_value_time = 0;
+  let last_hrm_reading_time = 0;
+  let last_raw_hrm_reading_time = 0;
+  let version = "9";
+  let movementFilename = "healthlog"+version; 
+  let hrmFilename = "hrmlog"+version; 
+  let hrmrawfilesFilename = "hrmrawfileslog"+version;
+  let hrmRawFile = null;
   let configFilename = "config"+version;
   let reading_config = false;
   let timezone = -4;
-  let max_chunk = 10000;
+  let max_chunk = 5000;
   let ble_mtu = 128;
   let from_time = require("Storage").read("from_time");
+  let sync_files = [];
+
   E.setTimeZone(timezone);
-  Bangle.setOptions({"wakeOnBTN1":true,"wakeOnBTN2":true,"wakeOnBTN3":true,"wakeOnFaceUp":false,"wakeOnTouch":false,"wakeOnTwist":false});
+  Bangle.setOptions({"hrmPollInterval": 20, "wakeOnBTN1":true,"wakeOnBTN2":true,"wakeOnBTN3":true,"wakeOnFaceUp":false,"wakeOnTouch":false,"wakeOnTwist":false});
   if(from_time === undefined){
     from_time = ""+Math.floor(Date.now() / 1000);
     require("Storage").write("from_time",from_time);
   }
+  Bangle.setHRMPower(false,"myApp"); //this actually resets the poll interval
+  Bangle.setHRMPower(true,"myApp");
+  Bangle.setHRMPower(false,"myApp"); 
 
+  //this function addresses the problem that you can't append to files in bangle without a special mode
+  //that special mode uses 255 as a delimeter.  So, we need a way to encode arbitrary binary
+  //this function uses the value 11 as an escape character. 
+  //255: 11, 0
+  //11: 11, 11
+  let escape_value = 0x0b;
+  var escaped_255 = String.fromCharCode(escape_value) + "\xFE";
+  var escaped_escape = String.fromCharCode(escape_value) + "\xFE";
+
+  
+  let encode = function(buff1){
+    //buff2 should be twice the size of buff1.  This will create a new array buffer of the correct size
+    var toReturn = "";
+    for(var i=0;i<buff1.length;i++){
+        if(buff1[i] == 255){
+            toReturn += escaped_255;
+        }else if(buff1[i] == escape_value){
+            toReturn += escaped_escape;
+        }else{
+            toReturn+=String.fromCharCode(buff1[i]);
+        }
+
+    }
+    return toReturn;
+  };
+
+  var movement_log_buffer = new ArrayBuffer(8);
   let writeMovementLog =function() {
-      if(syncing) return;
-      var arr2 = new ArrayBuffer(6); // an Int32 takes 4 bytes and Int16 takes 2 bytes
+    if(syncing) return;
       var time = Math.floor(Date.now() / 1000);
       var steps = Bangle.getStepCount();
+      var movement = Bangle.getHealthStatus().movement;
       var delta = steps - last_steps;
       last_steps = steps;
-      view = new DataView(arr2);
+      last_movement = movement; 
+      view = new DataView(movement_log_buffer);
       view.setUint32(0, time, false); // byteOffset = 0; litteEndian = false
       view.setUint16(4, delta, false);
-
-      
-    var file = require("Storage").open(movementFilename,"a");
-    file.write(btoa(arr2));
-      
+      view.setUint16(6, movement, false);
+      var file = require("Storage").open(movementFilename,"a");
+      file.write(encode(movement_log_buffer));
   };
   
-
-  
-  Bangle.on("HRM", function(hrm) { //12 bytes / s, 9 minutes / hour
+  var hrm_log_buffer = new ArrayBuffer(6);
+  Bangle.on("HRM", function(hrm) { 
         if(syncing) return;
         var file = require("Storage").open(hrmFilename,"a");
-        var arr = new ArrayBuffer(9);
-        var view = new DataView(arr);
+        var view = new DataView(hrm_log_buffer);
         var time = Math.floor(Date.now() / 1000);
         view.setUint32(0,time);
-        view.setUint16(4,hrm.bpm);
-        view.setUint16(6,hrm.confidence);
-        view.setInt8(8,0);
-        file.write(btoa(arr));
+        view.setUint8(4,hrm.bpm); //0 - 100
+        view.setUint8(5,hrm.confidence); // 0-100
+        file.write(encode(hrm_log_buffer));
   });
 
-  Bangle.on("HRM-raw", function(hrm) { //16 *40 bytes / s 9 minutes / hour
-        if(syncing) return;
-        var file = require("Storage").open(hrmRawFilename,"a");
-        var arr = new ArrayBuffer(12);
-        var view = new DataView(arr);
-        var time = Math.floor(Date.now() / 1000);
-        var acc = Bangle.getAccel();
-        view.setUint32(0,time);
-        view.setUint16(4,hrm.raw);
-        view.setInt16(6,acc.x*1000);
-        view.setInt16(8,acc.y*1000);
-        view.setInt16(10,acc.z*1000);
-        file.write(btoa(arr));
+  var hrm_raw_log_buffer_header = new ArrayBuffer(4);
+  let writeHRMRawBufferHeader = function(){
+    //generate a new filename
+    var filename = "hrmraw"+Math.floor(Date.now());
+    hrmRawFile = require("Storage").open(filename,"a");
+    require("Storage").open(hrmrawfilesFilename,"a").write(filename+"\n");
+    var view = new DataView(hrm_raw_log_buffer_header);
+    var time = hrm_raw_first_value_time;
+    view.setUint32(0,time); //we write the time to know the offset
+    hrmRawFile.write(encode(hrm_raw_log_buffer_header));
+  };
+
+  var hrm_raw_log_buffer = new ArrayBuffer(4);  //might be able to go down to 3 or even 2
+  Bangle.on("HRM-raw", function(hrm) { 
+        if(syncing) return;    
+        var view = new DataView(hrm_raw_log_buffer);
+        var now = Date.now();
+        if(hrm_buffer.length == 0){
+            hrm_raw_first_value_time = Math.floor(now/1000); 
+        }
+        var time_delta = now - last_raw_hrm_reading_time;
+        last_raw_hrm_reading_time = now;
+        var acc = Bangle.getAccel().diff*200;
+        if(acc > 254){
+            acc = 254; //we don't want to write 255, because that's a special encoded value
+        }
+        view.setUint8(0, time_delta);
+        view.setUint16(1,hrm.raw);
+        view.setUint8(3, acc); 
+        hrmRawFile.write(encode(hrm_raw_log_buffer)); //add to the buffer
   });
 
   // Actually draw the watch face
@@ -79,16 +128,17 @@ Graphics.prototype.setFontAnton = function(scale) {
   
 
     writeMovementLog();
-
+    
     var time = Math.floor(Date.now() / 1000);
-    if(time - lastHRMReading > 60*20){
+    if(time - last_hrm_reading_time > 60*20){
+        writeHRMRawBufferHeader(); //write out how many were written (must be read in reverse)
         Bangle.setHRMPower(true,"myapp");
-        lastHRMReading = time;
+        last_hrm_reading_time = time;
     }
-    if(Bangle.isHRMOn() && (time-lastHRMReading) > 60*3){
-        Bangle.setHRMPower(false,"myapp");
+    if(Bangle.isHRMOn() && (time-last_hrm_reading_time) > 60*3){
+        Bangle.setHRMPower(false,"myapp"); //this should immediately stop raw readings
+        
     }
-
 
     //open the file and write the data
   
@@ -110,7 +160,7 @@ Graphics.prototype.setFontAnton = function(scale) {
     var dateStr = parts[2]+" " + parts[1] + " " + parts[3]+"\n"+
                   days_of_week[dow].toUpperCase()+"DAY";
     g.setFontAlign(0, 0).setFont("6x8", 2).drawString(dateStr, x, y+48);
-  
+    
     // queue next draw
     if (drawTimeout) clearTimeout(drawTimeout); //
     drawTimeout = setTimeout(function() {
@@ -126,6 +176,13 @@ Graphics.prototype.setFontAnton = function(scale) {
 
         while(true){
             s = storageFile.read(ble_mtu);
+            if(s.charCodeAt(s.length - 1) == 0x11 && s.charCodeAt(s.length-2) != 0x11){
+                s = s.storageFile.read(1); //one more, because this message ended in the escape cahracter
+            }
+            escaped_escapes = String.fromCharCode(escape_value)+String.fromCharCode(escape_value);
+            escaped_255s = String.fromCharCode(escape_value)+String.fromCharCode(0);
+            s.replaceAll(escaped_escapes,String.fromCharCode(escape_value));
+            s.replaceAll(escaped_255s,"\xFF"); 
             if(s!=undefined){
                 Bluetooth.write(s);
                 bytesSent += s.length;
@@ -159,7 +216,7 @@ Graphics.prototype.setFontAnton = function(scale) {
   
   E.setConsole(null, {force: true});
   let config_buffer = "";
-  sync_files = [movementFilename,hrmFilename,hrmRawFilename];
+
   currentFileIndex = 0;
   Bluetooth.on('data', function(data) {
     if(reading_config){
@@ -187,20 +244,34 @@ Graphics.prototype.setFontAnton = function(scale) {
             if(!syncing) {
                 syncing = true;
                 currentFileIndex = 0;
+                sync_files = [];
+                sync_files.push(movementFilename,hrmFilename);
+                rawfiles = require("Storage").open(hrmrawfilesFilename).read().split("\n");
+                for(var i=0;i<rawfiles.length;i++){
+                    sync_files.push(rawfiles.length);
+                }
                 sendFile(sync_files[currentFileIndex]);
             }
             if(sendData()){
                 //if we are done, go on to the next file
                 currentFileIndex++;
                 if(currentFileIndex >= sync_files.length){ //we are completely done, so write a 2
+                    Bluetooth.flush();
                     Bluetooth.write(2);
+                    Bluetooth.flush(); //ensure 1 packet
                 }else{ 
+                    Bluetooth.flush();
                     Bluetooth.write(10); //write a new line to indicate we are moving to the next file
+                    Bluetooth.flush();
                     sendFile(sync_files[currentFileIndex]); //open the next one
+                    Bluetooth.flush();
                     Bluetooth.write(1); //write a 1 to indicate that this packet is done
+                    Bluetooth.flush();
                 }
             }else{
+                Bluetooth.flush();
                 Bluetooth.write(1); //indicate a packet, but not a new file yet
+                Bluetooth.flush();
             }
             
         }
@@ -208,7 +279,10 @@ Graphics.prototype.setFontAnton = function(scale) {
             for(var i=0;i<sync_files.length;i++){
                 require("Storage").open(sync_files[i], "w").erase();
             }
+            require("Storage").open(hrmrawfilesFilename,"w").erase();
+            Bluetooth.flush();
             Bluetooth.write(2); //confirm delete
+            Bluetooth.flush();
             from_time = ""+Math.floor(Date.now() / 1000); //we need to calculate a new from time
             require("Storage").write("from_time",from_time);
         }
@@ -229,7 +303,9 @@ Graphics.prototype.setFontAnton = function(scale) {
             view = new DataView(message);
             view.setUint32(1, timestamp, false); // byteOffset = 0; litteEndian = false
             message[0] = 7;
+            Bluetooth.flush();
             Bluetooth.write(message);
+            Bluetooth.flush();
 
         }
 
