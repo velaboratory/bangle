@@ -30,7 +30,8 @@ Graphics.prototype.setFontAnton = function(scale) {
   let current_hrmraw_file = null;
   let current_movement_file = require("Storage").open(movement_filename,"a"); //this can stay on
   let debug = false;
-
+  let last_bpm = 0;
+  let last_conf = 0;
   E.setTimeZone(timezone);
   Bangle.setOptions({"hrmPollInterval": 20, "wakeOnBTN1":true,"wakeOnBTN2":true,"wakeOnBTN3":true,"wakeOnFaceUp":false,"wakeOnTouch":false,"wakeOnTwist":false});
   if(from_time === undefined){
@@ -41,8 +42,16 @@ Graphics.prototype.setFontAnton = function(scale) {
   Bangle.setHRMPower(true,"myApp");
   Bangle.setHRMPower(false,"myApp"); 
 
+  setWatch(function(e){
+    if(!Bangle.isHRMOn()){
+        startHRMonitor();
+    }
+  }, BTN1, {repeat:true});
+
 
   var movement_log_buffer = new ArrayBuffer(9);
+
+  
   let writeMovementLog =function() {
       var time = Math.floor(Date.now() / 1000);
       var steps = Bangle.getStepCount();
@@ -60,40 +69,57 @@ Graphics.prototype.setFontAnton = function(scale) {
   
   var hrm_log_buffer = new ArrayBuffer(6);
   Bangle.on("HRM", function(hrm) { 
+        
         var view = new DataView(hrm_log_buffer);
         var time = Math.floor(Date.now() / 1000);
         view.setUint32(0,time);
         view.setUint8(4,hrm.bpm); //0 - 100
         view.setUint8(5,hrm.confidence); // 0-100
-        
+        last_bpm = hrm.bpm;
+        last_conf = hrm.confidence;
         if(current_hrm_file != null){
             current_hrm_file.write(btoa(hrm_log_buffer));
         }
+        drawWidgets();
   });
 
   let last_time = 0;
   var hrm_raw_log_buffer = new ArrayBuffer(3);  //might be able to go down to 3 or even 2
   Bangle.on("HRM-raw", function(hrm) { 
-        // var time = Date.now();
+        var time = Date.now()/1000;
+        if((time-last_hrm_reading_time) > 60*3){
+            stopHRMonitor();
+            return;
+        }
         // var time_delta =  (time-last_time)%256; 
         // last_time = time;
         var view = new DataView(hrm_raw_log_buffer);
         var acc = Bangle.getAccel().diff*200;
-        if(acc > 254){
-            acc = 254; //we don't want to write 255, because that's a special encoded value
+        if(acc > 255){
+            acc = 255; //we don't want to write 255, because that's a special encoded value
         }
+
+        var time_ms = Date.now();
+        var time_delta = time_ms - last_time;
+        if(time_delta > 255){
+            time_delta = 0;
+        }
+        last_time = time_ms;
         
         view.setUint16(0,hrm.raw);
-        //view.setUint8(2, time_delta); 
-        view.setUint8(2, acc); 
+        view.setUint8(2, time_delta); 
+        //view.setUint8(2, acc); 
         if(current_hrmraw_file != null){
             current_hrmraw_file.write(btoa(hrm_raw_log_buffer)); //add to the buffer
         }
   });
 
   let startHRMonitor = function(){
+    if(syncing){ //we don't want the HR monitor to start if we are actively syncing
+        return;
+    }
     //generate a new filename
-    ts = Math.floor(Date.now()/1000); //time in seconds
+    
     tms = Math.floor(Date.now()); //time in milliseconds
     var hrmraw_filename = "hrmraw"+ tms;
     var hrm_filename = "hrmreg"+ tms;
@@ -104,13 +130,35 @@ Graphics.prototype.setFontAnton = function(scale) {
     require("Storage").open(hrm_files_filename,"a").write(hrmraw_filename+"\n");
 
     Bangle.setHRMPower(true,"myapp");
-    last_hrm_reading_time = ts;
+    last_hrm_reading_time = Math.floor(Date.now()/1000); //time in seconds
     require("Storage").write("last_hrm_time",""+last_hrm_reading_time);
+    last_bpm = -1;
+    last_conf = -1;
+    drawWidgets();
 
   };
 
   let stopHRMonitor = function(){
     Bangle.setHRMPower(false,"myapp"); //this should immediately stop raw readings
+  };
+
+  let drawWidgets = function(){
+
+        var w = g.getWidth();
+        var h = g.getHeight();
+        var cx = w/2;
+        var cy = h/2; 
+        g.clearRect(0,0,w,20); //reserve 20 pixels
+        if(Bangle.isHRMOn()){
+            if(last_bpm >= 0 || last_conf >= 0) {
+                g.setFontAlign(0, 0).setFont("6x8", 2).drawString(last_bpm+":"+last_conf, cx, 10);
+            }
+            else{
+                g.setFontAlign(0, 0).setFont("6x8", 2).drawString("<3 on", cx, 10);
+            }
+        }
+        g.setFontAlign(1, 0).setFont("6x8",2).drawString(""+E.getBattery(), 170, 10);
+        g.setFontAlign(-1, 0).setFont("6x8",2).drawString(""+Bangle.getHealthStatus("day").steps, 5, 10);
   };
 
   let drawClockFace = function(){
@@ -132,42 +180,58 @@ Graphics.prototype.setFontAnton = function(scale) {
     var dateStr = parts[2]+" " + parts[1] + " " + parts[3]+"\n"+
                   days_of_week[dow].toUpperCase()+"DAY";
     g.setFontAlign(0, 0).setFont("6x8", 2).drawString(dateStr, x, y+48);
+    
   };
+
+  let drawSyncProgress = function(){
+    var w = g.getWidth();
+    var h = g.getHeight();
+    var cx = w/2;
+    var cy = h/2; 
+    var left = cx-50;
+    var width = 100;
+    var height = 30;
+    g.clearRect(cx-50,cy-20,cx+50,cy+20);
+    g.fillRect(left,cy-height/2,left+(total_sent/total_to_send)*width,cy+height/2); 
+  };
+
+
   // Actually draw the watch face
   let draw = function() {
-    if(syncing){
-        return; //allow terminal to run
-    }
-    if(!debug) drawClockFace();
+    if(syncing) return;
+
+    drawClockFace();
+    drawWidgets();
     writeMovementLog();
+    /* we are not doing this for now.  Uses too much battery life.
     var time = Math.floor(Date.now() / 1000);
-    if(time - last_hrm_reading_time > 60*5){
+    if(time - last_hrm_reading_time > 60*20){
         startHRMonitor();
     }
-    if(Bangle.isHRMOn() && (time-last_hrm_reading_time) > 60*1){
-        stopHRMonitor();
-    }
+    */
     // queue next draw
     if (drawTimeout) clearTimeout(drawTimeout); //
     drawTimeout = setTimeout(function() {
-      drawTimeout = undefined;
-      draw();
+    drawTimeout = undefined;
+    draw();
     }, 60000 - (Date.now() % 60000)); //force update on the minute
+    
   };
   
   let storageFile = null;
+  let bytes_sent = 0;
+  let total_to_send = 0;
+  let total_sent = 0;
   let sendData = function(){
-        //write the filename
-        var bytesSent = 0;
+       
 
         while(true){
             s = storageFile.read(ble_mtu);
             
             if(s!=undefined && s.length > 0){
                 Bluetooth.write(s);
-                bytesSent += s.length;
-
-                if(bytesSent + ble_mtu > max_chunk){
+                bytes_sent += s.length;
+                if(bytes_sent + ble_mtu > max_chunk){
                     return false;
                 }
             }else{
@@ -187,17 +251,13 @@ Graphics.prototype.setFontAnton = function(scale) {
     
       NRF.on("connect", function(mac, options) {
         if(debug) print("connection from " + mac);
-        if(Bangle.isHRMOn()){
-            NRF.disconnect(); 
-        }
+        
       });
 
       NRF.on('disconnect', function(reason) { 
           syncing = false;
           reading_config = false;
           hrmRawFile = null; //if I interruped a heart rate measurement, we need to restart it.
-          
-          Bangle.buzz();
       });
       NRF.setTxPower(8);
       // Change the name that's advertised
@@ -230,7 +290,7 @@ Graphics.prototype.setFontAnton = function(scale) {
 
     }else{
         if(data.charCodeAt(0) == 1){ 
-
+            bytes_sent = 0;
             if(!syncing) {
                 if(debug) print("Starting sync");
                 syncing = true;
@@ -248,13 +308,19 @@ Graphics.prototype.setFontAnton = function(scale) {
                         sync_files.push(s);
                     }
                 }
+
+                total_to_send = 0;
+                total_sent = 0;
+                //go through each sync file and calculate the total to send for progress
+                for(var sf=0;sf<sync_files.length;sf++){
+                    total_to_send += require("Storage").open(sync_files[sf],"r").getLength();
+                }
                 
                 sendFile(sync_files[currentFileIndex]);
             }
 
 
             while(sendData()){ //this will return true only if the read was undefined, meaning the file is done
-                if(debug) print("sending");
                 //if we are done, go on to the next file
                 currentFileIndex++;
                 if(currentFileIndex >= sync_files.length){ //we are completely done, so write a 2
@@ -266,8 +332,14 @@ Graphics.prototype.setFontAnton = function(scale) {
                 }
             }
             if(currentFileIndex < sync_files.length){
+                
                 Bluetooth.write(1); //indicate a packet, but not a new file yet
             }
+
+            total_sent += bytes_sent;
+            drawSyncProgress();
+            if(debug) print(total_sent+"/"+bytes_sent);
+            
             
             
         }
@@ -285,6 +357,7 @@ Graphics.prototype.setFontAnton = function(scale) {
 
             //we also need to re-open the movement file because we just erased it
             current_movement_file = require("Storage").open(movement_filename,"a");
+            Bangle.buzz();
         }
         if(data.charCodeAt(0) == 3){
             config_buffer = ""; 
@@ -292,6 +365,8 @@ Graphics.prototype.setFontAnton = function(scale) {
             if(debug) print("config read");
         }
         if(data.charCodeAt(0) == 7){ //a sync is going to start
+
+
             var dv = new DataView(E.toArrayBuffer(data.slice(-4)));
             var timestamp = dv.getInt32(0,false);
             E.setTimeZone(0); //set to utc before setting a utc time
@@ -305,7 +380,12 @@ Graphics.prototype.setFontAnton = function(scale) {
             var message = new ArrayBuffer(5); // an Int32 takes 4 bytes and Int16 takes 2 bytes
             view = new DataView(message);
             view.setUint32(1, timestamp, false); // byteOffset = 0; litteEndian = false
+            
             message[0] = 7;
+            if(Bangle.isHRMOn()){
+                message[0] = 8;
+            }
+           
             
             Bluetooth.write(message);
             if(debug) print("time sent");

@@ -293,7 +293,7 @@ bool confirming = false;
 bool configurating = false;
 bool send_next_packet = true;
 bool sync_success = false;
-long from_time = 0;
+unsigned long from_time = 0;
 #define BUFF_LEN 10000
 uint8_t buffer[BUFF_LEN]; 
 int buffer_index = 0;
@@ -411,16 +411,23 @@ void sendConfirmToServer(){
 
 
 void onRX(NimBLERemoteCharacteristic* pRemoteCharacteristic, uint8_t* pData, size_t length, bool isNotify){
-  
+  Serial.println(buffer_index);
   if(waiting_for_time){
+    Serial.println("Got RX in time");
     if(pData[0] == 7){
       uint8_t converter[4] = {pData[4],pData[3],pData[2],pData[1]};
       long * t = (long*)converter;
       from_time = *t;
       waiting_for_time = false;
+    }else if(pData[0] == 8){
+      //back off
+      waiting_for_time = false;
+      from_time = 0; //signal that we should wait
+
     }
 
   }else if(syncing){
+    Serial.println("Got RX in syncing");
     for(int i=0;i<length;i++){
       if(pData[i] == 1){  //packet to send, but there's more
         sendSyncDataToServer(false);
@@ -432,12 +439,15 @@ void onRX(NimBLERemoteCharacteristic* pRemoteCharacteristic, uint8_t* pData, siz
         //add the byte to the buffer
         buffer[buffer_index++] = pData[i];
       }
+      
     }
   }else if(confirming){
+    Serial.println("Got RX in confirming");
     if(pData[0] == 2){
       confirming = false;
     }
   }else if(configurating){
+    Serial.println("Got RX in confirming");
     if(pData[0] == 3){
       configurating = false;
     }
@@ -498,12 +508,13 @@ void loop() {
           delay(1);
         }
 
-  
 
-        if(!pClient->isConnected()){
+
+        if(!pClient->isConnected() || from_time == 0){ //if from_time is 0, then we shouldn't sync
           NimBLEDevice::deleteClient(pClient);
           continue;
         }
+
 
       
         syncing = true;
