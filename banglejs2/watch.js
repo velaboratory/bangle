@@ -1,4 +1,5 @@
-// Clock with large digits using the "Anton" bold font
+
+NRF.disconnect(); //disconnect at the start.  This removes issues associated with terminals
 Graphics.prototype.setFontAnton = function(scale) {
     g.setFontCustom(atob("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgAAAAAAAAAAA/gAAAAAAAAAAP/gAAAAAAAAAH//gAAAAAAAAB///gAAAAAAAAf///gAAAAAAAP////gAAAAAAD/////gAAAAAA//////gAAAAAP//////gAAAAH///////gAAAB////////gAAAf////////gAAP/////////gAD//////////AA//////////gAA/////////4AAA////////+AAAA////////gAAAA///////wAAAAA//////8AAAAAA//////AAAAAAA/////gAAAAAAA////4AAAAAAAA///+AAAAAAAAA///gAAAAAAAAA//wAAAAAAAAAA/8AAAAAAAAAAA/AAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////AAAAAB///////8AAAAH////////AAAAf////////wAAA/////////4AAB/////////8AAD/////////+AAH//////////AAP//////////gAP//////////gAP//////////gAf//////////wAf//////////wAf//////////wAf//////////wA//8AAAAAB//4A//wAAAAAAf/4A//gAAAAAAP/4A//gAAAAAAP/4A//gAAAAAAP/4A//wAAAAAAf/4A///////////4Af//////////wAf//////////wAf//////////wAf//////////wAP//////////gAP//////////gAH//////////AAH//////////AAD/////////+AAB/////////8AAA/////////4AAAP////////gAAAD///////+AAAAAf//////4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/gAAAAAAAAAAP/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/AAAAAAAAAAA//AAAAAAAAAAA/+AAAAAAAAAAB/8AAAAAAAAAAD//////////gAH//////////gAP//////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH/4AAAAB/gAAD//4AAAAf/gAAP//4AAAB//gAA///4AAAH//gAB///4AAAf//gAD///4AAA///gAH///4AAD///gAP///4AAH///gAP///4AAP///gAf///4AAf///gAf///4AB////gAf///4AD////gA////4AH////gA////4Af////gA////4A/////gA//wAAB/////gA//gAAH/////gA//gAAP/////gA//gAA///8//gA//gAD///w//gA//wA////g//gA////////A//gA///////8A//gA///////4A//gAf//////wA//gAf//////gA//gAf/////+AA//gAP/////8AA//gAP/////4AA//gAH/////gAA//gAD/////AAA//gAB////8AAA//gAA////wAAA//gAAP///AAAA//gAAD//8AAAA//gAAAP+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/+AAAAAD/wAAB//8AAAAP/wAAB///AAAA//wAAB///wAAB//wAAB///4AAD//wAAB///8AAH//wAAB///+AAP//wAAB///+AAP//wAAB////AAf//wAAB////AAf//wAAB////gAf//wAAB////gA///wAAB////gA///wAAB////gA///w//AAf//wA//4A//AAA//wA//gA//AAAf/wA//gB//gAAf/wA//gB//gAAf/wA//gD//wAA//wA//wH//8AB//wA///////////gA///////////gA///////////gA///////////gAf//////////AAf//////////AAP//////////AAP/////////+AAH/////////8AAH///+/////4AAD///+f////wAAA///8P////gAAAf//4H///+AAAAH//gB///wAAAAAP4AAH/8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/wAAAAAAAAAA//wAAAAAAAAAP//wAAAAAAAAB///wAAAAAAAAf///wAAAAAAAH////wAAAAAAA/////wAAAAAAP/////wAAAAAB//////wAAAAAf//////wAAAAH///////wAAAA////////wAAAP////////wAAA///////H/wAAA//////wH/wAAA/////8AH/wAAA/////AAH/wAAA////gAAH/wAAA///4AAAH/wAAA//+AAAAH/wAAA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gAAAAAAAAH/4AAAAAAAAAAH/wAAAAAAAAAAH/wAAAAAAAAAAH/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB//8AAA/////+B///AAA/////+B///wAA/////+B///4AA/////+B///8AA/////+B///8AA/////+B///+AA/////+B////AA/////+B////AA/////+B////AA/////+B////gA/////+B////gA/////+B////gA/////+A////gA//gP/gAAB//wA//gf/AAAA//wA//gf/AAAAf/wA//g//AAAAf/wA//g//AAAA//wA//g//gAAA//wA//g//+AAP//wA//g////////gA//g////////gA//g////////gA//g////////gA//g////////AA//gf///////AA//gf//////+AA//gP//////+AA//gH//////8AA//gD//////4AA//gB//////wAA//gA//////AAAAAAAH////8AAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////gAAAAB///////+AAAAH////////gAAAf////////4AAB/////////8AAD/////////+AAH//////////AAH//////////gAP//////////gAP//////////gAf//////////wAf//////////wAf//////////wAf//////////wAf//////////4A//wAD/4AAf/4A//gAH/wAAP/4A//gAH/wAAP/4A//gAP/wAAP/4A//gAP/4AAf/4A//wAP/+AD//4A///wP//////4Af//4P//////wAf//4P//////wAf//4P//////wAf//4P//////wAP//4P//////gAP//4H//////gAH//4H//////AAH//4D/////+AAD//4D/////8AAB//4B/////4AAA//4A/////wAAAP/4AP////AAAAB/4AD///4AAAAAAAAAH/8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//AAAAAAAAAAA//gAAAAAAAAAA//gAAAAAAAAAA//gAAAAAAADgA//gAAAAAAP/gA//gAAAAAH//gA//gAAAAB///gA//gAAAAP///gA//gAAAD////gA//gAAAf////gA//gAAB/////gA//gAAP/////gA//gAB//////gA//gAH//////gA//gA///////gA//gD///////gA//gf///////gA//h////////gA//n////////gA//////////gAA/////////AAAA////////wAAAA///////4AAAAA///////AAAAAA//////4AAAAAA//////AAAAAAA/////4AAAAAAA/////AAAAAAAA////8AAAAAAAA////gAAAAAAAA///+AAAAAAAAA///4AAAAAAAAA///AAAAAAAAAA//4AAAAAAAAAA/+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//gB///wAAAAP//4H///+AAAA///8P////gAAB///+f////4AAD///+/////8AAH/////////+AAH//////////AAP//////////gAP//////////gAf//////////gAf//////////wAf//////////wAf//////////wA///////////wA//4D//wAB//4A//wB//gAA//4A//gA//gAAf/4A//gA//AAAf/4A//gA//gAAf/4A//wB//gAA//4A///P//8AH//4Af//////////wAf//////////wAf//////////wAf//////////wAf//////////gAP//////////gAP//////////AAH//////////AAD/////////+AAD///+/////8AAB///8f////wAAAf//4P////AAAAH//wD///8AAAAA/+AAf//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH//gAAAAAAAAB///+AA/+AAAAP////gA//wAAAf////wA//4AAB/////4A//8AAD/////8A//+AAD/////+A///AAH/////+A///AAP//////A///gAP//////A///gAf//////A///wAf//////A///wAf//////A///wAf//////A///wA///////AB//4A//4AD//AAP/4A//gAB//AAP/4A//gAA//AAP/4A//gAA/+AAP/4A//gAB/8AAP/4A//wAB/8AAf/4Af//////////wAf//////////wAf//////////wAf//////////wAf//////////wAP//////////gAP//////////gAH//////////AAH/////////+AAD/////////8AAB/////////4AAAf////////wAAAP////////AAAAB///////4AAAAAD/////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/AAB/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="), 46, atob("EiAnGicnJycnJycnEw=="), 78 + (scale << 8) + (1 << 16));
   };
@@ -9,22 +10,26 @@ Graphics.prototype.setFontAnton = function(scale) {
   let drawTimeout;
   let syncing = false;
   let last_steps = Bangle.getStepCount();
-  let hrm_buffer = [];  //we aren't going to log hrm readings immediately, because they will be written in chunks
-  let hrm_raw_first_value_time = 0;
-  let last_hrm_reading_time = 0;
-  let last_raw_hrm_reading_time = 0;
-  let version = "9";
-  let movementFilename = "healthlog"+version; 
-  let hrmFilename = "hrmlog"+version; 
-  let hrmrawfilesFilename = "hrmrawfileslog"+version;
-  let hrmRawFile = null;
-  let configFilename = "config"+version;
+  let last_hrm_reading_time = require("Storage").read("last_hrm_time");
+  if(last_hrm_reading_time == undefined){
+    last_hrm_reading_time = 0;
+  }else{
+    last_hrm_reading_time = parseInt(last_hrm_reading_time);
+  }
+  let version = "26";
+  let movement_filename = "healthlog"+version; 
+  let hrm_files_filename = "hrmfileslog"+version;
+  let config_filename = "config"+version;
   let reading_config = false;
   let timezone = -4;
   let max_chunk = 5000;
   let ble_mtu = 128;
   let from_time = require("Storage").read("from_time");
   let sync_files = [];
+  let current_hrm_file = null;
+  let current_hrmraw_file = null;
+  let current_movement_file = require("Storage").open(movement_filename,"a"); //this can stay on
+  let debug = false;
 
   E.setTimeZone(timezone);
   Bangle.setOptions({"hrmPollInterval": 20, "wakeOnBTN1":true,"wakeOnBTN2":true,"wakeOnBTN3":true,"wakeOnFaceUp":false,"wakeOnTouch":false,"wakeOnTwist":false});
@@ -36,35 +41,9 @@ Graphics.prototype.setFontAnton = function(scale) {
   Bangle.setHRMPower(true,"myApp");
   Bangle.setHRMPower(false,"myApp"); 
 
-  //this function addresses the problem that you can't append to files in bangle without a special mode
-  //that special mode uses 255 as a delimeter.  So, we need a way to encode arbitrary binary
-  //this function uses the value 11 as an escape character. 
-  //255: 11, 0
-  //11: 11, 11
-  let escape_value = 0x0b;
-  var escaped_255 = String.fromCharCode(escape_value) + "\xFE";
-  var escaped_escape = String.fromCharCode(escape_value) + "\xFE";
 
-  
-  let encode = function(buff1){
-    //buff2 should be twice the size of buff1.  This will create a new array buffer of the correct size
-    var toReturn = "";
-    for(var i=0;i<buff1.length;i++){
-        if(buff1[i] == 255){
-            toReturn += escaped_255;
-        }else if(buff1[i] == escape_value){
-            toReturn += escaped_escape;
-        }else{
-            toReturn+=String.fromCharCode(buff1[i]);
-        }
-
-    }
-    return toReturn;
-  };
-
-  var movement_log_buffer = new ArrayBuffer(8);
+  var movement_log_buffer = new ArrayBuffer(9);
   let writeMovementLog =function() {
-    if(syncing) return;
       var time = Math.floor(Date.now() / 1000);
       var steps = Bangle.getStepCount();
       var movement = Bangle.getHealthStatus().movement;
@@ -75,73 +54,66 @@ Graphics.prototype.setFontAnton = function(scale) {
       view.setUint32(0, time, false); // byteOffset = 0; litteEndian = false
       view.setUint16(4, delta, false);
       view.setUint16(6, movement, false);
-      var file = require("Storage").open(movementFilename,"a");
-      file.write(encode(movement_log_buffer));
+      view.setUint8(8,0,false); //padding
+      current_movement_file.write(btoa(movement_log_buffer));
   };
   
   var hrm_log_buffer = new ArrayBuffer(6);
   Bangle.on("HRM", function(hrm) { 
-        if(syncing) return;
-        var file = require("Storage").open(hrmFilename,"a");
         var view = new DataView(hrm_log_buffer);
         var time = Math.floor(Date.now() / 1000);
         view.setUint32(0,time);
         view.setUint8(4,hrm.bpm); //0 - 100
         view.setUint8(5,hrm.confidence); // 0-100
-        file.write(encode(hrm_log_buffer));
+        
+        if(current_hrm_file != null){
+            current_hrm_file.write(btoa(hrm_log_buffer));
+        }
   });
 
-  var hrm_raw_log_buffer_header = new ArrayBuffer(4);
-  let writeHRMRawBufferHeader = function(){
-    //generate a new filename
-    var filename = "hrmraw"+Math.floor(Date.now());
-    hrmRawFile = require("Storage").open(filename,"a");
-    require("Storage").open(hrmrawfilesFilename,"a").write(filename+"\n");
-    var view = new DataView(hrm_raw_log_buffer_header);
-    var time = hrm_raw_first_value_time;
-    view.setUint32(0,time); //we write the time to know the offset
-    hrmRawFile.write(encode(hrm_raw_log_buffer_header));
-  };
-
-  var hrm_raw_log_buffer = new ArrayBuffer(4);  //might be able to go down to 3 or even 2
+  let last_time = 0;
+  var hrm_raw_log_buffer = new ArrayBuffer(3);  //might be able to go down to 3 or even 2
   Bangle.on("HRM-raw", function(hrm) { 
-        if(syncing) return;    
+        // var time = Date.now();
+        // var time_delta =  (time-last_time)%256; 
+        // last_time = time;
         var view = new DataView(hrm_raw_log_buffer);
-        var now = Date.now();
-        if(hrm_buffer.length == 0){
-            hrm_raw_first_value_time = Math.floor(now/1000); 
-        }
-        var time_delta = now - last_raw_hrm_reading_time;
-        last_raw_hrm_reading_time = now;
         var acc = Bangle.getAccel().diff*200;
         if(acc > 254){
             acc = 254; //we don't want to write 255, because that's a special encoded value
         }
-        view.setUint8(0, time_delta);
-        view.setUint16(1,hrm.raw);
-        view.setUint8(3, acc); 
-        hrmRawFile.write(encode(hrm_raw_log_buffer)); //add to the buffer
+        
+        view.setUint16(0,hrm.raw);
+        //view.setUint8(2, time_delta); 
+        view.setUint8(2, acc); 
+        if(current_hrmraw_file != null){
+            current_hrmraw_file.write(btoa(hrm_raw_log_buffer)); //add to the buffer
+        }
   });
 
-  // Actually draw the watch face
-  let draw = function() {
-  
+  let startHRMonitor = function(){
+    //generate a new filename
+    ts = Math.floor(Date.now()/1000); //time in seconds
+    tms = Math.floor(Date.now()); //time in milliseconds
+    var hrmraw_filename = "hrmraw"+ tms;
+    var hrm_filename = "hrmreg"+ tms;
+    current_hrm_file = require("Storage").open(hrm_filename,"a");
+    current_hrmraw_file = require("Storage").open(hrmraw_filename,"a");
+    //we write these names to storage, because we have to remember to sync them
+    require("Storage").open(hrm_files_filename,"a").write(hrm_filename+"\n");
+    require("Storage").open(hrm_files_filename,"a").write(hrmraw_filename+"\n");
 
-    writeMovementLog();
-    
-    var time = Math.floor(Date.now() / 1000);
-    if(time - last_hrm_reading_time > 60*20){
-        writeHRMRawBufferHeader(); //write out how many were written (must be read in reverse)
-        Bangle.setHRMPower(true,"myapp");
-        last_hrm_reading_time = time;
-    }
-    if(Bangle.isHRMOn() && (time-last_hrm_reading_time) > 60*3){
-        Bangle.setHRMPower(false,"myapp"); //this should immediately stop raw readings
-        
-    }
+    Bangle.setHRMPower(true,"myapp");
+    last_hrm_reading_time = ts;
+    require("Storage").write("last_hrm_time",""+last_hrm_reading_time);
 
-    //open the file and write the data
-  
+  };
+
+  let stopHRMonitor = function(){
+    Bangle.setHRMPower(false,"myapp"); //this should immediately stop raw readings
+  };
+
+  let drawClockFace = function(){
     var x = g.getWidth() / 2;
     var y = g.getHeight() / 2;
     g.reset().clearRect(Bangle.appRect); // clear whole background (w/o widgets)
@@ -160,7 +132,21 @@ Graphics.prototype.setFontAnton = function(scale) {
     var dateStr = parts[2]+" " + parts[1] + " " + parts[3]+"\n"+
                   days_of_week[dow].toUpperCase()+"DAY";
     g.setFontAlign(0, 0).setFont("6x8", 2).drawString(dateStr, x, y+48);
-    
+  };
+  // Actually draw the watch face
+  let draw = function() {
+    if(syncing){
+        return; //allow terminal to run
+    }
+    if(!debug) drawClockFace();
+    writeMovementLog();
+    var time = Math.floor(Date.now() / 1000);
+    if(time - last_hrm_reading_time > 60*5){
+        startHRMonitor();
+    }
+    if(Bangle.isHRMOn() && (time-last_hrm_reading_time) > 60*1){
+        stopHRMonitor();
+    }
     // queue next draw
     if (drawTimeout) clearTimeout(drawTimeout); //
     drawTimeout = setTimeout(function() {
@@ -176,14 +162,8 @@ Graphics.prototype.setFontAnton = function(scale) {
 
         while(true){
             s = storageFile.read(ble_mtu);
-            if(s.charCodeAt(s.length - 1) == 0x11 && s.charCodeAt(s.length-2) != 0x11){
-                s = s.storageFile.read(1); //one more, because this message ended in the escape cahracter
-            }
-            escaped_escapes = String.fromCharCode(escape_value)+String.fromCharCode(escape_value);
-            escaped_255s = String.fromCharCode(escape_value)+String.fromCharCode(0);
-            s.replaceAll(escaped_escapes,String.fromCharCode(escape_value));
-            s.replaceAll(escaped_255s,"\xFF"); 
-            if(s!=undefined){
+            
+            if(s!=undefined && s.length > 0){
                 Bluetooth.write(s);
                 bytesSent += s.length;
 
@@ -198,15 +178,25 @@ Graphics.prototype.setFontAnton = function(scale) {
   };
 
   let sendFile = function(filename){
+    if(debug) print("sending" + sync_files[currentFileIndex]);
     Bluetooth.write(filename+":");
     storageFile = require("Storage").open(filename,"r");
   };
 
   let setupServer = function(){
-      
+    
+      NRF.on("connect", function(mac, options) {
+        if(debug) print("connection from " + mac);
+        if(Bangle.isHRMOn()){
+            NRF.disconnect(); 
+        }
+      });
+
       NRF.on('disconnect', function(reason) { 
           syncing = false;
           reading_config = false;
+          hrmRawFile = null; //if I interruped a heart rate measurement, we need to restart it.
+          
           Bangle.buzz();
       });
       NRF.setTxPower(8);
@@ -214,7 +204,7 @@ Graphics.prototype.setFontAnton = function(scale) {
       //NRF.setAdvertising({}, {name:"Bangle.js"});
   };
   
-  E.setConsole(null, {force: true});
+  E.setConsole("Terminal", {force: true});
   let config_buffer = "";
 
   currentFileIndex = 0;
@@ -227,8 +217,8 @@ Graphics.prototype.setFontAnton = function(scale) {
            if(data.charAt(i)=="\n"){
                
                config_json = atob(config_buffer);
-               require("Storage").open(configFilename, "w").erase();
-               require("Storage").open(configFilename, "w").write(config_json);
+               require("Storage").open(config_filename, "w").erase();
+               require("Storage").open(config_filename, "w").write(config_json);
                reading_config = false;
                Bluetooth.write(3); //got all data
                load(); //restart
@@ -242,60 +232,73 @@ Graphics.prototype.setFontAnton = function(scale) {
         if(data.charCodeAt(0) == 1){ 
 
             if(!syncing) {
+                if(debug) print("Starting sync");
                 syncing = true;
                 currentFileIndex = 0;
                 sync_files = [];
-                sync_files.push(movementFilename,hrmFilename);
-                rawfiles = require("Storage").open(hrmrawfilesFilename).read().split("\n");
-                for(var i=0;i<rawfiles.length;i++){
-                    sync_files.push(rawfiles.length);
+                sync_files.push(movement_filename);
+                rawfiles = require("Storage").open(hrm_files_filename,"r");
+                while(true){
+                    s = rawfiles.readLine();
+                    if(s == undefined){
+                        break;
+                    }
+                    s = s.trim();
+                    if(s != ""){
+                        sync_files.push(s);
+                    }
                 }
+                
                 sendFile(sync_files[currentFileIndex]);
             }
-            if(sendData()){
+
+
+            while(sendData()){ //this will return true only if the read was undefined, meaning the file is done
+                if(debug) print("sending");
                 //if we are done, go on to the next file
                 currentFileIndex++;
                 if(currentFileIndex >= sync_files.length){ //we are completely done, so write a 2
-                    Bluetooth.flush();
                     Bluetooth.write(2);
-                    Bluetooth.flush(); //ensure 1 packet
+                    break;
                 }else{ 
-                    Bluetooth.flush();
                     Bluetooth.write(10); //write a new line to indicate we are moving to the next file
-                    Bluetooth.flush();
                     sendFile(sync_files[currentFileIndex]); //open the next one
-                    Bluetooth.flush();
-                    Bluetooth.write(1); //write a 1 to indicate that this packet is done
-                    Bluetooth.flush();
                 }
-            }else{
-                Bluetooth.flush();
-                Bluetooth.write(1); //indicate a packet, but not a new file yet
-                Bluetooth.flush();
             }
+            if(currentFileIndex < sync_files.length){
+                Bluetooth.write(1); //indicate a packet, but not a new file yet
+            }
+            
             
         }
         if(data.charCodeAt(0) == 2){
-            for(var i=0;i<sync_files.length;i++){
-                require("Storage").open(sync_files[i], "w").erase();
+            for(var f=0;f<sync_files.length;f++){
+                require("Storage").open(sync_files[f], "w").erase();
             }
-            require("Storage").open(hrmrawfilesFilename,"w").erase();
-            Bluetooth.flush();
+            require("Storage").open(hrm_files_filename,"w").erase();
+            
             Bluetooth.write(2); //confirm delete
-            Bluetooth.flush();
+            if(debug) print("files erased");
+            
             from_time = ""+Math.floor(Date.now() / 1000); //we need to calculate a new from time
             require("Storage").write("from_time",from_time);
+
+            //we also need to re-open the movement file because we just erased it
+            current_movement_file = require("Storage").open(movement_filename,"a");
         }
         if(data.charCodeAt(0) == 3){
             config_buffer = ""; 
             reading_config = true;
+            if(debug) print("config read");
         }
-        if(data.charCodeAt(0) == 7){
+        if(data.charCodeAt(0) == 7){ //a sync is going to start
             var dv = new DataView(E.toArrayBuffer(data.slice(-4)));
             var timestamp = dv.getInt32(0,false);
             E.setTimeZone(0); //set to utc before setting a utc time
             setTime(timestamp);
             E.setTimeZone(timezone); //now set to timezone
+
+
 
             //send back the from_time
             timestamp = parseInt(from_time);
@@ -303,9 +306,9 @@ Graphics.prototype.setFontAnton = function(scale) {
             view = new DataView(message);
             view.setUint32(1, timestamp, false); // byteOffset = 0; litteEndian = false
             message[0] = 7;
-            Bluetooth.flush();
+            
             Bluetooth.write(message);
-            Bluetooth.flush();
+            if(debug) print("time sent");
 
         }
 

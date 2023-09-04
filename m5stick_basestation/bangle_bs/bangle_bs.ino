@@ -331,6 +331,7 @@ ServerResponseDiscovered sendServerDiscovered(){
         }
   }
   else {
+    ESP.restart();
     Serial.print("Error code: ");
     Serial.println(httpResponseCode);
     M5.Lcd.println("fail server");
@@ -343,17 +344,16 @@ ServerResponseDiscovered sendServerDiscovered(){
 
 void sendSyncDataToServer(bool complete){
 
-  buffer[buffer_index] = 0; //string end
-  http.begin(sync_route.c_str());
-  http.addHeader("Content-Type", "application/x-www-form-urlencoded", false, true);
-  String data = urlEncode((char*)buffer);
   String config_json = urlEncode("{}"); //todo, get from watch
-  Serial.println(data);
-  String urlEncoded = "from_time="+String(from_time)+"&station_id="+station_mac+"&device_id="+device_mac+"&config_json="+ config_json + "&data="+data+"&complete=" + (complete?"1":"0");
+
+  String urlEncoded = "?from_time="+String(from_time)+"&station_id="+station_mac+"&device_id="+device_mac+"&config_json="+ config_json +"&complete=" + (complete?"1":"0");
+  
   if(sync_id != ""){
     urlEncoded += "&sync_id="+sync_id;
   } 
-  int httpResponseCode = http.POST(urlEncoded);
+  http.begin((sync_route + urlEncoded).c_str());
+  http.addHeader("Content-Type", "application/octet-stream", false, true);
+  int httpResponseCode = http.POST(buffer, buffer_index);
   ServerResponseDiscovered res;
 
   if (httpResponseCode==200) {
@@ -363,13 +363,19 @@ void sendSyncDataToServer(bool complete){
         Serial.println(payload);
         StaticJsonDocument<1000> doc;
         deserializeJson(doc, payload);
-        const char * sid = doc["sync_id"];
-        
-        sync_id = String(sid);
-        if(complete){
-            const char * config = doc["config_json"];
-            config_to_upload = String(config);
-            sync_success = true;
+        if(doc["success"]){
+          const char * sid = doc["sync_id"];
+          
+          sync_id = String(sid);
+          if(complete){
+              const char * config = doc["config_json"];
+              config_to_upload = String(config);
+              sync_success = true;
+          }
+        }else{
+          Serial.print("restarting");
+          delay(1000);
+          ESP.restart(); //not successful, just restart
         }
        
   }
@@ -377,6 +383,7 @@ void sendSyncDataToServer(bool complete){
     Serial.print("Error code: ");
     Serial.println(httpResponseCode);
     M5.Lcd.println("fail server");
+    ESP.restart();
   }
   // Free resources
   http.end();
@@ -404,9 +411,6 @@ void sendConfirmToServer(){
 
 
 void onRX(NimBLERemoteCharacteristic* pRemoteCharacteristic, uint8_t* pData, size_t length, bool isNotify){
-  
-  Serial.println("Got data");
-
   
   if(waiting_for_time){
     if(pData[0] == 7){
@@ -488,12 +492,13 @@ void loop() {
           TIME[b+1] = temp[3-b]; //big endian is needed
         }
         tx->writeValue(TIME,5);
-
+        Serial.println("Sent time");
         waiting_for_time = true;
         while(waiting_for_time && pClient->isConnected()){
           delay(1);
         }
 
+  
 
         if(!pClient->isConnected()){
           NimBLEDevice::deleteClient(pClient);

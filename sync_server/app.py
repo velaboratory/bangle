@@ -95,7 +95,7 @@ def discovered():
             last_sync = datetime.strptime(device.last_data_sync, 
                                           "%Y-%m-%d %H:%M:%S")  # stored in Y:m:d H:M:S
             last_sync = pytz.utc.localize(last_sync)
-            if (now-last_sync).total_seconds() > 3*60:
+            if (now-last_sync).total_seconds() > 1*60:
                 return success({"sync": 1, "server_unixtime":int(now.timestamp())})
             return success({"sync":0, "server_unixtime":int(now.timestamp())}) #sync not needed
 
@@ -104,10 +104,11 @@ def sync():
     from_time = request.values.get("from_time", None) #the combo of this and the device_id must be unique.  
     station_id = request.values.get("station_id", None)
     device_id = request.values.get("device_id", None)
-    data = request.values.get("data", None)
     sync_id = request.values.get("sync_id", None)
     complete = request.values.get("complete", 0, type=int)
     config_json = request.values.get("config_json", None)
+    data = request.data
+    print(data)
     if not all([station_id, device_id, data, config_json, from_time]):
         return {"success": False, "reason": "Invalid request"}
     print(from_time)
