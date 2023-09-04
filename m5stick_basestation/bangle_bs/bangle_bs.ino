@@ -276,9 +276,15 @@ bool connectWifi(){
    WiFi.begin(ssid.c_str(), password.c_str());
   }
 
-  while (WiFi.status() != WL_CONNECTED) {
+  int num_attempts = 0;
+  while (WiFi.status() != WL_CONNECTED ) {
     Serial.print('.');
     delay(1000);
+    num_attempts++;
+
+    if(num_attempts > 60){
+      ESP.restart();
+    }
   }
   
   Serial.println(WiFi.localIP());

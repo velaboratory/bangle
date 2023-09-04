@@ -16,8 +16,9 @@ Graphics.prototype.setFontAnton = function(scale) {
   }else{
     last_hrm_reading_time = parseInt(last_hrm_reading_time);
   }
-  let version = "26";
+  let version = "29";
   let movement_filename = "healthlog"+version; 
+  let acceleration_filename = "accellog"+version;
   let hrm_files_filename = "hrmfileslog"+version;
   let config_filename = "config"+version;
   let reading_config = false;
@@ -29,11 +30,12 @@ Graphics.prototype.setFontAnton = function(scale) {
   let current_hrm_file = null;
   let current_hrmraw_file = null;
   let current_movement_file = require("Storage").open(movement_filename,"a"); //this can stay on
+  let current_acceleration_file = require("Storage").open(acceleration_filename,"a"); //this can stay on
   let debug = false;
   let last_bpm = 0;
   let last_conf = 0;
   E.setTimeZone(timezone);
-  Bangle.setOptions({"hrmPollInterval": 20, "wakeOnBTN1":true,"wakeOnBTN2":true,"wakeOnBTN3":true,"wakeOnFaceUp":false,"wakeOnTouch":false,"wakeOnTwist":false});
+  Bangle.setOptions({"powerSave": true, "hrmPollInterval": 20, "wakeOnBTN1":true,"wakeOnBTN2":true,"wakeOnBTN3":true,"wakeOnFaceUp":false,"wakeOnTouch":false,"wakeOnTwist":false});
   if(from_time === undefined){
     from_time = ""+Math.floor(Date.now() / 1000);
     require("Storage").write("from_time",from_time);
@@ -45,6 +47,9 @@ Graphics.prototype.setFontAnton = function(scale) {
   setWatch(function(e){
     if(!Bangle.isHRMOn()){
         startHRMonitor();
+    }else{
+        stopHRMonitor();
+        drawWidgets();
     }
   }, BTN1, {repeat:true});
 
@@ -53,6 +58,7 @@ Graphics.prototype.setFontAnton = function(scale) {
 
   
   let writeMovementLog =function() {
+      
       var time = Math.floor(Date.now() / 1000);
       var steps = Bangle.getStepCount();
       var movement = Bangle.getHealthStatus().movement;
@@ -66,6 +72,38 @@ Graphics.prototype.setFontAnton = function(scale) {
       view.setUint8(8,0,false); //padding
       current_movement_file.write(btoa(movement_log_buffer));
   };
+
+  let accel_log_buffer = new ArrayBuffer(18);
+  let accumulated_movement = 0;
+  let last_movement = 0;
+  let accumulated_jitter = 0;
+  let num_samples = 0;
+  let last_sample_time = 0;
+  Bangle.on("accel", function(data){
+    if(syncing){
+        return; //for now (should do something like heart rate eventually)
+    }
+    var time = Math.floor(Date.now() / 1000);
+    num_samples++;
+    accumulated_jitter += Math.abs(data.diff - last_movement);
+    last_movement = data.diff;
+    accumulated_movement += last_movement;
+
+    if(time - last_sample_time > 60){
+        last_sample_time = time;
+        var view = new DataView(accel_log_buffer);
+        var time_s = Math.floor(time);
+        view.setUint32(0,time_s);
+        view.setUint32(4,Math.floor(accumulated_movement*1000)); 
+        view.setUint32(8,num_samples); 
+        view.setUint32(12,Math.floor(accumulated_jitter*1000)); 
+        //+2 so we fall on the 3 boundary
+        current_acceleration_file.write(btoa(accel_log_buffer));
+        accumulated_movement = 0;
+        accumulated_jitter = 0;
+        num_samples = 0;
+    }
+  });
   
   var hrm_log_buffer = new ArrayBuffer(6);
   Bangle.on("HRM", function(hrm) { 
@@ -89,6 +127,7 @@ Graphics.prototype.setFontAnton = function(scale) {
         var time = Date.now()/1000;
         if((time-last_hrm_reading_time) > 60*3){
             stopHRMonitor();
+            drawWidgets();
             return;
         }
         // var time_delta =  (time-last_time)%256; 
@@ -102,7 +141,7 @@ Graphics.prototype.setFontAnton = function(scale) {
         var time_ms = Date.now();
         var time_delta = time_ms - last_time;
         if(time_delta > 255){
-            time_delta = 0;
+            time_delta = 0; //how often is this happening?
         }
         last_time = time_ms;
         
@@ -297,6 +336,7 @@ Graphics.prototype.setFontAnton = function(scale) {
                 currentFileIndex = 0;
                 sync_files = [];
                 sync_files.push(movement_filename);
+                sync_files.push(acceleration_filename);
                 rawfiles = require("Storage").open(hrm_files_filename,"r");
                 while(true){
                     s = rawfiles.readLine();
@@ -355,9 +395,9 @@ Graphics.prototype.setFontAnton = function(scale) {
             from_time = ""+Math.floor(Date.now() / 1000); //we need to calculate a new from time
             require("Storage").write("from_time",from_time);
 
-            //we also need to re-open the movement file because we just erased it
+            //we also need to re-open the movement and acceleration files
             current_movement_file = require("Storage").open(movement_filename,"a");
-            Bangle.buzz();
+            current_acceleration_file = require("Storage").open(acceleration_filename,"a");
         }
         if(data.charCodeAt(0) == 3){
             config_buffer = ""; 
