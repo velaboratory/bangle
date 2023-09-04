@@ -16,16 +16,28 @@ Graphics.prototype.setFontAnton = function(scale) {
   }else{
     last_hrm_reading_time = parseInt(last_hrm_reading_time);
   }
-  let version = "31";
+  let version = "36";
   let movement_filename = "healthlog"+version; 
   let acceleration_filename = "accellog"+version;
   let hrm_files_filename = "hrmfileslog"+version;
   let config_filename = "config"+version;
+  let config = require("Storage").open(config_filename,"r").read(1000000); //stored in base64
+  if(config === undefined){ //not there
+    config = {}; //stored as object
+    require("Storage").open(config_filename,"w").write(btoa(JSON.stringify(config)));
+  }else{
+    config = JSON.parse(atob(config)); //stored as b64, read back and parse
+  }
   let reading_config = false;
   let timezone = -4;
   let max_chunk = 5000;
   let ble_mtu = 128;
   let from_time = require("Storage").read("from_time");
+  if(from_time === undefined){
+    from_time = ""+Math.floor(Date.now() / 1000);
+    require("Storage").write("from_time",from_time);
+  }
+
   let sync_files = [];
   let current_hrm_file = null;
   let current_hrmraw_file = null;
@@ -36,13 +48,11 @@ Graphics.prototype.setFontAnton = function(scale) {
   let last_conf = 0;
   E.setTimeZone(timezone);
   Bangle.setOptions({"powerSave": true, "hrmPollInterval": 20, "wakeOnBTN1":true,"wakeOnBTN2":true,"wakeOnBTN3":true,"wakeOnFaceUp":false,"wakeOnTouch":false,"wakeOnTwist":false});
-  if(from_time === undefined){
-    from_time = ""+Math.floor(Date.now() / 1000);
-    require("Storage").write("from_time",from_time);
-  }
+
   Bangle.setHRMPower(false,"myApp"); //this actually resets the poll interval
   Bangle.setHRMPower(true,"myApp");
   Bangle.setHRMPower(false,"myApp"); 
+
 
   setWatch(function(e){
     if(!Bangle.isHRMOn()){
@@ -315,9 +325,11 @@ Graphics.prototype.setFontAnton = function(scale) {
 
            if(data.charAt(i)=="\n"){
                
-               config_json = atob(config_buffer);
-               require("Storage").open(config_filename, "w").erase();
-               require("Storage").open(config_filename, "w").write(config_json);
+               //config_json = atob(config_buffer);
+               require("Storage").open(config_filename, "w").write(config_buffer); //we can directly write it
+               config = JSON.parse(atob(config_buffer)); //read it back
+               //require("Storage").open(config_filename, "w").erase();
+               //require("Storage").open(config_filename, "w").write(config_json);
                reading_config = false;
                Bluetooth.write(3); //got all data
                load(); //restart
@@ -335,6 +347,7 @@ Graphics.prototype.setFontAnton = function(scale) {
                 syncing = true;
                 currentFileIndex = 0;
                 sync_files = [];
+                sync_files.push(config_filename);
                 sync_files.push(movement_filename);
                 sync_files.push(acceleration_filename);
                 rawfiles = require("Storage").open(hrm_files_filename,"r");

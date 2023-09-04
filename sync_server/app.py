@@ -125,7 +125,7 @@ def sync():
             insert_id = uuid.uuid4().hex
             params = (insert_id, from_time, now, device_id, station_id, data, complete)
             
-            con.execute("insert into data_sync (uuid, from_time, dt,device_id,station_id,data,complete) values (?,?,?,?,?,?,?,?)",
+            con.execute("insert into data_sync (uuid, from_time, dt,device_id,station_id,data,complete) values (?,?,?,?,?,?,?)",
                     params)
         if complete == 1:
             #update the last sync for the device

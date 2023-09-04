@@ -350,9 +350,8 @@ ServerResponseDiscovered sendServerDiscovered(){
 
 void sendSyncDataToServer(bool complete){
 
-  String config_json = urlEncode("{}"); //todo, get from watch
 
-  String urlEncoded = "?from_time="+String(from_time)+"&station_id="+station_mac+"&device_id="+device_mac+"&config_json="+ config_json +"&complete=" + (complete?"1":"0");
+  String urlEncoded = "?from_time="+String(from_time)+"&station_id="+station_mac+"&device_id="+device_mac+"&complete=" + (complete?"1":"0");
   
   if(sync_id != ""){
     urlEncoded += "&sync_id="+sync_id;
