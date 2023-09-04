@@ -16,7 +16,7 @@ Graphics.prototype.setFontAnton = function(scale) {
   }else{
     last_hrm_reading_time = parseInt(last_hrm_reading_time);
   }
-  let version = "29";
+  let version = "31";
   let movement_filename = "healthlog"+version; 
   let acceleration_filename = "accellog"+version;
   let hrm_files_filename = "hrmfileslog"+version;
@@ -75,7 +75,7 @@ Graphics.prototype.setFontAnton = function(scale) {
 
   let accel_log_buffer = new ArrayBuffer(18);
   let accumulated_movement = 0;
-  let last_movement = 0;
+  let last_diff = 0;
   let accumulated_jitter = 0;
   let num_samples = 0;
   let last_sample_time = 0;
@@ -85,9 +85,9 @@ Graphics.prototype.setFontAnton = function(scale) {
     }
     var time = Math.floor(Date.now() / 1000);
     num_samples++;
-    accumulated_jitter += Math.abs(data.diff - last_movement);
-    last_movement = data.diff;
-    accumulated_movement += last_movement;
+    accumulated_jitter += Math.abs(data.diff - last_diff);
+    last_diff = data.diff;
+    accumulated_movement += last_diff;
 
     if(time - last_sample_time > 60){
         last_sample_time = time;
@@ -160,8 +160,8 @@ Graphics.prototype.setFontAnton = function(scale) {
     //generate a new filename
     
     tms = Math.floor(Date.now()); //time in milliseconds
-    var hrmraw_filename = "hrmraw"+ tms;
-    var hrm_filename = "hrmreg"+ tms;
+    var hrmraw_filename = "hrmraw"+version+"_"+ tms;
+    var hrm_filename = "hrmreg"+version+"_"+ tms;
     current_hrm_file = require("Storage").open(hrm_filename,"a");
     current_hrmraw_file = require("Storage").open(hrmraw_filename,"a");
     //we write these names to storage, because we have to remember to sync them
