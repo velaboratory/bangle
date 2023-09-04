@@ -95,7 +95,7 @@ def discovered():
             last_sync = datetime.strptime(device.last_data_sync, 
                                           "%Y-%m-%d %H:%M:%S")  # stored in Y:m:d H:M:S
             last_sync = pytz.utc.localize(last_sync)
-            if (now-last_sync).total_seconds() > 15*60:
+            if (now-last_sync).total_seconds() > 1*60:
                 return success({"sync": 1, "server_unixtime":int(now.timestamp())})
             return success({"sync":0, "server_unixtime":int(now.timestamp())}) #sync not needed
 
@@ -106,10 +106,9 @@ def sync():
     device_id = request.values.get("device_id", None)
     sync_id = request.values.get("sync_id", None)
     complete = request.values.get("complete", 0, type=int)
-    config_json = request.values.get("config_json", None)
     data = request.data
     print(data)
-    if not all([station_id, device_id, data, config_json, from_time]):
+    if not all([station_id, device_id, data, from_time]):
         return {"success": False, "reason": "Invalid request"}
     print(from_time)
     station_id = station_id.lower()
@@ -124,9 +123,9 @@ def sync():
             print("appended data")
         else:
             insert_id = uuid.uuid4().hex
-            params = (insert_id, from_time, now, device_id, station_id, data, config_json, complete)
+            params = (insert_id, from_time, now, device_id, station_id, data, complete)
             
-            con.execute("insert into data_sync (uuid, from_time, dt,device_id,station_id,data,config_json,complete) values (?,?,?,?,?,?,?,?)",
+            con.execute("insert into data_sync (uuid, from_time, dt,device_id,station_id,data,complete) values (?,?,?,?,?,?,?,?)",
                     params)
         if complete == 1:
             #update the last sync for the device
