@@ -239,6 +239,7 @@ void setup() {
   NimBLEDevice::setScanDuplicateCacheSize(10);
 
   NimBLEDevice::init("basestation");
+  NimBLEDevice::setMTU(517);
 
   pBLEScan = NimBLEDevice::getScan(); //create new scan
 
@@ -300,7 +301,7 @@ bool configurating = false;
 bool send_next_packet = true;
 bool sync_success = false;
 unsigned long from_time = 0;
-#define BUFF_LEN 10000
+#define BUFF_LEN 25000
 uint8_t buffer[BUFF_LEN]; 
 int buffer_index = 0;
 String sync_id="";
@@ -484,7 +485,8 @@ void loop() {
       }
       //connect to the bangle
       NimBLEClient *pClient = NimBLEDevice::createClient(); //must be deleted after this point!
-        
+      pClient->setConnectionParams(6,6,0,15); 
+      pClient->setConnectTimeout(5); 
       if(pClient->connect(&device)) {
         M5.Lcd.println("connected");
         

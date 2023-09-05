@@ -30,7 +30,7 @@ Graphics.prototype.setFontAnton = function(scale) {
   }
   let reading_config = false;
   let timezone = -4;
-  let max_chunk = 5000;
+  let max_chunk = 23040; //75 mtus, and under the 10000 buffer size of the esp32
   let ble_mtu = 128;
   let from_time = require("Storage").read("from_time");
   if(from_time === undefined){
