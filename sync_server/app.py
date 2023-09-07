@@ -121,7 +121,7 @@ def get_syncs():
     if not all([device_id]):
         return failure("invalid request")
     with dbConnection() as con:
-        df = pd.read_sql("select from_time as dt_start,dt as dt_sync, device_id, station_id, data from data_sync where device_id = ? and from_time >= ? and completed=1", con = con, params = (device_id, from_time))
+        df = pd.read_sql("select from_time as dt_start,dt as dt_sync, device_id, station_id, data from data_sync where device_id = ? and from_time >= ? and complete=1", con = con, params = (device_id, from_time))
     to_return = df.to_json(orient="records")
     return success({"syncs":to_return})
 
