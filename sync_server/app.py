@@ -126,7 +126,7 @@ def force_sync():
     with dbConnection() as con:
         df = pd.read_sql("select id from device where id=?",con, params=(device_id,))
         if len(df) == 0: return failure("no device")
-        else: con.execute("update device set wants_sync=1 where id=?",(device_id))
+        else: con.execute("update device set wants_sync=1 where id=?",(device_id,))
         return success({})
     
 @app.route("/getdevices", methods= ["GET"])
