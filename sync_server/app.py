@@ -99,6 +99,32 @@ def discovered():
                 return success({"sync": 1, "server_unixtime":int(now.timestamp())})
             return success({"sync":0, "server_unixtime":int(now.timestamp())}) #sync not needed
 
+@app.route("/setconfig", methods = ["GET"])
+def set_config():
+    device_id = request.values.get("device_id", None)
+    config_json = request.values.get("config_json", None)
+    if not all([device_id, config_json]):
+        return failure("invalid request")
+    with dbConnection() as con:
+        df = pd.read_sql("select id from device where id=?",con, params=(device_id,))
+        if len(df) == 0: con.execute("insert into device (id, last_data_sync, target_config_json) values (?,?,?)",(device_id, None, config_json))
+        else: con.execute("update device set config_json=? where id=?",(config_json,device_id))
+        return success({})
+@app.route("/getdevices", methods= ["GET"])
+def get_devices():
+    with dbConnection() as con:
+        return pd.read_sql("select * from device", con).to_json(orient="records")
+@app.route("/getsyncs", methods = ["GET"])
+def get_syncs():
+    from_time = request.values.get("from_time", 0,type=int) #utc timestamp
+    device_id = request.values.get("device_id", None)
+    if not all([device_id]):
+        return failure("invalid request")
+    with dbConnection() as con:
+        df = pd.read_sql("select from_time as dt_start,dt as dt_sync, device_id, station_id, data from data_sync where device_id = ? and from_time >= ? and completed=1", con = con, params = (device_id, from_time))
+    to_return = df.to_json(orient="records")
+    return success({"syncs":to_return})
+
 @app.route("/sync", methods=["POST"])
 def sync():
     from_time = request.values.get("from_time", None) #the combo of this and the device_id must be unique.  
