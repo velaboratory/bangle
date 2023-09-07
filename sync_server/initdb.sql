@@ -23,6 +23,15 @@ CREATE TABLE data_sync (
     foreign key (device_id) references device(id) on delete cascade on update cascade
 );
 
+CREATE TABLE discovery_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    dt text,
+    station_id text,
+    device_id text,
+    data text, -- 0 until the sync is complete (comes in chunks)
+    foreign key (station_id) references station(id) on delete cascade on update cascade,
+    foreign key (device_id) references device(id) on delete cascade on update cascade
+);
 
 -- this table holds a list of all of the requests made to the service
 CREATE TABLE request_log (

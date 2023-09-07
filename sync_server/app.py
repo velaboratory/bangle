@@ -74,6 +74,7 @@ def discovered():
         station_id = request.values.get("station_id", None) # probably add to the list if found
         device_id = request.values.get("device_id", None) 
         rssi = request.values.get("rssi", None)
+        battery = request.values.get("battery", None)
         if not all([station_id, device_id, rssi]):
              return failure("Invalid Request")
         station_id = station_id.lower()
@@ -89,6 +90,10 @@ def discovered():
         if len(df_device) == 0:
             return failure("Not found")
         else:
+
+            #add the discovery
+            con.execute("insert into discovery_log (dt,station_id,device_id,data) values (?,?,?,?)",(datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),station_id,device_id,json.dumps({"battery":battery})))
+        
             # determine if it's been long enough
             device = df_device.iloc[0]
             now = datetime.now(timezone.utc)
