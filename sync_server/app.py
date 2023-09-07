@@ -113,7 +113,7 @@ def set_config():
 @app.route("/getdevices", methods= ["GET"])
 def get_devices():
     with dbConnection() as con:
-        return pd.read_sql("select * from device", con).to_json(orient="records")
+        return success({"devices":json.loads(pd.read_sql("select * from device", con).to_json(orient="records"))})
 @app.route("/getsyncs", methods = ["GET"])
 def get_syncs():
     from_time = request.values.get("from_time", 0,type=int) #utc timestamp
@@ -122,7 +122,7 @@ def get_syncs():
         return failure("invalid request")
     with dbConnection() as con:
         df = pd.read_sql("select from_time as dt_start,dt as dt_sync, device_id, station_id, data from data_sync where device_id = ? and from_time >= ? and complete=1", con = con, params = (device_id, from_time))
-    to_return = df.to_json(orient="records")
+    to_return = json.loads(df.to_json(orient="records"))
     return success({"syncs":to_return})
 
 @app.route("/sync", methods=["POST"])
