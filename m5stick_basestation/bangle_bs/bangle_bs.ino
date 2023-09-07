@@ -19,7 +19,7 @@ NimBLECharacteristic *pCharacteristic_complete;
 #define UUID_NORDIC_UART "6e400001-b5a3-f393-e0a9-e50e24dcca9e"
 #define UUID_NORDIC_TX "6e400002-b5a3-f393-e0a9-e50e24dcca9e"
 #define UUID_NORDIC_RX "6e400003-b5a3-f393-e0a9-e50e24dcca9e"
-String server_root = "http://192.168.68.131:5000/";
+String server_root = "https://bbs.ugavel.com/";
 String discover_route = server_root + "discovered";
 String sync_route = server_root + "sync";
 String confirm_route = server_root + "confirm";
