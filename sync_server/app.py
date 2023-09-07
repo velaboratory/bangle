@@ -101,7 +101,6 @@ def discovered():
                                           "%Y-%m-%d %H:%M:%S")  # stored in Y:m:d H:M:S
             last_sync = pytz.utc.localize(last_sync)
             if device.wants_sync == 1:
-                con.execute("update device set wants_sync = 0 where id = ?",(device.id, ))
                 return success({"sync": 1, "server_unixtime":int(now.timestamp())})
             elif ((now-last_sync).total_seconds() > 15*60):
                 return success({"sync": 1, "server_unixtime":int(now.timestamp())})
@@ -174,7 +173,7 @@ def sync():
                     params)
         if complete == 1:
             #update the last sync for the device
-            con.execute("update device set last_data_sync = ? where id=?",(datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),device_id))
+            con.execute("update device set last_data_sync = ?, wants_sync = 0 where id=?",(datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),device_id))
             #retrieve the new configuration for the watch
             device_df = pd.read_sql("select target_config_json from device where id=?",
                                 con, params=(device_id,))
