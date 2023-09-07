@@ -101,7 +101,7 @@ def discovered():
                                           "%Y-%m-%d %H:%M:%S")  # stored in Y:m:d H:M:S
             last_sync = pytz.utc.localize(last_sync)
             if device.wants_sync == 1:
-                con.execute("update device set wants_sync = 0 where id = ?",(device.id))
+                con.execute("update device set wants_sync = 0 where id = ?",(device.id, ))
                 return success({"sync": 1, "server_unixtime":int(now.timestamp())})
             elif ((now-last_sync).total_seconds() > 15*60):
                 return success({"sync": 1, "server_unixtime":int(now.timestamp())})
