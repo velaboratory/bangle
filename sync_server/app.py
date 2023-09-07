@@ -92,7 +92,7 @@ def discovered():
         else:
 
             #add the discovery
-            con.execute("insert into discovery_log (dt,station_id,device_id,data) values (?,?,?,?)",(datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),station_id,device_id,json.dumps({"battery":battery})))
+            con.execute("insert into discovery_log (dt,station_id,device_id,data) values (?,?,?,?)",(datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),station_id,device_id,json.dumps({"battery":battery,"rssi":rssi})))
         
             # determine if it's been long enough
             device = df_device.iloc[0]
