@@ -93,14 +93,17 @@ def discovered():
 
             #add the discovery
             con.execute("insert into discovery_log (dt,station_id,device_id,data) values (?,?,?,?)",(datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),station_id,device_id,json.dumps({"battery":battery,"rssi":rssi})))
-        
+
             # determine if it's been long enough
             device = df_device.iloc[0]
             now = datetime.now(timezone.utc)
             last_sync = datetime.strptime(device.last_data_sync, 
                                           "%Y-%m-%d %H:%M:%S")  # stored in Y:m:d H:M:S
             last_sync = pytz.utc.localize(last_sync)
-            if (now-last_sync).total_seconds() > 15*60:
+            if device.wants_sync == 1:
+                con.execute("update device set wants_sync = 0 where id = ?",(device.id))
+                return success({"sync": 1, "server_unixtime":int(now.timestamp())})
+            elif ((now-last_sync).total_seconds() > 15*60):
                 return success({"sync": 1, "server_unixtime":int(now.timestamp())})
             return success({"sync":0, "server_unixtime":int(now.timestamp())}) #sync not needed
 
@@ -115,6 +118,17 @@ def set_config():
         if len(df) == 0: con.execute("insert into device (id, last_data_sync, target_config_json) values (?,?,?)",(device_id, None, config_json))
         else: con.execute("update device set config_json=? where id=?",(config_json,device_id))
         return success({})
+@app.route("/forcesync", methods=["GET"])
+def force_sync():
+    device_id = request.values.get("device_id", None)
+    if not all([device_id]):
+        return failure("invalid request")
+    with dbConnection() as con:
+        df = pd.read_sql("select id from device where id=?",con, params=(device_id,))
+        if len(df) == 0: return failure("no device")
+        else: con.execute("update device set wants_sync=1 where id=?",(device_id))
+        return success({})
+    
 @app.route("/getdevices", methods= ["GET"])
 def get_devices():
     with dbConnection() as con:

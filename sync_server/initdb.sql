@@ -4,7 +4,8 @@ PRAGMA foreign_keys=ON;
 CREATE TABLE device (
     id text PRIMARY KEY, -- probably a mac address
     last_data_sync text, -- a date time of the last upload from the device
-    target_config_json text -- a configuration string to update the device to
+    target_config_json text,
+    wants_sync int default 0 -- a configuration string to update the device to
 );
 
 CREATE TABLE station (
