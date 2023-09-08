@@ -316,34 +316,21 @@ Graphics.prototype.setFontAnton = function(scale) {
   };
   
   E.setConsole("Terminal", {force: true});
-  let config_buffer = "";
-  let firmware_buffer = "";
+  let config_file_temp = undefined;
+  let config_file_temp_name = "config_file_temp"
   currentFileIndex = 0;
-
   let firmware_file = undefined;
   Bluetooth.on('data', function(data) {
     if(reading_config){
-      
-        for(var i=0;i<data.length;i++){
-
-
-           if(data.charAt(i)=="\n"){
-               
-               //config_json = atob(config_buffer);
-               require("Storage").open(config_filename, "w").write(config_buffer); //we can directly write it
-               config = JSON.parse(atob(config_buffer)); //read it back
-               //require("Storage").open(config_filename, "w").erase();
-               //require("Storage").open(config_filename, "w").write(config_json);
-               reading_config = false;
-               Bluetooth.write(3); //got all data
-               config_buffer = "";
-               load(); //restart
-           }
-           else{
-               config_buffer += data[i];
-           }
-       }
-
+        parts = data.split("\n");
+        config_file_temp.write(parts[0]);
+        if(parts.length > 1){
+            var config_file_data = require("Storage").open(config_file_temp_name,"r").read(10000000);
+            require("Storage").open(config_filename,"w").write(config_file_data);
+            reading_config = false;
+            Bluetooth.write(3); //got all data
+            load();
+        }
     }else if(reading_firmware){
         parts = data.split("\n");
         firmware_file.write(parts[0]);
@@ -432,6 +419,8 @@ Graphics.prototype.setFontAnton = function(scale) {
         if(data.charCodeAt(0) == 3){
             config_buffer = ""; 
             reading_config = true;
+            config_file_temp = require("Storage").open(config_file_temp_name, "w").erase();
+            config_file_temp = require("Storage").open(config_file_temp_name,"a")
             if(debug) print("config read");
         }
         if(data.charCodeAt(0) == 4){
