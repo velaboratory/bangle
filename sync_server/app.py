@@ -9,6 +9,9 @@ import json
 import numpy as np
 import pytz
 import base64
+import hashlib
+import js2py
+
 app = Flask(__name__)
 sqlite3.register_adapter(np.int64, lambda val: int(val))
 class NumpyEncoder(json.JSONEncoder):
@@ -66,6 +69,7 @@ def initdb():
             except Exception as e:
                 print(e)
     return app.redirect("/")
+
 
 
 @app.route("/discovered", methods=["POST"])
@@ -143,12 +147,69 @@ def get_syncs():
     to_return = json.loads(df.to_json(orient="records"))
     return success({"syncs":to_return})
 
+@app.route("/setapp", methods=["GET"])
+def set_app():
+    name = request.values.get("name", None)
+    version = request.values.get("version", -1, type=int)
+    code_base64 = request.values.get("code_base64", None)
+    code = base64.b64decode(code_base64).decode()
+    try:
+        f = js2py.parse_js(code)
+    except:
+        return "invalid javascript"
+    if name == None or code_base64 == None:
+        return failure("must have the name of the app and the code")
+    try:
+        base64.b64decode(code_base64)
+    except:
+        return failure("invalid code")
+    
+    with dbConnection() as con:
+        if version == -1:
+            # new app version, increment
+            df = pd.read_sql("select version from app where name = ? order by version desc limit 1",con,params=(name,))
+            if len(df) == 0:
+                con.execute("insert into app (name, version, code_base64) values (?,?,?)",(name, version, code_base64))
+            else:
+                version = df.iloc[0].version + 1
+                con.execute("insert into app(name, version, code_base64) values (?,?,?)",(name, version, code_base64))
+        else:
+            df = pd.read_sql("select * from app where name = ? and version = ?",con,params=(name, version))
+            if len(df) == 0:
+                con.execute("insert into app(name,version,code_base64) values (?,?,?)", (name, version, code_base64))
+            else:
+                #update
+                con.execute("update app set code_base64 = ? where name = ? and version = ?", (code_base64, name, version))
+        return success({"name": name, "version":version})
+
+@app.route("/getapp", methods=["GET"])
+def get_app():
+    name = request.values.get("name", None)
+    version = request.values.get("version", -1, type=int)
+
+    if name:
+        with dbConnection() as con:
+            if version != -1:
+                df = pd.read_sql("select * from app where name = ? and version = ?",con,params=(name,version))
+                if len(df) > 0:
+                    return success({"code_base64":df.iloc[0].code_base64})
+                return failure("no app, or bad version")
+            else:
+                df = pd.read_sql("select * from app where name = ? order by version desc",con,params=(name,))
+                if len(df) > 0:
+                     return success({"code_base64":df.iloc[0].code_base64, "version": df.iloc[0].version})
+                else:
+                    return failure("no app by that name")
+    return failure("invalid request")
+                
 @app.route("/sync", methods=["POST"])
 def sync():
     from_time = request.values.get("from_time", None) #the combo of this and the device_id must be unique.  
     station_id = request.values.get("station_id", None)
     device_id = request.values.get("device_id", None)
     sync_id = request.values.get("sync_id", None)
+    app_name = request.values.get("app_name", None) #need to add these to the sync request
+    app_version = request.values.get("version", -1, type=int)
     complete = request.values.get("complete", 0, type=int)
     data = request.data
     print(data)
@@ -167,19 +228,19 @@ def sync():
             print("appended data")
         else:
             insert_id = uuid.uuid4().hex
-            params = (insert_id, from_time, now, device_id, station_id, data, complete)
+            params = (insert_id, from_time, now, device_id, station_id, data, app_name, app_version, complete)
             
-            con.execute("insert into data_sync (uuid, from_time, dt,device_id,station_id,data,complete) values (?,?,?,?,?,?,?)",
+            con.execute("insert into data_sync (uuid, from_time, dt,device_id,station_id,data,app_name, app_version, complete) values (?,?,?,?,?,?,?)",
                     params)
         if complete == 1:
             #update the last sync for the device
             con.execute("update device set last_data_sync = ?, wants_sync = 0 where id=?",(datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),device_id))
             #retrieve the new configuration for the watch
-            device_df = pd.read_sql("select target_config_json from device where id=?",
+            device_df = pd.read_sql("select target_config_json, target_app_name, target_app_version from device where id=?",
                                 con, params=(device_id,))
-            return success({"sync_id": insert_id, "config_json": base64.b64encode(device_df.iloc[0].target_config_json.encode()).decode()})
+            return success({"sync_id": insert_id, "config_json": base64.b64encode(device_df.iloc[0].target_config_json.encode()).decode(), "target_app_name": device_df.iloc[0].target_app_name, "target_version":device_df.iloc[0].target_version})
         else:
             return success({"sync_id": insert_id})
 
 if __name__ == "__main__":
-    app.run(host = "0.0.0.0",port=5000, debug=True)
+    app.run(host = "0.0.0.0",port=8083, debug=True)
