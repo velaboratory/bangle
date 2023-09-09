@@ -16,7 +16,10 @@ Graphics.prototype.setFontAnton = function(scale) {
   }else{
     last_hrm_reading_time = parseInt(last_hrm_reading_time);
   }
-  let version = "37";
+
+  let app_name = "test";
+  let app_version = 37;
+  let version = app_name+app_version;
   let movement_filename = "healthlog"+version; 
   let acceleration_filename = "accellog"+version;
   let hrm_files_filename = "hrmfileslog"+version;
@@ -44,12 +47,11 @@ Graphics.prototype.setFontAnton = function(scale) {
   let current_hrmraw_file = null;
   let current_movement_file = require("Storage").open(movement_filename,"a"); //this can stay on
   let current_acceleration_file = require("Storage").open(acceleration_filename,"a"); //this can stay on
-  let debug = false;
+  let debug = true;
   let last_bpm = 0;
   let last_conf = 0;
   E.setTimeZone(timezone);
   Bangle.setOptions({"powerSave": true, "hrmPollInterval": 20, "wakeOnBTN1":true,"wakeOnBTN2":true,"wakeOnBTN3":true,"wakeOnFaceUp":false,"wakeOnTouch":false,"wakeOnTwist":false});
-
   Bangle.setHRMPower(false,"myApp"); //this actually resets the poll interval
   Bangle.setHRMPower(true,"myApp");
   Bangle.setHRMPower(false,"myApp"); 
@@ -329,7 +331,9 @@ Graphics.prototype.setFontAnton = function(scale) {
             require("Storage").open(config_filename,"w").write(config_file_data);
             reading_config = false;
             Bluetooth.write(3); //got all data
-            load();
+            
+        }else{
+            print("1");
         }
     }else if(reading_firmware){
         parts = data.split("\n");
@@ -341,7 +345,7 @@ Graphics.prototype.setFontAnton = function(scale) {
             firmware_file = require("Storage").open("firmware","r");
             program = atob(firmware_file.read(10000000));
             E.setBootCode(program);
-            load();
+        
         }
     }else{
         if(data.charCodeAt(0) == 1){ 
@@ -431,6 +435,9 @@ Graphics.prototype.setFontAnton = function(scale) {
             reading_firmware = true;
             if(debug) print("firmware read");
         }
+        if(data.charCodeAt(0) == 5){
+            load(); //we are done
+        }
         if(data.charCodeAt(0) == 7){ //a sync is going to start
 
 
@@ -443,15 +450,21 @@ Graphics.prototype.setFontAnton = function(scale) {
 
             //send back the from_time
             timestamp = parseInt(from_time);
-            var message = new ArrayBuffer(5); // an Int32 takes 4 bytes and Int16 takes 2 bytes
+            var message = new ArrayBuffer(20); // an Int32 takes 4 bytes and Int16 takes 2 bytes
             view = new DataView(message);
             view.setUint32(1, timestamp, false); // byteOffset = 0; litteEndian = false
+            view.setUint32(5, app_version, false);
+            for(var i=0;i<app_name.length;i++){
+                message[9+i] = app_name.charCodeAt(i);
+            }
             
-            message[0] = 7;
+            message[9+app_name.length] =0;
             if(Bangle.isHRMOn()){
                 message[0] = 8;
             }
-           
+            else{
+                message[0] = 7;
+            }
             
             Bluetooth.write(message);
             if(debug) print("time sent");
