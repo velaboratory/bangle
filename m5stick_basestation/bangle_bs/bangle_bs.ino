@@ -22,8 +22,7 @@ NimBLECharacteristic *pCharacteristic_complete;
 String server_root = "https://bbs.ugavel.com/";
 String discover_route = server_root + "discovered";
 String sync_route = server_root + "sync";
-String confirm_route = server_root + "confirm";
-String config_route = server_root + "update_config";
+String update_route = server_root + "getapp";
 String station_mac = "none";
 Preferences preferences;
 
@@ -295,20 +294,56 @@ bool connectWifi(){
 
 
 bool waiting_for_time = false;
+bool updating = false;
 bool syncing = false;
 bool confirming = false;
 bool configurating = false;
 bool send_next_packet = true;
 bool sync_success = false;
 unsigned long from_time = 0;
-#define BUFF_LEN 25000
+#define BUFF_LEN 40000
 uint8_t buffer[BUFF_LEN]; 
 int buffer_index = 0;
 String sync_id="";
 String device_mac="";
 String config_to_upload = "";
 int device_rssi = 0;
+String app_name="";
+long app_version=-1;
+String target_app_name="";
+long target_app_version=-1;
+StaticJsonDocument<20000> doc;
+char* search_string = "code_base64\": \"";
+bool getSoftwareUpdates(){
+  updating = true;
+  String urlEncoded = "name="+target_app_name+"&version="+target_app_version; 
+  http.begin((update_route+"?"+urlEncoded).c_str());
+  int httpResponseCode = http.GET();
+  if(httpResponseCode==200){
+    Serial.println(http.getSize());
+    WiFiClient * stream = http.getStreamPtr();
+    buffer_index = 0;
+    while(true){
+      int b = stream->read();
+      if(b < 0){
+        buffer[buffer_index+1] = 0;
+        http.end();
+        //we need to find the beginning and the end of the program if the result is successful
+        Serial.println((char*)buffer);
+        if(strstr((char*)buffer,search_string)){
+          return true;
+        }
+        return false;
+      }else{
+        buffer[buffer_index++] = b;
+      }
+    }
+  }
+  Serial.println("failed to download software");
+  http.end();
+  return false;
 
+}
 ServerResponseDiscovered sendServerDiscovered(){
   
   http.begin(discover_route.c_str());
@@ -326,7 +361,6 @@ ServerResponseDiscovered sendServerDiscovered(){
         String payload = http.getString();
         Serial.println(payload);
         if(httpResponseCode==200){
-          StaticJsonDocument<1000> doc;
           deserializeJson(doc, payload);
           res.success = doc["success"];
           res.timestamp = doc["server_unixtime"];
@@ -352,7 +386,7 @@ ServerResponseDiscovered sendServerDiscovered(){
 void sendSyncDataToServer(bool complete){
 
 
-  String urlEncoded = "?from_time="+String(from_time)+"&station_id="+station_mac+"&device_id="+device_mac+"&complete=" + (complete?"1":"0");
+  String urlEncoded = "?from_time="+String(from_time)+"&station_id="+station_mac+"&device_id="+device_mac+"&app_name="+app_name+"&app_version="+app_version+"&complete=" + (complete?"1":"0");
   
   if(sync_id != ""){
     urlEncoded += "&sync_id="+sync_id;
@@ -367,15 +401,17 @@ void sendSyncDataToServer(bool complete){
         Serial.println(httpResponseCode);
         String payload = http.getString();
         Serial.println(payload);
-        StaticJsonDocument<1000> doc;
         deserializeJson(doc, payload);
         if(doc["success"]){
           const char * sid = doc["sync_id"];
           
           sync_id = String(sid);
           if(complete){
-              const char * config = doc["config_json"];
-              config_to_upload = String(config);
+              const char* config = doc["config_json"];
+              config_to_upload = config;
+              const char* name = doc["target_app_name"];
+              target_app_name = name;
+              target_app_version = doc["target_app_version"].as<unsigned long>();
               sync_success = true;
           }
         }else{
@@ -402,34 +438,32 @@ void sendSyncDataToServer(bool complete){
   buffer_index = 0;
 }
 
-void sendConfirmToServer(){
-  http.begin(confirm_route.c_str());
-  http.addHeader("Content-Type", "application/x-www-form-urlencoded", false, true);
-  String urlEncoded = "station_id="+station_mac+"&sync_id="+sync_id;
-  int httpResponseCode = http.POST(urlEncoded);
-  if (httpResponseCode==200) {
-    Serial.println("confirmed");
-  }else{
-    Serial.println("failed");
-  }
-  http.end();
-}
-
-
 void onRX(NimBLERemoteCharacteristic* pRemoteCharacteristic, uint8_t* pData, size_t length, bool isNotify){
   Serial.println(buffer_index);
   if(waiting_for_time){
     Serial.println("Got RX in time");
+    Serial.println(pData[0]);
     if(pData[0] == 7){
+      Serial.println("here");
       uint8_t converter[4] = {pData[4],pData[3],pData[2],pData[1]};
-      long * t = (long*)converter;
-      from_time = *t;
+      uint8_t converter2[4] = {pData[8],pData[7],pData[6],pData[5]};
+      uint8_t app_name_converter[11];
+      for(int i=0;i<10;i++){
+        
+        app_name_converter[i] = pData[9+i];
+        if(pData[i] == 0){
+           break;
+        }
+      }
+      pData[19] = 0; //ensure nul terminated
+      app_name = String((char*)(pData+9));
+      app_version = *((unsigned long*)converter2);
+      from_time = *((long*)converter);
       waiting_for_time = false;
     }else if(pData[0] == 8){
       //back off
       waiting_for_time = false;
       from_time = 0; //signal that we should wait
-
     }
 
   }else if(syncing){
@@ -453,9 +487,14 @@ void onRX(NimBLERemoteCharacteristic* pRemoteCharacteristic, uint8_t* pData, siz
       confirming = false;
     }
   }else if(configurating){
-    Serial.println("Got RX in confirming");
+    Serial.println("Got RX in configurating");
     if(pData[0] == 3){
       configurating = false;
+    }
+  }else if(updating){
+    Serial.println("Got RX in updating");
+    if(pData[0] == 4){
+      updating = false;
     }
   }
 }
@@ -576,6 +615,50 @@ void loop() {
         while(configurating && pClient->isConnected()){
           delay(1);
         }
+        Serial.println(app_name);
+        Serial.println(target_app_name);
+        Serial.println(app_version);
+        Serial.println(target_app_version);
+        if(app_name != target_app_name || app_version != target_app_version){
+          if(getSoftwareUpdates()){
+
+            Serial.println("Got software, sending");
+            uint8_t START_UPDATE[1];
+            START_UPDATE[0] = 4;
+            delay(10);
+            tx->writeValue(START_UPDATE,1);
+            delay(10);
+            int sent = 0;
+            uint8_t small_buffer[50];
+            char * start_string = strstr((char*)buffer,search_string) +strlen(search_string); //actual start *
+            int start_loc = start_string-(char*)buffer; //the start loc in the buffer of the data
+            char * end_string = strstr(start_string,"\""); //the actual end location
+            int end_loc = end_string-(char*)buffer; //end location in the buffer
+            Serial.println(start_loc);
+            Serial.println(end_loc);
+            for(int b=start_loc;b < end_loc;b++){
+              small_buffer[sent++] = buffer[b];
+              Serial.print((char)buffer[b]);
+              if(sent == 50 || (b+1) >= end_loc){
+                delay(20);
+                tx->writeValue(small_buffer,sent);
+                sent = 0;
+              }
+            }
+            delay(20);
+            START_UPDATE[0] = 10; //finish with a \n
+            tx->writeValue(START_UPDATE,1);
+
+            while(updating && pClient->isConnected()){ //wait for a 4
+              delay(1);
+            }
+
+            delay(20);
+            START_UPDATE[0] = 5;
+            tx->writeValue(START_UPDATE,1);
+          }
+        }
+        
         
         Serial.println("Complete!");
         
