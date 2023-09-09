@@ -47,29 +47,16 @@ def dbConnection():
 
 def success(data):
     data["success"] = True
+    print(data);
     return json.dumps(data,cls=NumpyEncoder)
 
 def failure(reason):
-    return json.dumps({"success":False, "reason":reason},cls=NumpyEncoder)
+    data = {"success":False, "reason":reason};
+    print(data)
+    return json.dumps(data,cls=NumpyEncoder)
 @app.route("/")
 def root():
     return "Hello world"
-
-
-@app.route("/initdb")
-def initdb():
-    with dbConnection() as con:
-        with open('initdb.sql') as script:
-            try:
-                con.executescript(script.read())
-                test_mac = "e5:cc:1d:bb:e4:d1"
-                con.execute("insert into device (id, last_data_sync, target_config_json) values (?,?,?)",
-                            (test_mac, "1970-01-01 00:00:00", "{}"))
-                con.commit()
-            except Exception as e:
-                print(e)
-    return app.redirect("/")
-
 
 
 @app.route("/discovered", methods=["POST"])
@@ -230,7 +217,7 @@ def sync():
             insert_id = uuid.uuid4().hex
             params = (insert_id, from_time, now, device_id, station_id, data, app_name, app_version, complete)
             
-            con.execute("insert into data_sync (uuid, from_time, dt,device_id,station_id,data,app_name, app_version, complete) values (?,?,?,?,?,?,?)",
+            con.execute("insert into data_sync (uuid, from_time, dt,device_id,station_id,data,app_name, app_version, complete) values (?,?,?,?,?,?,?,?,?)",
                     params)
         if complete == 1:
             #update the last sync for the device
@@ -238,7 +225,7 @@ def sync():
             #retrieve the new configuration for the watch
             device_df = pd.read_sql("select target_config_json, target_app_name, target_app_version from device where id=?",
                                 con, params=(device_id,))
-            return success({"sync_id": insert_id, "config_json": base64.b64encode(device_df.iloc[0].target_config_json.encode()).decode(), "target_app_name": device_df.iloc[0].target_app_name, "target_version":device_df.iloc[0].target_version})
+            return success({"sync_id": insert_id, "config_json": base64.b64encode(device_df.iloc[0].target_config_json.encode()).decode(), "target_app_name": device_df.iloc[0].target_app_name, "target_app_version":device_df.iloc[0].target_app_version})
         else:
             return success({"sync_id": insert_id})
 
