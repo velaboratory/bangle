@@ -54,6 +54,7 @@ async def run():
                             print("here")
                             break
 
+                        print("reading watch software")
                         # now we can send the data
 
                         js_data = open("watch.js").read()

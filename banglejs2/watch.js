@@ -313,6 +313,7 @@ Graphics.prototype.setFontAnton = function(scale) {
           reading_config = false;
           reading_firmware = false;
           hrmRawFile = null; //if I interruped a heart rate measurement, we need to restart it.
+          draw();
       });
       NRF.setTxPower(8);
       // Change the name that's advertised
