@@ -47,7 +47,7 @@ Graphics.prototype.setFontAnton = function(scale) {
   let current_hrmraw_file = null;
   let current_movement_file = require("Storage").open(movement_filename,"a"); //this can stay on
   let current_acceleration_file = require("Storage").open(acceleration_filename,"a"); //this can stay on
-  let debug = true;
+  let debug = false;
   let last_bpm = 0;
   let last_conf = 0;
   E.setTimeZone(timezone);
@@ -261,6 +261,9 @@ Graphics.prototype.setFontAnton = function(scale) {
         startHRMonitor();
     }
     */
+
+    NRF.setAdvertising({0x180F:[E.getBattery()]},{name:"VELWATCH"});
+
     // queue next draw
     if (drawTimeout) clearTimeout(drawTimeout); //
     drawTimeout = setTimeout(function() {
@@ -300,7 +303,6 @@ Graphics.prototype.setFontAnton = function(scale) {
   };
 
   let setupServer = function(){
-    
       NRF.on("connect", function(mac, options) {
         if(debug) print("connection from " + mac);
         
@@ -332,8 +334,6 @@ Graphics.prototype.setFontAnton = function(scale) {
             reading_config = false;
             Bluetooth.write(3); //got all data
             
-        }else{
-            print("1");
         }
     }else if(reading_firmware){
         parts = data.split("\n");
