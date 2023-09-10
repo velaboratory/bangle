@@ -47,16 +47,27 @@ def dbConnection():
 
 def success(data):
     data["success"] = True
-    print(data);
+    print(data)
     return json.dumps(data,cls=NumpyEncoder)
 
 def failure(reason):
     data = {"success":False, "reason":reason};
+    
     print(data)
     return json.dumps(data,cls=NumpyEncoder)
 @app.route("/")
 def root():
-    return "Hello world"
+    with dbConnection() as con:
+        query = '''
+WITH last_syncs AS (
+    SELECT MAX(dt) as last_sync, device_id, app_name, app_version
+	FROM data_sync
+	GROUP BY device_id
+)
+SELECT id, last_sync, app_name, app_version 
+FROM device JOIN last_syncs ON device.id = last_syncs.device_id'''
+        devices = json.loads(pd.read_sql(query, con).to_json(orient="records"))
+        return render_template('home.html', devices=devices)
 
 
 @app.route("/discovered", methods=["POST"])
@@ -195,8 +206,8 @@ def sync():
     station_id = request.values.get("station_id", None)
     device_id = request.values.get("device_id", None)
     sync_id = request.values.get("sync_id", None)
-    app_name = request.values.get("app_name", None) #need to add these to the sync request
-    app_version = request.values.get("version", -1, type=int)
+    app_name = request.values.get("app_name", None)
+    app_version = request.values.get("app_version", -1, type=int)
     complete = request.values.get("complete", 0, type=int)
     data = request.data
     print(data)
