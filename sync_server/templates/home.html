@@ -6,26 +6,34 @@
 
 {% block content %}
     <h2>Devices</h2>
-    <table id="deviceTable" class="display">
-        <thead>
-            <tr>
-                <th>MAC Address</th>
-                <th>Last Sync</th>
-                <th>Last App</th>
-                <th>Last Version</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for device in devices %}
+    <form>
+        <table id="deviceTable" class="display">
+            <thead>
                 <tr>
-                    <td>{{ device.id }}</td>
-                    <td>{{ device.last_sync }}</td>
-                    <td>{{ device.app_name }}</td>
-                    <td>{{ device.app_version }}</td>
+                    <th>MAC Address</th>
+                    <th>Last Sync</th>
+                    <th>Last App</th>
+                    <th>Last Version</th>
+                    <th>Select Target App</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for device in devices %}
+                    <tr>
+                        <td>{{ device.id }}</td>
+                        <td>{{ device.last_sync }}</td>
+                        <td>{{ device.app_name }}</td>
+                        <td>{{ device.app_version }}</td>
+                        <td><select id="selectApp" name="app_name">
+                            {% for app in apps %}
+                                <option value="{{ app.name }}">{{ app.name }}:{{app.version}}</option>
+                            {% endfor %}
+                        </select></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>     
 
     <script>
         $(document).ready(function() {

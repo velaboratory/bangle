@@ -1,5 +1,5 @@
 
-from flask import Flask, app, request, render_template,jsonify
+from flask import Flask, app, request, render_template,jsonify, Response,redirect
 import sqlite3
 import pandas as pd
 import os
@@ -11,6 +11,7 @@ import pytz
 import base64
 import hashlib
 import js2py
+import requests
 
 app = Flask(__name__)
 sqlite3.register_adapter(np.int64, lambda val: int(val))
@@ -67,8 +68,73 @@ WITH last_syncs AS (
 SELECT id, last_sync, app_name, app_version 
 FROM device JOIN last_syncs ON device.id = last_syncs.device_id'''
         devices = json.loads(pd.read_sql(query, con).to_json(orient="records"))
-        return render_template('home.html', devices=devices)
+        return render_template('home.html', devices=devices, apps=json.loads(pd.read_sql("select name,version from app group by name order by name,version", con).to_json(orient="records")))
 
+@app.route("/app_upload", methods=["GET"])
+def apps():
+    with dbConnection() as con:
+        return render_template("appupload.html", apps=json.loads(pd.read_sql("select name,max(version) as version from app group by name", con).to_json(orient="records")))
+
+def validate_and_minify(js_data):
+    #minify
+    res = requests.post("https://www.toptal.com/developers/javascript-minifier/api/raw",{"input":js_data})
+    try:
+        f = js2py.parse_js(res.text)
+    except:
+        return None,"invalid javascript"
+    
+    
+
+    to_return = {"minified":res.text, "base64":base64.b64encode(res.text.encode()).decode()}
+    if len(to_return["base64"]) > 40000:
+        return None,"too big"
+    return to_return, "success"
+
+@app.route("/app_upload", methods=["POST"])
+def app_upload():
+    # this should minify and then base64
+    version = request.form.get("version",0,type=int)
+    app_name = request.form.get("app_name",None)
+    if not app_name:
+        return "app cannot be blank"
+    if version == 0:
+        return "version cannot be blank and must be a whole number"
+    #check the version
+    with dbConnection() as con:
+        if not len(pd.read_sql("select name from app where name=? and version >= ?",con,params=(app_name, version)))==0:
+            return None,"App version not high enough"
+        
+    js_file = request.files.get("jsFile",None)
+    if not js_file:
+        return "file cannot be empty"
+    #validate the javascript file
+    js_data = request.files["jsFile"].read()
+    #minify
+    to_return, reason = validate_and_minify(js_data)
+    if not to_return:
+        return reason
+    
+    #we are good, add it
+    with dbConnection() as con:
+        con.execute("insert into app (name,version,code_base64) values (?,?,?)",(app_name,version,to_return["base64"]))
+
+    return to_return
+
+@app.route("/create_app", methods=["POST"])
+def create_app():
+    new_app_name = request.form.get("new_app_name",None)
+    if not new_app_name:
+        return "new app name cannot be blank"
+    js_data = request.files["jsFile"].read()
+    #minify
+    to_return, reason = validate_and_minify(js_data)
+    if not to_return:
+        return reason
+    
+    with dbConnection() as con:
+        con.execute("insert into app (name, version, code_base64) values (?,?,?)",(new_app_name, 1, to_return["base64"]))
+
+    return redirect("/app_upload")
 
 @app.route("/discovered", methods=["POST"])
 def discovered():
