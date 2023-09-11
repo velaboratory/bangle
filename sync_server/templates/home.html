@@ -6,34 +6,46 @@
 
 {% block content %}
     <h2>Devices</h2>
-    <form>
-        <table id="deviceTable" class="display">
-            <thead>
-                <tr>
-                    <th>MAC Address</th>
-                    <th>Last Sync</th>
-                    <th>Last App</th>
-                    <th>Last Version</th>
-                    <th>Select Target App</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for device in devices %}
+    
+    <table id="deviceTable" class="display">
+        <thead>
+            <tr>
+                <th>MAC Address</th>
+                <th>Last Sync Time</th>
+                <th>Last Sync App</th>
+                <th>Current Target</th>
+                <th>Select Target App</th>
+                <th>Update</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for device in devices %}
+
+                    
                     <tr>
-                        <td>{{ device.id }}</td>
-                        <td>{{ device.last_sync }}</td>
-                        <td>{{ device.app_name }}</td>
-                        <td>{{ device.app_version }}</td>
-                        <td><select id="selectApp" name="app_name">
-                            {% for app in apps %}
-                                <option value="{{ app.name }}">{{ app.name }}:{{app.version}}</option>
-                            {% endfor %}
-                        </select></td>
+                        <form action="/change_app" method="POST">
+                            <input type="hidden" name="device_id" value="{{device.id}}"/>
+                            <td>{{ device.id }}</td>
+                            <td>{{ device.last_sync }}</td>
+                            <td>{{ device.app_name }} v{{ device.app_version }}</td>
+                            <td>{{ device.target_app_name}} v{{device.target_app_version}}</td>
+                            <td><select id="selectApp" name="app_name">
+                                {% for app in apps %}
+                                    {% if app.name == device.target_app_name and app.version == device.target_app_version %}
+                                    <option value="{{device.id}},{{app.name}},{{app.version}}" selected>{{app.name}} v{{app.version}}</option>
+                                    {% else %}
+                                    <option value="{{device.id}},{{app.name}},{{app.version}}">{{app.name}} v{{app.version}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select></td>
+                            <td><input type="submit" value="Update"></td>
+                        </form>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </form>     
+                
+            {% endfor %}
+        </tbody>
+    </table>
+       
 
     <script>
         $(document).ready(function() {

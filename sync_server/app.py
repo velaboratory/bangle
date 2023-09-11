@@ -65,11 +65,15 @@ WITH last_syncs AS (
 	FROM data_sync
 	GROUP BY device_id
 )
-SELECT id, last_sync, app_name, app_version 
+SELECT id, last_sync, app_name, app_version, target_app_name, target_app_version 
 FROM device JOIN last_syncs ON device.id = last_syncs.device_id'''
         devices = json.loads(pd.read_sql(query, con).to_json(orient="records"))
-        return render_template('home.html', devices=devices, apps=json.loads(pd.read_sql("select name,version from app group by name order by name,version", con).to_json(orient="records")))
+        return render_template('home.html', devices=devices, apps=json.loads(pd.read_sql("select name,version from app order by name asc,version desc", con).to_json(orient="records")))
 
+@app.route("/show_discoveries")
+def show_discoveries():
+    with dbConnection() as con:
+        return render_template("discoveries.html",discoveries = json.loads(pd.read_sql("select dt,station_id,device_id,data from discovery_log order by dt desc limit 1000",con).to_json(orient="records")))
 @app.route("/app_upload", methods=["GET"])
 def apps():
     with dbConnection() as con:
@@ -118,7 +122,7 @@ def app_upload():
     with dbConnection() as con:
         con.execute("insert into app (name,version,code_base64) values (?,?,?)",(app_name,version,to_return["base64"]))
 
-    return to_return
+    return redirect("/")
 
 @app.route("/create_app", methods=["POST"])
 def create_app():
@@ -135,15 +139,25 @@ def create_app():
         con.execute("insert into app (name, version, code_base64) values (?,?,?)",(new_app_name, 1, to_return["base64"]))
 
     return redirect("/app_upload")
+@app.route("/change_app", methods=["POST"])
+def change_app():
+    name = request.form.get("app_name",None)
+    if not name: return "No app name provided"
+    id,name,version = (x for x in name.split(","))
+    
+    with dbConnection() as con:
+        con.execute("update device set wants_sync=1,target_app_name=?,target_app_version=? where id = ?",(name,version,id))
 
+    return redirect("/")
 @app.route("/discovered", methods=["POST"])
 def discovered():
     with dbConnection() as con:
+        device_name = request.values.get("name", None)
         station_id = request.values.get("station_id", None) # probably add to the list if found
         device_id = request.values.get("device_id", None) 
         rssi = request.values.get("rssi", None)
         battery = request.values.get("battery", None)
-        if not all([station_id, device_id, rssi]):
+        if not all([station_id, device_id, rssi, device_name]):
              return failure("Invalid Request")
         station_id = station_id.lower()
         device_id = device_id.lower()
@@ -160,7 +174,7 @@ def discovered():
         else:
 
             #add the discovery
-            con.execute("insert into discovery_log (dt,station_id,device_id,data) values (?,?,?,?)",(datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),station_id,device_id,json.dumps({"battery":battery,"rssi":rssi})))
+            con.execute("insert into discovery_log (dt,station_id,device_id,data) values (?,?,?,?)",(datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),station_id,device_id,json.dumps({"battery":battery,"rssi":rssi, "name":device_name})))
 
             # determine if it's been long enough
             device = df_device.iloc[0]

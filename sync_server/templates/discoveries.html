@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Discoveries</h2>
+    <table id="discoveryTable" class="display">
+        <thead>
+            <tr>
+                <th>Station Address</th>
+                <th>Device Address</th>
+                <th>Date Time</th>>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for discovery in discoveries %}
+                    <tr>
+                        
+                        <td>{{ discovery.station_id }}</td>
+                        <td>{{ discovery.device_id }}</td>
+                        <td>{{ discovery.dt }}</td>
+                        <td>{{ discovery.data }}</td>
+                            
+                       
+                    </tr>
+                
+            {% endfor %}
+        </tbody>
+    </table>
+       
+
+    <script>
+        $(document).ready(function() {
+            $('#discoveryTable').DataTable();
+        });
+    </script>
+{% endblock %}
