@@ -306,6 +306,8 @@ uint8_t buffer[BUFF_LEN];
 int buffer_index = 0;
 String sync_id="";
 String device_mac="";
+String device_name="";
+uint8_t device_battery = 0;
 String config_to_upload = "";
 int device_rssi = 0;
 String app_name="";
@@ -348,7 +350,7 @@ ServerResponseDiscovered sendServerDiscovered(){
   
   http.begin(discover_route.c_str());
   http.addHeader("Content-Type", "application/x-www-form-urlencoded", false, true);
-  String urlEncoded = "rssi="+String(device_rssi)+"&station_id="+station_mac+"&device_id="+device_mac; //todo, set station id correctly
+  String urlEncoded = "name=" + device_name + "&battery=" + device_battery + "&rssi="+String(device_rssi)+"&station_id="+station_mac+"&device_id="+device_mac; //todo, set station id correctly
   int httpResponseCode = http.POST(urlEncoded);
   ServerResponseDiscovered res;
   res.success=false;
@@ -444,7 +446,6 @@ void onRX(NimBLERemoteCharacteristic* pRemoteCharacteristic, uint8_t* pData, siz
     Serial.println("Got RX in time");
     Serial.println(pData[0]);
     if(pData[0] == 7){
-      Serial.println("here");
       uint8_t converter[4] = {pData[4],pData[3],pData[2],pData[1]};
       uint8_t converter2[4] = {pData[8],pData[7],pData[6],pData[5]};
       uint8_t app_name_converter[11];
@@ -513,11 +514,17 @@ void loop() {
   NimBLEScanResults results = pBLEScan->start(10);
   for(int i = 0; i < results.getCount(); i++) {
     NimBLEAdvertisedDevice device = results.getDevice(i);
-
-    if(strstr(device.getName().c_str(),"Bangle.js")){
+    if(device.getName() != ""){
+      Serial.print("Found: ");
+      Serial.println(device.getName().c_str());
+    }
+    if(strstr(device.getName().c_str(),"VELWATCH")){
       M5.Lcd.println(device.getName().c_str());
+      device_name = String(device.getName().c_str());
       device_mac = String(device.getAddress().toString().c_str());
       device_rssi = device.getRSSI();
+      device_battery = device.getServiceData<uint8_t>(0);
+
       ServerResponseDiscovered res = sendServerDiscovered(); //get back sync data
       if(!res.sync){
         continue;  //recently synced, just continue
@@ -579,7 +586,7 @@ void loop() {
           NimBLEDevice::deleteClient(pClient);
           continue;
         }
-
+        Serial.println("confirming");
         confirming = true;
         uint8_t CONFIRM[] = {2};
         tx->writeValue(CONFIRM,1);
@@ -592,7 +599,7 @@ void loop() {
           NimBLEDevice::deleteClient(pClient);
           continue;
         }
-
+        Serial.println("configurating");
         configurating = true;
         uint8_t CONFIGURE[] = {3};
         tx->writeValue(CONFIGURE,1);
@@ -615,9 +622,13 @@ void loop() {
         while(configurating && pClient->isConnected()){
           delay(1);
         }
-        Serial.println(app_name);
-        Serial.println(target_app_name);
-        Serial.println(app_version);
+        Serial.print("updating: Found ");
+        Serial.print(app_name);
+        Serial.print(".v");
+        Serial.print(app_version);
+        Serial.print(" Target ");
+        Serial.print(target_app_name);
+        Serial.print(".v");
         Serial.println(target_app_version);
         if(app_name != target_app_name || app_version != target_app_version){
           if(getSoftwareUpdates()){
@@ -646,6 +657,7 @@ void loop() {
               }
             }
             delay(20);
+            Serial.println("updating");
             START_UPDATE[0] = 10; //finish with a \n
             tx->writeValue(START_UPDATE,1);
 
@@ -653,6 +665,7 @@ void loop() {
               delay(1);
             }
 
+            Serial.println("restarting");
             delay(20);
             START_UPDATE[0] = 5;
             tx->writeValue(START_UPDATE,1);
@@ -667,6 +680,13 @@ void loop() {
       }
 
       NimBLEDevice::deleteClient(pClient);
+    }else if(strstr(device.getName().c_str(),"Bangle")){
+      M5.Lcd.println(device.getName().c_str());
+      device_name = String(device.getName().c_str());
+      device_mac = String(device.getAddress().toString().c_str());
+      device_rssi = device.getRSSI();
+      device_battery = 0;
+      ServerResponseDiscovered res = sendServerDiscovered(); //get back sync data
     }
   }
 

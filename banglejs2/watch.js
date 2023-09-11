@@ -17,8 +17,8 @@ Graphics.prototype.setFontAnton = function(scale) {
     last_hrm_reading_time = parseInt(last_hrm_reading_time);
   }
 
-  let app_name = "test";
-  let app_version = 37;
+  let app_name = "test_app";
+  let app_version = 41;
   let version = app_name+app_version;
   let movement_filename = "healthlog"+version; 
   let acceleration_filename = "accellog"+version;
