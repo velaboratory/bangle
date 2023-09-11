@@ -314,7 +314,7 @@ String app_name="";
 long app_version=-1;
 String target_app_name="";
 long target_app_version=-1;
-StaticJsonDocument<20000> doc;
+StaticJsonDocument<5000> doc;
 char* search_string = "code_base64\": \"";
 bool getSoftwareUpdates(){
   updating = true;
@@ -347,7 +347,6 @@ bool getSoftwareUpdates(){
 
 }
 ServerResponseDiscovered sendServerDiscovered(){
-  
   http.begin(discover_route.c_str());
   http.addHeader("Content-Type", "application/x-www-form-urlencoded", false, true);
   String urlEncoded = "name=" + device_name + "&battery=" + device_battery + "&rssi="+String(device_rssi)+"&station_id="+station_mac+"&device_id="+device_mac; //todo, set station id correctly
