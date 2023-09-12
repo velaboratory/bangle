@@ -8,6 +8,8 @@
 #include <DNSServer.h>
 #include <ArduinoJson.h>
 #include <UrlEncode.h>
+#include <AsyncTCP.h> //Library for establishing a captive portal
+#include <ESPAsyncWebServer.h> //Library for establishing a captive portal
 NimBLEScan* pBLEScan;
 bool setupComplete = true;
 NimBLECharacteristic *pCharacteristic_ssid;
@@ -26,10 +28,19 @@ String update_route = server_root + "getapp";
 String station_mac = "none";
 Preferences preferences;
 
-WebServer server(80);
-HTTPClient http;
-const byte DNS_PORT = 53; 
 DNSServer dnsServer;
+AsyncWebServer server(80);
+const IPAddress localIP(192, 168, 4, 1);
+const String IPURL = "http://192.168.4.1";
+String ssid;
+String password;
+String username;
+
+//WebServer server(80);
+//HTTPClient http;
+//const byte DNS_PORT = 53; 
+//DNSServer dnsServer;
+
 //this is used if you are setting up wifi with bluetooth (see below)
 class CharacteristicCallbacks: public NimBLECharacteristicCallbacks {
     void onWrite(NimBLECharacteristic* pCharacteristic){
@@ -99,6 +110,12 @@ void doBluetoothWifiSetup(){
 }
 
 //this is called if you want to do the wifi setup thing (webpage to configure)
+void setUpDNSServer(DNSServer &dnsServer, const IPAddress localIP) {
+  // Set the TTL for DNS response and start the DNS server
+  dnsServer.setTTL(3600);
+  dnsServer.start(53, "*", localIP);
+}
+/*
 void doWifiWifiSetup(){
   M5.Lcd.setCursor(7, 20, 2);
   M5.Lcd.fillScreen(0);
@@ -132,6 +149,153 @@ void doWifiWifiSetup(){
     dnsServer.processNextRequest();
     server.handleClient();
   }
+}
+*/
+void doWifiWifiSetup(AsyncWebServer &server){
+
+  
+  WiFi.mode(WIFI_AP);
+  WiFi.softAP("watchconfig");
+  
+  server.on("/connecttest.txt", [](AsyncWebServerRequest *request) { request->redirect("http://logout.net"); }); //Windows
+  server.on("/wpad.dat", [](AsyncWebServerRequest *request) { request->send(404); }); //Windows
+  server.on("/generate_204", [](AsyncWebServerRequest *request) { request->redirect(IPURL); }); //Android
+  server.on("/redirect", [](AsyncWebServerRequest *request) { request->redirect(IPURL); }); //Microsoft
+  server.on("/hotspot-detect.html", [](AsyncWebServerRequest *request) { request->redirect(IPURL); }); //Apple
+  server.on("/canonical.html", [](AsyncWebServerRequest *request) { request->redirect(IPURL); }); //Firefox
+  server.on("/success.txt", [](AsyncWebServerRequest *request) { request->send(200); }); //Firefox
+  server.on("/ncsi.txt", [](AsyncWebServerRequest *request) { request->redirect(IPURL); });// windows call home??
+  
+  server.on("/", HTTP_ANY, [](AsyncWebServerRequest *request) {
+    String HTML = "<!DOCTYPE html>\
+    <html>\
+    <head>\
+    <meta charset=\"UTF-8\">\
+  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\
+  <title>University of Georgia Survey</title>\
+    <style>\
+    body {\
+      font-family: Arial, sans-serif;\
+      background-color: #f4f4f4;\
+      margin: 0;\
+      font-size: 5%;\
+      padding: 0;\
+    }\
+    .container {\
+      max-width: 600px;\
+      margin: 0 auto;\
+      padding: 20px;\
+      background-color: #ffffff;\
+      border-radius: 5px;\
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);\
+    }\
+    .logo {\
+      text-align: center;\
+      margin-bottom: 20px;\
+    }\
+    .logo img {\
+      max-width: 100px;\
+    }\
+    .survey-form {\
+      margin-bottom: 20px;\
+    }\
+    .survey-form label {\
+      display: block;\
+      margin-bottom: 10px;\
+      font-weight: bold;\
+    }\
+    .survey-form input[type=\"text\"],\
+    .survey-form textarea {\
+      width: 100%;\
+      padding: 10px;\
+      border: 1px solid #ccc;\
+      border-radius: 5px;\
+      font-size: 16px;\
+      margin-bottom: 15px;\
+    }\
+    .survey-form button {\
+      background-color: #007a72;\
+      color: #ffffff;\
+      border: none;\
+      padding: 10px 20px;\
+      border-radius: 5px;\
+      font-size: 16px;\
+      cursor: pointer;\
+    }\
+    </style>\
+    </head>\
+    <body>\
+    <header>\
+    <div class=\"container\">\
+    <h1>Bangle.JS Basestation WIFI Setup<h1/>\
+    <form action=\"post\" method=\"post\">\
+    SSID<br>";
+    int n = WiFi.scanNetworks();
+    Serial.println(n);
+    for(int i=0;i<n;i++){
+      String ssid = WiFi.SSID(i);
+      HTML = HTML + "<input type=\"radio\" id=\"ssid\" name=\"ssid\" value= \"" + ssid + "\">"+ssid+"<br>";
+    }
+    HTML = HTML + "<label for=\"password\">Password</label>\
+    <input type=\"text\" id=\"password\"name=\"password\"><br>\
+    <label for=\"username\">Username</label>\
+    <input type=\"text\" id=\"username\" name=\"username\"><br>\
+    <input type=\"submit\">\
+    </div>\
+    </body>\
+    </html>";
+    AsyncWebServerResponse *response = request->beginResponse(200, "text/html", HTML);
+    response->addHeader("Cache-Control", "public,max-age=31536000");  // save this file to cache for 1 year (unless you refresh)
+    request->send(response);
+    Serial.println("Served Basic HTML Page");
+  });
+
+  server.on("/post", HTTP_POST, [] (AsyncWebServerRequest *request) {
+    String param1 = "ssid";
+    String param2 = "password";
+    String param3 = "username";
+    String sssid = "none";
+    String spassword = "none";
+    String susername = "none";
+    if (request->hasParam("ssid", true)) {
+      sssid = request->getParam("ssid", true)->value();
+    }
+    if (request->hasParam(param2, true)) {
+      spassword = request->getParam(param2, true)->value();
+    }
+    if (request->hasParam(param3, true)) {
+      susername = request->getParam(param3, true)->value();
+    }
+    ssid = sssid;
+    password = spassword;
+    username = susername;
+    Serial.println(sssid);
+    Serial.println(spassword);
+    Serial.println(susername);
+  });
+  
+  server.onNotFound([](AsyncWebServerRequest *request) {
+    //List all parameters
+int params = request->params();
+for(int i=0;i<params;i++){
+  AsyncWebParameter* p = request->getParam(i);
+  if(p->isFile()){ //p->isPost() is also true
+    Serial.printf("FILE[%s]: %s, size: %u\n", p->name().c_str(), p->value().c_str(), p->size());
+  } else if(p->isPost()){
+    Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+  } else {
+    Serial.printf("GET[%s]: %s\n", p->name().c_str(), p->value().c_str());
+  }
+}
+  Serial.println(request->methodToString());
+    request->redirect(IPURL);
+    Serial.print("onnotfound ");
+    Serial.print(request->host());
+    Serial.print(" ");
+    Serial.print(request->url());
+    Serial.print(" sent redirect to " + IPURL + "\n");
+  });
+
 }
 
 boolean isIp(String str) {
@@ -220,10 +384,14 @@ void setup() {
 
   M5.Lcd.setCursor(7, 20, 2);
   M5.Lcd.fillScreen(0);
-  M5.Lcd.println("Hold button for Wifi Config");
-
+  M5.Lcd.println("Connect to wifi");
+  M5.Lcd.println("\"watchconfig\"");
+  M5.Lcd.println("through an external device");
   delay(2000);
 
+  setUpDNSServer(dnsServer, localIP);
+  server.begin();
+  
   if(digitalRead(37)==LOW){
     //doBluetoothWifiSetup()
     doWifiWifiSetup();
@@ -252,10 +420,10 @@ bool connectWifi(){
 
   station_mac = WiFi.macAddress();
   Serial.println(station_mac);
-  String username=preferences.getString("username","");
-  String password=preferences.getString("password","");
-  String ssid = preferences.getString("ssid","");
-  bool is_eap = preferences.getBool("eap",false);
+ //String username=preferences.getString("username","");
+  //String password=preferences.getString("password","");
+  //String ssid = preferences.getString("ssid","");
+  //bool is_eap = preferences.getBool("eap",false);
 
   M5.Lcd.setCursor(7, 20, 2);
   M5.Lcd.fillScreen(0);
@@ -265,7 +433,7 @@ bool connectWifi(){
   WiFi.mode(WIFI_STA);
   
  
-  if(is_eap){
+  if(username != NULL){
     esp_wifi_sta_wpa2_ent_set_identity((uint8_t *)"", 0);
     esp_wifi_sta_wpa2_ent_set_username((uint8_t *)username.c_str(), username.length());
     esp_wifi_sta_wpa2_ent_set_password((uint8_t *)password.c_str(), password.length());
@@ -500,11 +668,11 @@ void onRX(NimBLERemoteCharacteristic* pRemoteCharacteristic, uint8_t* pData, siz
 }
 
 void loop() {
-
+ if(ssid != NULL){
   if ((WiFi.status() != WL_CONNECTED)) {
     connectWifi();
   }
-
+ }
 
   M5.Lcd.setCursor(7, 20, 2);
   M5.Lcd.fillScreen(0);
@@ -688,5 +856,6 @@ void loop() {
       ServerResponseDiscovered res = sendServerDiscovered(); //get back sync data
     }
   }
-
+   dnsServer.processNextRequest();
+   delay(30);
 }
