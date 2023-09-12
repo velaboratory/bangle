@@ -35,10 +35,10 @@ const String IPURL = "http://192.168.4.1";
 String ssid;
 String password;
 String username;
+HTTPClient http;
+const byte DNS_PORT = 53;
 
-//WebServer server(80);
-//HTTPClient http;
-//const byte DNS_PORT = 53; 
+//WebServer server(80); 
 //DNSServer dnsServer;
 
 //this is used if you are setting up wifi with bluetooth (see below)
@@ -155,7 +155,9 @@ void doWifiWifiSetup(AsyncWebServer &server){
 
   
   WiFi.mode(WIFI_AP);
-  WiFi.softAP("watchconfig");
+  WiFi.softAP("watchconfig", "password");
+
+  IPAddress apIP = WiFi.softAPIP();
   
   server.on("/connecttest.txt", [](AsyncWebServerRequest *request) { request->redirect("http://logout.net"); }); //Windows
   server.on("/wpad.dat", [](AsyncWebServerRequest *request) { request->send(404); }); //Windows
@@ -317,7 +319,7 @@ String toStringIp(IPAddress ip) {
   return res;
 }
 
-
+/*
 boolean captivePortal() {
   if (!isIp(server.hostHeader())) {
     Serial.println("Request redirected to captive portal");
@@ -328,9 +330,10 @@ boolean captivePortal() {
   }
   return false;
 }
+*/
 
 //the root form, scans for ssids and displays a form to allow entry
-void handle_root(){
+/*void handle_root(){
   if (captivePortal()) { 
     return;
   }
@@ -377,7 +380,7 @@ void handle_form(){
   preferences.end();
   ESP.restart();
 }
-
+*/
 void setup() {
   M5.begin();
   preferences.begin("my-app", false); 
@@ -394,7 +397,7 @@ void setup() {
   
   if(digitalRead(37)==LOW){
     //doBluetoothWifiSetup()
-    doWifiWifiSetup();
+    doWifiWifiSetup(server);
   }
   
   connectWifi();  //from flash
