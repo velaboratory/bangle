@@ -136,7 +136,7 @@ def add_device():
         df = pd.read_sql("select id from device where id=?",con, params=(device_id,))
         if len(df) == 0: con.execute('insert into device (id, label, last_data_sync, target_config_json, target_app_name, target_app_version) values (?,?,?,"{}",?,?)',(device_id, device_label, None,name,version))
         else: return failure("device already exists")
-        return success({})
+        return redirect("/")
 @app.route("/create_app", methods=["POST"])
 def create_app():
     new_app_name = request.form.get("new_app_name",None)
