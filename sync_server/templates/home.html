@@ -12,7 +12,9 @@
                 <th>Last Sync App</th>
                 <th>Current Target</th>
                 <th>Select Target App</th>
+                <th>Delete</th>
                 <th>Update</th>
+                
             </tr>
         </thead>
         <tbody>
@@ -36,7 +38,8 @@
                                     {% endif %}
                                 {% endfor %}
                             </select></td>
-                            <td><input type="submit" value="Update"></td>
+                            <td><input type="submit" name="action" value="Delete"></td>
+                            <td><input type="submit" name="action" value="Update"></td>
                         </form>
                     </tr>
                 

@@ -157,9 +157,12 @@ def change_app():
     name = request.form.get("app_name",None)
     if not name: return "No app name provided"
     id,name,version = (x for x in name.split(","))
-    
-    with dbConnection() as con:
-        con.execute("update device set wants_sync=1,target_app_name=?,target_app_version=? where id = ?",(name,version,id))
+    if request.form.get("action",None) == "Delete":
+        with dbConnection() as con:
+            con.execute("delete from device where id = ?",(id,))
+    else:
+        with dbConnection() as con:
+            con.execute("update device set wants_sync=1,target_app_name=?,target_app_version=? where id = ?",(name,version,id))
 
     return redirect("/")
 @app.route("/discovered", methods=["POST"])
