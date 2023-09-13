@@ -65,8 +65,8 @@ WITH last_syncs AS (
 	FROM data_sync
 	GROUP BY device_id
 )
-SELECT id, last_sync, app_name, app_version, target_app_name, target_app_version 
-FROM device JOIN last_syncs ON device.id = last_syncs.device_id'''
+SELECT id, label, last_sync, app_name, app_version, target_app_name, target_app_version 
+FROM device LEFT JOIN last_syncs ON device.id = last_syncs.device_id'''
         devices = json.loads(pd.read_sql(query, con).to_json(orient="records"))
         return render_template('home.html', devices=devices, apps=json.loads(pd.read_sql("select name,version from app order by name asc,version desc", con).to_json(orient="records")))
 
@@ -124,6 +124,19 @@ def app_upload():
 
     return redirect("/")
 
+@app.route("/add_device", methods=["POST"])
+def add_device():
+    device_id = request.values.get("device_id", None)
+    app_name_version = request.values.get("app_name_version")
+    device_label = request.values.get("device_label",None)
+    if not all([device_id,app_name_version, device_label]):
+        return failure("invalid request")
+    name,version = app_name_version.split(",")
+    with dbConnection() as con:
+        df = pd.read_sql("select id from device where id=?",con, params=(device_id,))
+        if len(df) == 0: con.execute('insert into device (id, label, last_data_sync, target_config_json, target_app_name, target_app_version) values (?,?,?,"{}",?,?)',(device_id, device_label, None,name,version))
+        else: return failure("device already exists")
+        return success({})
 @app.route("/create_app", methods=["POST"])
 def create_app():
     new_app_name = request.form.get("new_app_name",None)
@@ -218,10 +231,11 @@ def get_devices():
 def get_syncs():
     from_time = request.values.get("from_time", 0,type=int) #utc timestamp
     device_id = request.values.get("device_id", None)
-    if not all([device_id]):
+    app_name = request.values.get("app_name", None)
+    if not all([device_id,app_name]):
         return failure("invalid request")
     with dbConnection() as con:
-        df = pd.read_sql("select from_time as dt_start,dt as dt_sync, device_id, station_id, data from data_sync where device_id = ? and from_time >= ? and complete=1", con = con, params = (device_id, from_time))
+        df = pd.read_sql("select uuid, from_time as dt_start,dt as dt_sync, device_id, station_id, data from data_sync where device_id = ? and from_time >= ? and app_name = ? and complete=1", con = con, params = (device_id, from_time,app_name))
     to_return = json.loads(df.to_json(orient="records"))
     return success({"syncs":to_return})
 

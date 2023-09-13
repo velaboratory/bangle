@@ -6,6 +6,7 @@
     <table id="deviceTable" class="display">
         <thead>
             <tr>
+                <th>Device Label</th>
                 <th>MAC Address</th>
                 <th>Last Sync Time</th>
                 <th>Last Sync App</th>
@@ -21,6 +22,7 @@
                     <tr>
                         <form action="/change_app" method="POST">
                             <input type="hidden" name="device_id" value="{{device.id}}"/>
+                            <td>{{ device.label }}</td>
                             <td>{{ device.id }}</td>
                             <td>{{ device.last_sync }}</td>
                             <td>{{ device.app_name }} v{{ device.app_version }}</td>
@@ -41,7 +43,23 @@
             {% endfor %}
         </tbody>
     </table>
-       
+    <h2>Add Device</h2>   
+    <form action="/add_device" method="POST">
+        <label for="device_id">Label</label>
+        <input type="text" id="device_label" name="device_label" required>
+        <br><br>
+        <label for="device_id">Device ID</label>
+        <input type="text" id="device_id" name="device_id" required>
+        <br><br>
+        <label for="app_name_version">App & Version</label>
+        <select id="app_name_version" name="app_name_version">
+            {% for app in apps %}         
+                <option value="{{app.name}},{{app.version}}">{{app.name}} v{{app.version}}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+        <input type="submit" value="Add Device">
+    </form>
 
     <script>
         $(document).ready(function() {
