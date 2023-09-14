@@ -1,4 +1,5 @@
 
+
 NRF.disconnect(); //disconnect at the start.  This removes issues associated with terminals
 Graphics.prototype.setFontAnton = function(scale) {
     g.setFontCustom(atob("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgAAAAAAAAAAA/gAAAAAAAAAAP/gAAAAAAAAAH//gAAAAAAAAB///gAAAAAAAAf///gAAAAAAAP////gAAAAAAD/////gAAAAAA//////gAAAAAP//////gAAAAH///////gAAAB////////gAAAf////////gAAP/////////gAD//////////AA//////////gAA/////////4AAA////////+AAAA////////gAAAA///////wAAAAA//////8AAAAAA//////AAAAAAA/////gAAAAAAA////4AAAAAAAA///+AAAAAAAAA///gAAAAAAAAA//wAAAAAAAAAA/8AAAAAAAAAAA/AAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////AAAAAB///////8AAAAH////////AAAAf////////wAAA/////////4AAB/////////8AAD/////////+AAH//////////AAP//////////gAP//////////gAP//////////gAf//////////wAf//////////wAf//////////wAf//////////wA//8AAAAAB//4A//wAAAAAAf/4A//gAAAAAAP/4A//gAAAAAAP/4A//gAAAAAAP/4A//wAAAAAAf/4A///////////4Af//////////wAf//////////wAf//////////wAf//////////wAP//////////gAP//////////gAH//////////AAH//////////AAD/////////+AAB/////////8AAA/////////4AAAP////////gAAAD///////+AAAAAf//////4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/gAAAAAAAAAAP/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/AAAAAAAAAAA//AAAAAAAAAAA/+AAAAAAAAAAB/8AAAAAAAAAAD//////////gAH//////////gAP//////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH/4AAAAB/gAAD//4AAAAf/gAAP//4AAAB//gAA///4AAAH//gAB///4AAAf//gAD///4AAA///gAH///4AAD///gAP///4AAH///gAP///4AAP///gAf///4AAf///gAf///4AB////gAf///4AD////gA////4AH////gA////4Af////gA////4A/////gA//wAAB/////gA//gAAH/////gA//gAAP/////gA//gAA///8//gA//gAD///w//gA//wA////g//gA////////A//gA///////8A//gA///////4A//gAf//////wA//gAf//////gA//gAf/////+AA//gAP/////8AA//gAP/////4AA//gAH/////gAA//gAD/////AAA//gAB////8AAA//gAA////wAAA//gAAP///AAAA//gAAD//8AAAA//gAAAP+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/+AAAAAD/wAAB//8AAAAP/wAAB///AAAA//wAAB///wAAB//wAAB///4AAD//wAAB///8AAH//wAAB///+AAP//wAAB///+AAP//wAAB////AAf//wAAB////AAf//wAAB////gAf//wAAB////gA///wAAB////gA///wAAB////gA///w//AAf//wA//4A//AAA//wA//gA//AAAf/wA//gB//gAAf/wA//gB//gAAf/wA//gD//wAA//wA//wH//8AB//wA///////////gA///////////gA///////////gA///////////gAf//////////AAf//////////AAP//////////AAP/////////+AAH/////////8AAH///+/////4AAD///+f////wAAA///8P////gAAAf//4H///+AAAAH//gB///wAAAAAP4AAH/8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/wAAAAAAAAAA//wAAAAAAAAAP//wAAAAAAAAB///wAAAAAAAAf///wAAAAAAAH////wAAAAAAA/////wAAAAAAP/////wAAAAAB//////wAAAAAf//////wAAAAH///////wAAAA////////wAAAP////////wAAA///////H/wAAA//////wH/wAAA/////8AH/wAAA/////AAH/wAAA////gAAH/wAAA///4AAAH/wAAA//+AAAAH/wAAA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gAAAAAAAAH/4AAAAAAAAAAH/wAAAAAAAAAAH/wAAAAAAAAAAH/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB//8AAA/////+B///AAA/////+B///wAA/////+B///4AA/////+B///8AA/////+B///8AA/////+B///+AA/////+B////AA/////+B////AA/////+B////AA/////+B////gA/////+B////gA/////+B////gA/////+A////gA//gP/gAAB//wA//gf/AAAA//wA//gf/AAAAf/wA//g//AAAAf/wA//g//AAAA//wA//g//gAAA//wA//g//+AAP//wA//g////////gA//g////////gA//g////////gA//g////////gA//g////////AA//gf///////AA//gf//////+AA//gP//////+AA//gH//////8AA//gD//////4AA//gB//////wAA//gA//////AAAAAAAH////8AAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////gAAAAB///////+AAAAH////////gAAAf////////4AAB/////////8AAD/////////+AAH//////////AAH//////////gAP//////////gAP//////////gAf//////////wAf//////////wAf//////////wAf//////////wAf//////////4A//wAD/4AAf/4A//gAH/wAAP/4A//gAH/wAAP/4A//gAP/wAAP/4A//gAP/4AAf/4A//wAP/+AD//4A///wP//////4Af//4P//////wAf//4P//////wAf//4P//////wAf//4P//////wAP//4P//////gAP//4H//////gAH//4H//////AAH//4D/////+AAD//4D/////8AAB//4B/////4AAA//4A/////wAAAP/4AP////AAAAB/4AD///4AAAAAAAAAH/8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//AAAAAAAAAAA//gAAAAAAAAAA//gAAAAAAAAAA//gAAAAAAADgA//gAAAAAAP/gA//gAAAAAH//gA//gAAAAB///gA//gAAAAP///gA//gAAAD////gA//gAAAf////gA//gAAB/////gA//gAAP/////gA//gAB//////gA//gAH//////gA//gA///////gA//gD///////gA//gf///////gA//h////////gA//n////////gA//////////gAA/////////AAAA////////wAAAA///////4AAAAA///////AAAAAA//////4AAAAAA//////AAAAAAA/////4AAAAAAA/////AAAAAAAA////8AAAAAAAA////gAAAAAAAA///+AAAAAAAAA///4AAAAAAAAA///AAAAAAAAAA//4AAAAAAAAAA/+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//gB///wAAAAP//4H///+AAAA///8P////gAAB///+f////4AAD///+/////8AAH/////////+AAH//////////AAP//////////gAP//////////gAf//////////gAf//////////wAf//////////wAf//////////wA///////////wA//4D//wAB//4A//wB//gAA//4A//gA//gAAf/4A//gA//AAAf/4A//gA//gAAf/4A//wB//gAA//4A///P//8AH//4Af//////////wAf//////////wAf//////////wAf//////////wAf//////////gAP//////////gAP//////////AAH//////////AAD/////////+AAD///+/////8AAB///8f////wAAAf//4P////AAAAH//wD///8AAAAA/+AAf//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH//gAAAAAAAAB///+AA/+AAAAP////gA//wAAAf////wA//4AAB/////4A//8AAD/////8A//+AAD/////+A///AAH/////+A///AAP//////A///gAP//////A///gAf//////A///wAf//////A///wAf//////A///wAf//////A///wA///////AB//4A//4AD//AAP/4A//gAB//AAP/4A//gAA//AAP/4A//gAA/+AAP/4A//gAB/8AAP/4A//wAB/8AAf/4Af//////////wAf//////////wAf//////////wAf//////////wAf//////////wAP//////////gAP//////////gAH//////////AAH/////////+AAD/////////8AAB/////////4AAAf////////wAAAP////////AAAAB///////4AAAAAD/////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/AAB/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="), 46, atob("EiAnGicnJycnJycnEw=="), 78 + (scale << 8) + (1 << 16));
@@ -7,19 +8,6 @@ Graphics.prototype.setFontAnton = function(scale) {
   { // must be inside our own scope here so that when we are unloaded everything disappears
     // we also define functions using 'let fn = function() {..}' for the same reason. function decls are global
 
-  let readSetting = function(s, default_value){
-    var f = require("Storage").read("setting_"+s);
-    if(f){
-      return JSON.parse(f);
-    }else{
-      return default_value;
-    }
-  };
-  let writeSetting = function(s,v){
-    require("Storage").write("setting_"+s,JSON.stringify(v));
-  };
-  
-    
   let drawTimeout;
   let syncing = false;
   let last_steps = Bangle.getStepCount();
@@ -31,13 +19,12 @@ Graphics.prototype.setFontAnton = function(scale) {
   }
 
   let app_name = "test_app";
-  let app_version = 43;
+  let app_version = 41;
   let version = app_name+app_version;
   let movement_filename = "healthlog"+version; 
   let acceleration_filename = "accellog"+version;
   let hrm_files_filename = "hrmfileslog"+version;
   let config_filename = "config"+version;
-  let goals_filename = "goals"+version;
   let config = require("Storage").open(config_filename,"r").read(1000000); //stored in base64
   if(config === undefined){ //not there
     config = {}; //stored as object
@@ -55,13 +42,7 @@ Graphics.prototype.setFontAnton = function(scale) {
     from_time = ""+Math.floor(Date.now() / 1000);
     require("Storage").write("from_time",from_time);
   }
-  
-  let current_goal = readSetting("current_goal", 5000);
-  let next_goal = readSetting("next_goal",current_goal);
-  let daily_steps = readSetting("daily_steps", 0);
-  let goals_reached = readSetting("goals_reached", 0);
-  let goals_file = require("Storage").open(goals_filename,"a");
-  
+
   let sync_files = [];
   let current_hrm_file = null;
   let current_hrmraw_file = null;
@@ -71,73 +52,29 @@ Graphics.prototype.setFontAnton = function(scale) {
   let last_bpm = 0;
   let last_conf = 0;
   E.setTimeZone(timezone);
-  Bangle.setOptions({"powerSave": true, "hrmPollInterval": 20, "lockTimeout": 10000, "backlightTimeout":1000,"wakeOnBTN1":true,"wakeOnBTN2":true,"wakeOnBTN3":true,"wakeOnFaceUp":false,"wakeOnTouch":false,"wakeOnTwist":false});
+  Bangle.setOptions({"powerSave": true, "hrmPollInterval": 20, "wakeOnBTN1":true,"wakeOnBTN2":true,"wakeOnBTN3":true,"wakeOnFaceUp":false,"wakeOnTouch":false,"wakeOnTwist":false});
   Bangle.setHRMPower(false,"myApp"); //this actually resets the poll interval
   Bangle.setHRMPower(true,"myApp");
   Bangle.setHRMPower(false,"myApp"); 
+
+
     
-  let dt = new Date();
-  let date_string = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
-  let current_day = readSetting("current_day", date_string);
-
-  menu_active = false;
-  
-  var goal_log_buffer = new ArrayBuffer(6);
-    var menu = {
-
-    "Start HRM":function(){
-      if(!Bangle.isHRMOn()){
-        startHRMonitor();
-      }
-    },
-    "Stop HRM": function(){
-       stopHRMonitor();
-    },
-    "Set Goal": {
-                  value: next_goal,
-                  min:5000,
-                  max:25000,
-                  step:500,
-                  onchange: v=> { 
-                    writeSetting("next_goal",v);
-                    view = new DataView(goal_log_buffer);
-                    view.setUint32(0, Math.floor(Date.now() / 1000), false); 
-                    view.setUint16(4, next_goal, false);
-                    goals_file.write(btoa(goal_log_buffer));
-                  }
-                },
-    "Exit": function(){
-      closeMenu();
-    }
-
-  };
-
   setWatch(function(e){
-    if(!menu_active){
-      openMenu();
+    if(!Bangle.isHRMOn()){
+        startHRMonitor();
     }else{
-      closeMenu();
+        stopHRMonitor();
+        drawWidgets();
     }
+  Bangle.buzz();
+  //stop low power
+  stopEverythingDog();
+  //start high power
+  fastDrawIntervalDog = setInterval(drawClockFace, fastUpdateTimeDog);
+  //stop high power after some amount of time
+  timeoutDog = setTimeout(stopFastDrawDog, awakeTimeDog);
+  stopTimeoutDog = setTimeout(stopEverythingDog, stopTimeDog);
   }, BTN1, {repeat:true});
-
-
-let openMenu = function(){
-      if(menu_active){
-        return;
-      }
-    E.showMenu(menu);
-    menu_active = true;
-  };
-  let closeMenu = function(){
-    if(!menu_active){
-      return;
-    }
-    menu_active = false;
-    E.showMenu();
-    draw();
-  };
-
-
 
   var movement_log_buffer = new ArrayBuffer(9);
 
@@ -148,7 +85,6 @@ let openMenu = function(){
       var steps = Bangle.getStepCount();
       var movement = Bangle.getHealthStatus().movement;
       var delta = steps - last_steps;
-      
       last_steps = steps;
       last_movement = movement; 
       view = new DataView(movement_log_buffer);
@@ -157,13 +93,6 @@ let openMenu = function(){
       view.setUint16(6, movement, false);
       view.setUint8(8,0,false); //padding
       current_movement_file.write(btoa(movement_log_buffer));
-    
-      writeSetting("daily_steps",daily_steps+delta);
-      if(daily_steps > (goals_reached+1)*current_goal){
-        Bangle.buzz();
-        goals_reached++; 
-        writeSetting("goals_reached",goals_reached);
-      }
   };
 
   let accel_log_buffer = new ArrayBuffer(18);
@@ -272,7 +201,6 @@ let openMenu = function(){
 
   let stopHRMonitor = function(){
     Bangle.setHRMPower(false,"myapp"); //this should immediately stop raw readings
-    drawWidgets();
   };
 
   let drawWidgets = function(){
@@ -291,30 +219,79 @@ let openMenu = function(){
             }
         }
         g.setFontAlign(1, 0).setFont("6x8",2).drawString(""+E.getBattery(), 170, 10);
-        g.setFontAlign(-1, 0).setFont("6x8",2).drawString(""+daily_steps +"/"+(goals_reached+1)*current_goal, 5, 10);
+        g.setFontAlign(-1, 0).setFont("6x8",2).drawString(""+Bangle.getHealthStatus("day").steps, 5, 10);
   };
-
-  let drawClockFace = function(){
-    var x = g.getWidth() / 2;
-    var y = g.getHeight() / 2;
-    g.reset().clearRect(Bangle.appRect); // clear whole background (w/o widgets)
-    var date = new Date(); //timezone aware
-    var hour = date.getHours() % 12;
-    var minuteStr = (""+date.getMinutes()).padStart(2,"0");
-
-    var timeStr = (hour == 0?"12":(""+hour)) + ":"+minuteStr;
-    //var timeStr = locale.time(date, 1); // Hour and minute
-    g.setFontAlign(0, 0).setFont("Anton").drawString(timeStr, x, y);
-    // Show date and day of week
-    var dow = date.getDay();
-    days_of_week = ["Sun","Mon","Tues","Wednes","Thurs","Fri","Satur"];
-    var dateStringFull = date.toString();
-    var parts = dateStringFull.split(" ");
-    var dateStr = parts[2]+" " + parts[1] + " " + parts[3]+"\n"+
-                  days_of_week[dow].toUpperCase()+"DAY";
-    g.setFontAlign(0, 0).setFont("6x8", 2).drawString(dateStr, x, y+48);
+  
+    // Draw time
+    // Load fonts
+    require("Font7x11Numeric7Seg").add(Graphics);
+    // position on screen
+    const X = 150, Y = 170;
     
+// Dog animation
+    var fastUpdateTimeDog = 500;
+    var slowUpdateTimeDog = 2000;
+    var stopTimeDog = 10000;
+    var awakeTimeDog = 4000;
+    var fastDrawIntervalDog;
+    var slowDrawIntervalDog;
+    var timeoutDog;
+    var stopTimeoutDog;
+    var dog_imgs =                   [require("heatshrink").decompress(atob("iMUwkBBpNEAAdAA4MEogBDCBdAAwQQBgMQCAsRiIdBCoIIBgMRCAQaDCAYxCCAohFKIoQBiMM5gACA4QZC8gYDFQYABPIIHFGRYQHOwxtCgiHCPYJLGJgIA=")),require("heatshrink").decompress(atob("i0UwkBBY8BiMRgEEogADBQwBDCqFABAICBBQcRCooJDBQVAgAKIGoQKTFY5sIAQMQ5gAC4ASCoAKBDoPkIgIGCCoQqDJ4JpBGw5aBFoQKFgkAJhEECgUQEAwUCGoMEV4Q0DBQLQGBQQ=")),require("heatshrink").decompress(atob("icUwkBBY8BiEAogADoEAiMAglEAIYSNoAHCCQURiASFiIABEIIYBBIIRBCQYdDCQg3CCQwlGLo4JBhnMAARTCDgfkDYUEE4IsCAAIdBBYQvEBAQ4GoAbGJwIIBQgx6DgiXCRIJUHRoQ="))];
+
+  var currentframe=0;
+    
+  let drawClockFace = function(){
+ //draw current frame of dog
+  g.clearRect(50,30,165,165);
+  g.drawImage(dog_imgs[currentframe],50,20,{scale:5} );
+  currentframe = (currentframe + 1)% dog_imgs.length;
+    
+  // work out how to display the current time
+  var d = new Date();
+  var h = d.getHours(), m = d.getMinutes();
+  var time = (" "+h).substr(-2) + ":" + m.toString().padStart(2,0);
+  // Reset the state of the graphics library
+  g.reset();
+  // draw the current time (4x size 7 segment)
+  g.setFont("7x11Numeric7Seg",4);
+  g.setFontAlign(1,1); // align right bottom
+  g.drawString(time, X, Y, true /*clear background*/);
+  
   };
+
+// Clear the screen once, at startup
+g.clear();
+
+   
+    //by default start watch in low power
+slowDrawIntervalDog = setInterval(drawClockFace, slowUpdateTimeDog);
+    
+    let stopFastDrawDog = function() {
+  //actually stop high power
+  clearInterval(fastDrawIntervalDog);
+  //make sure and start low power again!
+  slowDrawIntervalDog= setInterval(drawClockFace, slowUpdateTimeDog);
+};
+
+let stopEverythingDog = function() {
+  if(timeoutDog) {
+    clearTimeout(timeoutDog);
+  }
+  if(stopTimeoutDog) {
+    clearTimeout(stopTimeoutDog);
+  }
+  if(fastDrawIntervalDog) {
+    clearInterval(fastDrawIntervalDog);
+  }
+  if(slowDrawIntervalDog) {
+    clearInterval(slowDrawIntervalDog);
+  }
+};
+    
+
+    
+
 
   let drawSyncProgress = function(){
     var w = g.getWidth();
@@ -332,24 +309,10 @@ let openMenu = function(){
   // Actually draw the watch face
   let draw = function() {
     if(syncing) return;
-    
-    if(!menu_active){
-      drawClockFace();
-      drawWidgets();
-    }
-   
+
+    drawClockFace();
+    drawWidgets();
     writeMovementLog();
-    
-    let dt = new Date();
-    let date_string = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
-    if(date_string != current_day){
-      //it's a brand new day
-      writeSetting("current_goal",next_goal);
-      writeSetting("daily_steps", 0);
-      writeSetting("goals_reached", 0);
-      writeSetting("current_day",date_string);
-      current_day = date_string;
-    }
     /* we are not doing this for now.  Uses too much battery life.
     var time = Math.floor(Date.now() / 1000);
     if(time - last_hrm_reading_time > 60*20){
@@ -454,7 +417,6 @@ let openMenu = function(){
                 sync_files.push(config_filename);
                 sync_files.push(movement_filename);
                 sync_files.push(acceleration_filename);
-                sync_files.push(goals_filename);
                 rawfiles = require("Storage").open(hrm_files_filename,"r");
                 while(true){
                     s = rawfiles.readLine();
@@ -556,7 +518,7 @@ let openMenu = function(){
             }
             
             message[9+app_name.length] =0;
-            if(Bangle.isHRMOn() || menu_active){
+            if(Bangle.isHRMOn()){
                 message[0] = 8;
             }
             else{
