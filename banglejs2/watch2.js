@@ -56,7 +56,7 @@ Graphics.prototype.setFontAnton = function(scale) {
     require("Storage").write("from_time",from_time);
   }
   
-  let current_goal = readSetting("current_goal", 5000);
+  let current_goal = readSetting("current_goal", 50);
   let next_goal = readSetting("next_goal",current_goal);
   let daily_steps = readSetting("daily_steps", 0);
   let goals_reached = readSetting("goals_reached", 0);
@@ -64,10 +64,13 @@ Graphics.prototype.setFontAnton = function(scale) {
 
   // Dog animation
   let dog_happy_till = 0;
+  let make_dog_happy = function(for_time){
+    dog_happy_till = Date.now() + for_time;  //5 seconds
+        drawDog();
+  }
   Bangle.on("lock", function(on){
     if(!on){
-        dog_happy_till = Date.now() + 10000;  //5 seconds
-        drawDog();
+        make_dog_happy(10000);
     }
   });
   
@@ -112,6 +115,7 @@ Graphics.prototype.setFontAnton = function(scale) {
                   step:500,
                   onchange: v=> { 
                     writeSetting("next_goal",v);
+                    next_goal = v;
                     view = new DataView(goal_log_buffer);
                     view.setUint32(0, Math.floor(Date.now() / 1000), false); 
                     view.setUint16(4, next_goal, false);
@@ -172,8 +176,9 @@ let openMenu = function(){
       daily_steps += delta;
       writeSetting("daily_steps",daily_steps);
       if(daily_steps > (goals_reached+1)*current_goal){
-        Bangle.buzz();
+        Bangle.buzz(1000,1);
         goals_reached++; 
+        make_dog_happy(5000);    
         writeSetting("goals_reached",goals_reached);
       }
   };

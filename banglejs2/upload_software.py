@@ -12,9 +12,26 @@ import asyncio
 import json
 import base64
 import json_minify
+import js2py
+pause=False
 def callback(sender,data:bytearray):
-    print("received: " + data.decode())
+    if data[0] == 19:
+        pause = True
+    if data[0] == 17:
+        pause = False
 
+def validate_and_minify(js_data):
+    #minify
+    res = requests.post("https://www.toptal.com/developers/javascript-minifier/api/raw",{"input":js_data})
+    try:
+        f = js2py.parse_js(res.text)
+    except:
+        return None,"invalid javascript"
+    
+    to_return = {"minified":res.text, "base64":base64.b64encode(res.text.encode()).decode()}
+    if len(to_return["base64"]) > 40000:
+        return None,"too big"
+    return to_return, "success"
 
 async def run():
     
@@ -77,13 +94,21 @@ async def run():
                             print("hello")
                             await client.write_gatt_char(UUID_NORDIC_TX,bytearray([4]))
                             print("here")
-                            data = open("watch2.js").read()
-                            encoded = base64.b64encode(data.encode()).decode()+"\n" 
+                            js_data = open("watch2.js").read()
+                            data, reason = validate_and_minify(js_data)
+                            if not data:
+                                print(reason)
+                                break
+                            encoded = data["base64"]+"\n" 
                             print(encoded)
-                            for i in range(0, len(encoded), 50):
+                            for i in range(0, len(encoded), 100):
                                  print(i)
-                                 await client.write_gatt_char(UUID_NORDIC_TX,encoded[i:i+50].encode())
-                                 await asyncio.sleep(.02) #seems good enough
+                                 while pause:
+                                     await asyncio.sleep(.05) #seems good enough
+                                 
+                                 await client.write_gatt_char(UUID_NORDIC_TX,encoded[i:i+100].encode())
+
+                                 
                             return
                         
         except:
