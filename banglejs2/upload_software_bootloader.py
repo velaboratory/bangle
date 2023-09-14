@@ -57,7 +57,7 @@ async def run():
                         print("reading watch software")
                         # now we can send the data
 
-                        js_data = open("watch.js").read()
+                        js_data = open("watch2.js").read()
                         data, reason = validate_and_minify(js_data)
                         if not data:
                             print(reason)

@@ -61,7 +61,19 @@ Graphics.prototype.setFontAnton = function(scale) {
   let daily_steps = readSetting("daily_steps", 0);
   let goals_reached = readSetting("goals_reached", 0);
   let goals_file = require("Storage").open(goals_filename,"a");
+
+  // Dog animation
+  let dog_happy_till = 0;
+  Bangle.on("lock", function(on){
+    if(!on){
+        dog_happy_till = Date.now() + 10000;  //5 seconds
+        drawDog();
+    }
+  });
   
+  var dog_imgs = [require("heatshrink").decompress(atob("iMUwkBBpNEAAdAA4MEogBDCBdAAwQQBgMQCAsRiIdBCoIIBgMRCAQaDCAYxCCAohFKIoQBiMM5gACA4QZC8gYDFQYABPIIHFGRYQHOwxtCgiHCPYJLGJgIA=")),require("heatshrink").decompress(atob("i0UwkBBY8BiMRgEEogADBQwBDCqFABAICBBQcRCooJDBQVAgAKIGoQKTFY5sIAQMQ5gAC4ASCoAKBDoPkIgIGCCoQqDJ4JpBGw5aBFoQKFgkAJhEECgUQEAwUCGoMEV4Q0DBQLQGBQQ=")),require("heatshrink").decompress(atob("icUwkBBY8BiEAogADoEAiMAglEAIYSNoAHCCQURiASFiIABEIIYBBIIRBCQYdDCQg3CCQwlGLo4JBhnMAARTCDgfkDYUEE4IsCAAIdBBYQvEBAQ4GoAbGJwIIBQgx6DgiXCRIJUHRoQ="))];
+  var currentframe = 0;
+
   let sync_files = [];
   let current_hrm_file = null;
   let current_hrmraw_file = null;
@@ -294,9 +306,44 @@ let openMenu = function(){
         g.setFontAlign(-1, 0).setFont("6x8",2).drawString(""+daily_steps +"/"+(goals_reached+1)*current_goal, 5, 10);
   };
 
+
+  let drawDogTimeout;
+  let drawDog = function(){
+        
+        
+        
+
+        if(dog_happy_till > Date.now()){
+            if(drawDogTimeout != undefined){
+                clearTimeout(drawDogTimeout);
+            }
+            drawDogTimeout = setTimeout(drawDog,400);
+            currentframe = (currentframe + 1)% dog_imgs.length;
+            if(currentframe == 0){
+                currentframe = 1;
+            }
+        }else{
+            currentframe = 0;
+        }
+
+        //draw current frame of dog
+        dog_image = dog_imgs[currentframe];
+        metrics = g.imageMetrics(dog_image);
+        dog_scale = 4;
+        dog_w = metrics.width*dog_scale;
+        dog_h = metrics.height*dog_scale;
+        dog_x = 10;
+        dog_y = 30;
+        if(!menu_active){
+            g.reset().clearRect(dog_x,dog_y,dog_x+dog_w+20,dog_y+dog_h);
+            g.drawImage(dog_image,dog_x,dog_y,{scale:dog_scale} ); 
+        }
+
+  }
   let drawClockFace = function(){
     var x = g.getWidth() / 2;
     var y = g.getHeight() / 2;
+    var screen_size = 175;
     g.reset().clearRect(Bangle.appRect); // clear whole background (w/o widgets)
     var date = new Date(); //timezone aware
     var hour = date.getHours() % 12;
@@ -304,7 +351,7 @@ let openMenu = function(){
 
     var timeStr = (hour == 0?"12":(""+hour)) + ":"+minuteStr;
     //var timeStr = locale.time(date, 1); // Hour and minute
-    g.setFontAlign(0, 0).setFont("Anton").drawString(timeStr, x, y);
+    
     // Show date and day of week
     var dow = date.getDay();
     days_of_week = ["Sun","Mon","Tues","Wednes","Thurs","Fri","Satur"];
@@ -312,8 +359,11 @@ let openMenu = function(){
     var parts = dateStringFull.split(" ");
     var dateStr = parts[2]+" " + parts[1] + " " + parts[3]+"\n"+
                   days_of_week[dow].toUpperCase()+"DAY";
-    g.setFontAlign(0, 0).setFont("6x8", 2).drawString(dateStr, x, y+48);
+    //g.setFontAlign(0, 0).setFont("Anton").drawString(timeStr, x, 165);
     
+    drawDog();
+
+    g.setFontAlign(0, 1).setFont("6x8", 5).drawString(timeStr, x, screen_size-10);
   };
 
   let drawSyncProgress = function(){
@@ -359,12 +409,13 @@ let openMenu = function(){
 
     NRF.setAdvertising({0x180F:[E.getBattery()]},{name:"VELWATCH"});
 
+    next_draw = 60000 - (Date.now() % 60000)
     // queue next draw
     if (drawTimeout) clearTimeout(drawTimeout); //
     drawTimeout = setTimeout(function() {
     drawTimeout = undefined;
     draw();
-    }, 60000 - (Date.now() % 60000)); //force update on the minute
+    }, next_draw); //force update on the minute
     
   };
   

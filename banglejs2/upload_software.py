@@ -23,7 +23,7 @@ async def run():
             devices = await BleakScanner.discover(5,return_adv=True) # short discovery time so it starts quickly
             for d,adv in devices.values():
                 print(d.name)
-                if d.name and ("Bangle.js" in d.name): # this approach should work on windows or mac
+                if d.name and ("VELWATCH" in d.name): # this approach should work on windows or mac
                     print(d.name)
                     # # check with the server
                     # data={"station_id":get_mac_address().lower(),"device_id":d.address.lower(),"config_id":config_id}
@@ -77,7 +77,7 @@ async def run():
                             print("hello")
                             await client.write_gatt_char(UUID_NORDIC_TX,bytearray([4]))
                             print("here")
-                            data = open("watch.js").read()
+                            data = open("watch2.js").read()
                             encoded = base64.b64encode(data.encode()).decode()+"\n" 
                             print(encoded)
                             for i in range(0, len(encoded), 50):
