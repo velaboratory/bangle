@@ -91,7 +91,7 @@ Graphics.prototype.setFontAnton = function(scale) {
   let dt = new Date();
   let date_string = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
   let current_day = readSetting("current_day", date_string);
-
+  
   menu_active = false;
   
   var goal_log_buffer = new ArrayBuffer(6);
@@ -395,8 +395,11 @@ let openMenu = function(){
     if(date_string != current_day){
       //it's a brand new day
       writeSetting("current_goal",next_goal);
+      current_goal = next_goal;
       writeSetting("daily_steps", 0);
+      daily_steps = 0;
       writeSetting("goals_reached", 0);
+      goals_reached = 0;
       writeSetting("current_day",date_string);
       current_day = date_string;
     }
