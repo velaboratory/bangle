@@ -195,8 +195,12 @@ def discovered():
             # determine if it's been long enough
             device = df_device.iloc[0]
             now = datetime.now(timezone.utc)
-            last_sync = datetime.strptime(device.last_data_sync, 
-                                          "%Y-%m-%d %H:%M:%S")  # stored in Y:m:d H:M:S
+            try:
+                last_sync = datetime.strptime(device.last_data_sync, 
+                                            "%Y-%m-%d %H:%M:%S")  # stored in Y:m:d H:M:S
+            except:
+                last_sync = datetime.utcfromtimestamp(0)
+                
             last_sync = pytz.utc.localize(last_sync)
             if device.wants_sync == 1:
                 return success({"sync": 1, "server_unixtime":int(now.timestamp())})
