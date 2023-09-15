@@ -42,7 +42,7 @@ Graphics.prototype.setFontAnton = function(scale) {
   }
 
   let app_name = "test_app";
-  let app_version = 45;
+  let app_version = 47;
   let version = app_name+app_version;
   let movement_filename = "healthlog"+version; 
   let acceleration_filename = "accellog"+version;
@@ -83,7 +83,7 @@ Graphics.prototype.setFontAnton = function(scale) {
     dog_idle: require("heatshrink").decompress(atob("iMUwkBBpNEAAdAA4MEogBDCBdAAwQQBgMQCAsRiIdBCoIIBgMRCAQaDCAYxCCAohFKIoQBiMM5gACA4QZC8gYDFQYABPIIHFGRYQHOwxtCgiHCPYJLGJgIA=")),
     dog_wag1: require("heatshrink").decompress(atob("i0UwkBBY8BiMRgEEogADBQwBDCqFABAICBBQcRCooJDBQVAgAKIGoQKTFY5sIAQMQ5gAC4ASCoAKBDoPkIgIGCCoQqDJ4JpBGw5aBFoQKFgkAJhEECgUQEAwUCGoMEV4Q0DBQLQGBQQ=")),
     dog_wag2: require("heatshrink").decompress(atob("icUwkBBY8BiEAogADoEAiMAglEAIYSNoAHCCQURiASFiIABEIIYBBIIRBCQYdDCQg3CCQwlGLo4JBhnMAARTCDgfkDYUEE4IsCAAIdBBYQvEBAQ4GoAbGJwIIBQgx6DgiXCRIJUHRoQ=")),
-    dog_bowl_empty: require("heatshrink").decompress(atob("kcjwkBiIA/AH4AgiCrEVBUA5gAECRMMBYIADAwIRHiHAcI3ACB4RIGYw0JiBVFAAQiI4AcBNAgiHCAP/GYkP+ARGD4IRBAAgQBCIpEBERJGFEQRFHEQ4AJEQqaHcxwA/AH4A/ABMQA==")),
+    dog_bowl_empty: require("heatshrink").decompress(atob("kcjwkCkQA/AH4A/AAjOEZZQMB5gADCRIPB4MRAAUcCQIPFkEMB4gSD4AkFgfMCA0R5nAEQs0IAIzF5lEEQsM4lMKwnMA4IiGngaBCQfEogDBEQkgIoItCAAQlDCIgQDAA40EGYQAJESwQKEQgQMCIkMCBY0DEUcAABbSFAH4AkkA")),
     dog_bone: require("heatshrink").decompress(atob("kcjwkBiIA/AH4AxgAGMAAUP+DOEgPwCJP/AAgQKEQoGBIrIA/AH4A/AH4A/ADMQA"))
   };
 
@@ -334,18 +334,18 @@ let openMenu = function(){
         g.setFontAlign(-1, 0).setFont("6x8",2).drawString(""+daily_steps +"/"+(goals_reached+1)*current_goal, 5, 10);
   };
 
-  bone_area_rect = [90,30,175,75]
+  bone_area_rect = [90,30,175,60]
   let drawBones = function(n){
         metrics = g.imageMetrics(imgs.dog_bone);
         scale = 2.5;
         w = metrics.width*scale;
         h = metrics.height*scale;
         x = 95; //top left
-        y = 55;
+        y = 45;
         
       g.clearRect(bone_area_rect[0],bone_area_rect[1],bone_area_rect[2],bone_area_rect[3])
       for(var i =0;i<n;i++){
-        g.drawImage(imgs.dog_bone,x-(10*(i%2)),y-12*(i),{scale:scale} ); 
+        g.drawImage(imgs.dog_bone,x-(10*(i%2)),y-10*(i),{scale:scale} ); 
       }
         
   };
@@ -356,20 +356,25 @@ let openMenu = function(){
         w = metrics.width*scale;
         h = metrics.height*scale;
         x = 90; //top left
-        y = 55;
+        y = 40;
         if(!menu_active){
             g.clearRect(x,y,x+w,y+h/2);
             g.drawImage(imgs.dog_bowl_empty,x,y,{scale:scale} );
             num_bones = Math.floor(daily_steps / (current_goal / 5)); 
             drawBones(num_bones-bones_eaten);
         }
+        if(config.dog_name!=undefined){
+          if(config.dog_name.length < 8){
+            g.setFontAlign(0, 0).setFont("4x6", 2).drawString(config.dog_name, x+38, y+55);
+          }else{
+            g.setFontAlign(0, 0).setFont("6x8", 1).drawString(config.dog_name, x+38, y+55);
+          }
+        }
   };
   let drawDogTimeout;
   let last_dog_rect = []
   let drawDog = function(){
-      if(config.dog_name == undefined){
-        return;
-      }
+
         let frames = [imgs.dog_wag1,imgs.dog_wag2];
         let img;
         if(dog_happy_till > Date.now()){
@@ -396,7 +401,7 @@ let openMenu = function(){
           last_dog_rect = [dog_x,dog_y,dog_x+dog_w,dog_y+dog_h]
           g.drawImage(img,dog_x,dog_y,{scale:dog_scale} ); 
           
-          g.setFontAlign(0, 1).setFont("6x8", 1).drawString(config.dog_name, dog_x+dog_w/2, dog_y);
+          
           
         }
 

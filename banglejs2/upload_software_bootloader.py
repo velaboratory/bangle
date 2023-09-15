@@ -5,7 +5,7 @@ from getmac import get_mac_address
 from bleak import BleakClient, BleakScanner
 import requests
 import base64
-address = "dd:0c:e4:29:32:ab"
+address = "e5:cc:1d:bb:e4:d1"
 UUID_NORDIC_TX = "6e400002-b5a3-f393-e0a9-e50e24dcca9e"
 UUID_NORDIC_RX = "6e400003-b5a3-f393-e0a9-e50e24dcca9e"
 import asyncio
@@ -41,7 +41,7 @@ async def run():
             for d,adv in devices.values():
                 received_data = ""
                 print(d.name)
-                if d.name and ("Bangle.js" in d.name): # this approach should work on windows or mac
+                if d.name and ("Bangle.js" in d.name) and (d.address.lower() == address.lower()): # this approach should work on windows or mac
                     async with BleakClient(d) as client:
                         print("starting sync")
                         await client.start_notify(UUID_NORDIC_RX,callback)
