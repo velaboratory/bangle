@@ -56,12 +56,16 @@ Graphics.prototype.setFontAnton = function(scale) {
     require("Storage").write("from_time",from_time);
   }
   
-  let current_goal = readSetting("current_goal", 50);
+  writeSetting("bones_eaten",0);
+  writeSetting("daily_steps",501);
+  writeSetting("goals_reached",0);
+  let current_goal = readSetting("current_goal", 500);
   let next_goal = readSetting("next_goal",current_goal);
   let daily_steps = readSetting("daily_steps", 0);
   let goals_reached = readSetting("goals_reached", 0);
   let goals_file = require("Storage").open(goals_filename,"a");
-
+  let bones_eaten = readSetting("bones_eaten", 0);
+  let num_bones = 0;
   // Dog animation
   let dog_happy_till = 0;
   let make_dog_happy = function(for_time){
@@ -74,7 +78,16 @@ Graphics.prototype.setFontAnton = function(scale) {
     }
   });
   
-  var dog_imgs = [require("heatshrink").decompress(atob("iMUwkBBpNEAAdAA4MEogBDCBdAAwQQBgMQCAsRiIdBCoIIBgMRCAQaDCAYxCCAohFKIoQBiMM5gACA4QZC8gYDFQYABPIIHFGRYQHOwxtCgiHCPYJLGJgIA=")),require("heatshrink").decompress(atob("i0UwkBBY8BiMRgEEogADBQwBDCqFABAICBBQcRCooJDBQVAgAKIGoQKTFY5sIAQMQ5gAC4ASCoAKBDoPkIgIGCCoQqDJ4JpBGw5aBFoQKFgkAJhEECgUQEAwUCGoMEV4Q0DBQLQGBQQ=")),require("heatshrink").decompress(atob("icUwkBBY8BiEAogADoEAiMAglEAIYSNoAHCCQURiASFiIABEIIYBBIIRBCQYdDCQg3CCQwlGLo4JBhnMAARTCDgfkDYUEE4IsCAAIdBBYQvEBAQ4GoAbGJwIIBQgx6DgiXCRIJUHRoQ="))];
+  var imgs = {
+    dog_idle: require("heatshrink").decompress(atob("iMUwkBBpNEAAdAA4MEogBDCBdAAwQQBgMQCAsRiIdBCoIIBgMRCAQaDCAYxCCAohFKIoQBiMM5gACA4QZC8gYDFQYABPIIHFGRYQHOwxtCgiHCPYJLGJgIA=")),
+    dog_wag1: require("heatshrink").decompress(atob("i0UwkBBY8BiMRgEEogADBQwBDCqFABAICBBQcRCooJDBQVAgAKIGoQKTFY5sIAQMQ5gAC4ASCoAKBDoPkIgIGCCoQqDJ4JpBGw5aBFoQKFgkAJhEECgUQEAwUCGoMEV4Q0DBQLQGBQQ=")),
+    dog_wag2: require("heatshrink").decompress(atob("icUwkBBY8BiEAogADoEAiMAglEAIYSNoAHCCQURiASFiIABEIIYBBIIRBCQYdDCQg3CCQwlGLo4JBhnMAARTCDgfkDYUEE4IsCAAIdBBYQvEBAQ4GoAbGJwIIBQgx6DgiXCRIJUHRoQ=")),
+    dog_bowl_empty: require("heatshrink").decompress(atob("kcjwkBiIA/AH4AgiCrEVBUA5gAECRMMBYIADAwIRHiHAcI3ACB4RIGYw0JiBVFAAQiI4AcBNAgiHCAP/GYkP+ARGD4IRBAAgQBCIpEBERJGFEQRFHEQ4AJEQqaHcxwA/AH4A/ABMQA==")),
+    dog_bone: require("heatshrink").decompress(atob("kcjwkBiIA/AH4AxgAGMAAUP+DOEgPwCJP/AAgQKEQoGBIrIA/AH4A/AH4A/ADMQA"))
+  };
+
+
+  
   var currentframe = 0;
 
   let sync_files = [];
@@ -175,8 +188,17 @@ let openMenu = function(){
       current_movement_file.write(btoa(movement_log_buffer));
       daily_steps += delta;
       writeSetting("daily_steps",daily_steps);
+
+      
+
       if(daily_steps > (goals_reached+1)*current_goal){
-        Bangle.buzz(1000,1);
+        drawBowl(); //the first time, show all bones
+        Bangle.buzz(500,1);
+        setTimeout(function(){Bangle.buzz(500,1);bones_eaten++;drawBowl();},1000); //eat bones
+        setTimeout(function(){Bangle.buzz(500,1);bones_eaten++;drawBowl();},2000); 
+        setTimeout(function(){Bangle.buzz(500,1);bones_eaten++;drawBowl();},3000);
+        setTimeout(function(){Bangle.buzz(500,1);bones_eaten++;drawBowl();},4000);
+        setTimeout(function(){Bangle.buzz(500,1);bones_eaten++;drawBowl();writeSetting("bones_eaten",bones_eaten);},5000);
         goals_reached++; 
         make_dog_happy(5000);    
         writeSetting("goals_reached",goals_reached);
@@ -311,37 +333,65 @@ let openMenu = function(){
         g.setFontAlign(-1, 0).setFont("6x8",2).drawString(""+daily_steps +"/"+(goals_reached+1)*current_goal, 5, 10);
   };
 
+  bone_area_rect = [90,30,175,75]
+  let drawBones = function(n){
+        metrics = g.imageMetrics(imgs.dog_bone);
+        scale = 2.5;
+        w = metrics.width*scale;
+        h = metrics.height*scale;
+        x = 95; //top left
+        y = 55;
+        
+      g.clearRect(bone_area_rect[0],bone_area_rect[1],bone_area_rect[2],bone_area_rect[3])
+      for(var i =0;i<n;i++){
+        g.drawImage(imgs.dog_bone,x-(10*(i%2)),y-12*(i),{scale:scale} ); 
+      }
+        
+  };
 
+  let drawBowl = function(){
+        metrics = g.imageMetrics(imgs.dog_bowl_empty);
+        scale = 2.5;
+        w = metrics.width*scale;
+        h = metrics.height*scale;
+        x = 90; //top left
+        y = 55;
+        if(!menu_active){
+            g.clearRect(x,y,x+w,y+h/2);
+            g.drawImage(imgs.dog_bowl_empty,x,y,{scale:scale} );
+            num_bones = Math.floor(daily_steps / (current_goal / 5)); 
+            drawBones(num_bones-bones_eaten);
+        }
+  };
   let drawDogTimeout;
+  let last_dog_rect = []
   let drawDog = function(){
-        
-        
-        
-
+        let frames = [imgs.dog_wag1,imgs.dog_wag2];
+        let img;
         if(dog_happy_till > Date.now()){
             if(drawDogTimeout != undefined){
                 clearTimeout(drawDogTimeout);
             }
             drawDogTimeout = setTimeout(drawDog,400);
-            currentframe = (currentframe + 1)% dog_imgs.length;
-            if(currentframe == 0){
-                currentframe = 1;
-            }
+            currentframe = (currentframe + 1)% frames.length;
+            img = frames[currentframe];
         }else{
-            currentframe = 0;
+            img = imgs.dog_idle;
         }
 
-        //draw current frame of dog
-        dog_image = dog_imgs[currentframe];
-        metrics = g.imageMetrics(dog_image);
+        metrics = g.imageMetrics(img);
         dog_scale = 4;
         dog_w = metrics.width*dog_scale;
         dog_h = metrics.height*dog_scale;
         dog_x = 10;
         dog_y = 30;
+        if(last_dog_rect.length > 0){
+          g.clearRect(last_dog_rect[0],last_dog_rect[1],last_dog_rect[2],last_dog_rect[3]);
+        }
+        last_dog_rect = [dog_x,dog_y,dog_x+dog_w,dog_y+dog_h]
         if(!menu_active){
-            g.reset().clearRect(dog_x,dog_y,dog_x+dog_w+20,dog_y+dog_h);
-            g.drawImage(dog_image,dog_x,dog_y,{scale:dog_scale} ); 
+            
+            g.drawImage(img,dog_x,dog_y,{scale:dog_scale} ); 
         }
 
   }
@@ -359,16 +409,18 @@ let openMenu = function(){
     
     // Show date and day of week
     var dow = date.getDay();
-    days_of_week = ["Sun","Mon","Tues","Wednes","Thurs","Fri","Satur"];
+    days_of_week = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
     var dateStringFull = date.toString();
     var parts = dateStringFull.split(" ");
-    var dateStr = parts[2]+" " + parts[1] + " " + parts[3]+"\n"+
-                  days_of_week[dow].toUpperCase()+"DAY";
+    var dateStr = days_of_week[dow] + " " + parts[1]+" " + parts[2];
+              
     //g.setFontAlign(0, 0).setFont("Anton").drawString(timeStr, x, 165);
     
     drawDog();
+    drawBowl();
 
-    g.setFontAlign(0, 1).setFont("6x8", 5).drawString(timeStr, x, screen_size-10);
+    g.setFontAlign(0, 1).setFont("6x8", 5).drawString(timeStr, x, screen_size-20);
+    g.setFontAlign(0, 1).setFont("6x8", 2).drawString(dateStr, x, screen_size);
   };
 
   let drawSyncProgress = function(){
@@ -407,6 +459,8 @@ let openMenu = function(){
       goals_reached = 0;
       writeSetting("current_day",date_string);
       current_day = date_string;
+      writeSetting("bones_eaten", 0);
+      bones_eaten = 0;
     }
     /* we are not doing this for now.  Uses too much battery life.
     var time = Math.floor(Date.now() / 1000);
