@@ -42,7 +42,7 @@ Graphics.prototype.setFontAnton = function(scale) {
   }
 
   let app_name = "test_app";
-  let app_version = 44;
+  let app_version = 45;
   let version = app_name+app_version;
   let movement_filename = "healthlog"+version; 
   let acceleration_filename = "accellog"+version;
