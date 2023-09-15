@@ -18,6 +18,17 @@ Graphics.prototype.setFontAnton = function(scale) {
   let writeSetting = function(s,v){
     require("Storage").write("setting_"+s,JSON.stringify(v));
   };
+
+  let read_config = function(){
+    config = require("Storage").open(config_filename,"r").read(1000000); //stored in base64
+    if(config === undefined){ //not there
+      config = {}; //stored as object
+      require("Storage").open(config_filename,"w").write(btoa(JSON.stringify(config)));
+    }else{
+      config = JSON.parse(atob(config)); //stored as b64, read back and parse
+    }
+    return config;
+  };
   
     
   let drawTimeout;
@@ -38,13 +49,7 @@ Graphics.prototype.setFontAnton = function(scale) {
   let hrm_files_filename = "hrmfileslog"+version;
   let config_filename = "config"+version;
   let goals_filename = "goals"+version;
-  let config = require("Storage").open(config_filename,"r").read(1000000); //stored in base64
-  if(config === undefined){ //not there
-    config = {}; //stored as object
-    require("Storage").open(config_filename,"w").write(btoa(JSON.stringify(config)));
-  }else{
-    config = JSON.parse(atob(config)); //stored as b64, read back and parse
-  }
+  let config = read_config();
   let reading_config = false;
   let reading_firmware = false;
   let timezone = -4;
@@ -362,6 +367,9 @@ let openMenu = function(){
   let drawDogTimeout;
   let last_dog_rect = []
   let drawDog = function(){
+      if(config.dog_name == undefined){
+        return;
+      }
         let frames = [imgs.dog_wag1,imgs.dog_wag2];
         let img;
         if(dog_happy_till > Date.now()){
@@ -383,10 +391,13 @@ let openMenu = function(){
         dog_y = 30;
         if(!menu_active){
           if(last_dog_rect.length > 0){
-            g.clearRect(last_dog_rect[0],last_dog_rect[1],last_dog_rect[2],last_dog_rect[3]);
+            g.clearRect(last_dog_rect[0],last_dog_rect[1]-10,last_dog_rect[2],last_dog_rect[3]);
           }
           last_dog_rect = [dog_x,dog_y,dog_x+dog_w,dog_y+dog_h]
           g.drawImage(img,dog_x,dog_y,{scale:dog_scale} ); 
+          
+          g.setFontAlign(0, 1).setFont("6x8", 1).drawString(config.dog_name, dog_x+dog_w/2, dog_y);
+          
         }
 
   }
@@ -529,12 +540,16 @@ let openMenu = function(){
   currentFileIndex = 0;
   let firmware_file;
   Bluetooth.on('data', function(data) {
-    if(reading_config){
+    if(reading_config){  
         parts = data.split("\n");
         config_file_temp.write(parts[0]);
         if(parts.length > 1){
             var config_file_data = require("Storage").open(config_file_temp_name,"r").read(10000000);
             require("Storage").open(config_filename,"w").write(config_file_data);
+            
+            config = read_config(); 
+            
+            
             reading_config = false;
             Bluetooth.write(3); //got all data
             
