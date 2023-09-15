@@ -55,7 +55,6 @@ Graphics.prototype.setFontAnton = function(scale) {
     from_time = ""+Math.floor(Date.now() / 1000);
     require("Storage").write("from_time",from_time);
   }
-  
   let current_goal = readSetting("current_goal", 500);
   let next_goal = readSetting("next_goal",current_goal);
   let daily_steps = readSetting("daily_steps", 0);
@@ -96,7 +95,7 @@ Graphics.prototype.setFontAnton = function(scale) {
   let last_bpm = 0;
   let last_conf = 0;
   E.setTimeZone(timezone);
-  Bangle.setOptions({"powerSave": true, "hrmPollInterval": 20, "lockTimeout": 10000, "backlightTimeout":1000,"wakeOnBTN1":true,"wakeOnBTN2":true,"wakeOnBTN3":true,"wakeOnFaceUp":false,"wakeOnTouch":false,"wakeOnTwist":false});
+  Bangle.setOptions({"powerSave": true, "hrmPollInterval": 20, "lockTimeout": 10000, "backlightTimeout":10000,"wakeOnBTN1":true,"wakeOnBTN2":true,"wakeOnBTN3":true,"wakeOnFaceUp":false,"wakeOnTouch":false,"wakeOnTwist":false});
   Bangle.setHRMPower(false,"myApp"); //this actually resets the poll interval
   Bangle.setHRMPower(true,"myApp");
   Bangle.setHRMPower(false,"myApp"); 
@@ -382,13 +381,12 @@ let openMenu = function(){
         dog_h = metrics.height*dog_scale;
         dog_x = 10;
         dog_y = 30;
-        if(last_dog_rect.length > 0){
-          g.clearRect(last_dog_rect[0],last_dog_rect[1],last_dog_rect[2],last_dog_rect[3]);
-        }
-        last_dog_rect = [dog_x,dog_y,dog_x+dog_w,dog_y+dog_h]
         if(!menu_active){
-            
-            g.drawImage(img,dog_x,dog_y,{scale:dog_scale} ); 
+          if(last_dog_rect.length > 0){
+            g.clearRect(last_dog_rect[0],last_dog_rect[1],last_dog_rect[2],last_dog_rect[3]);
+          }
+          last_dog_rect = [dog_x,dog_y,dog_x+dog_w,dog_y+dog_h]
+          g.drawImage(img,dog_x,dog_y,{scale:dog_scale} ); 
         }
 
   }
@@ -626,6 +624,7 @@ let openMenu = function(){
             //we also need to re-open the movement and acceleration files
             current_movement_file = require("Storage").open(movement_filename,"a");
             current_acceleration_file = require("Storage").open(acceleration_filename,"a");
+            goals_file = require("Storage").open(goals_filename,"a")
         }
         if(data.charCodeAt(0) == 3){
             config_buffer = ""; 
