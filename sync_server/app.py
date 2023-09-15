@@ -217,7 +217,7 @@ def set_config():
     with dbConnection() as con:
         df = pd.read_sql("select id from device where id=?",con, params=(device_id,))
         if len(df) == 0: con.execute("insert into device (id, last_data_sync, target_config_json) values (?,?,?)",(device_id, None, config_json))
-        else: con.execute("update device set config_json=? where id=?",(config_json,device_id))
+        else: con.execute("update device set target_config_json=? where id=?",(config_json,device_id))
         return success({})
 @app.route("/forcesync", methods=["GET"])
 def force_sync():
