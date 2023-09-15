@@ -56,9 +56,6 @@ Graphics.prototype.setFontAnton = function(scale) {
     require("Storage").write("from_time",from_time);
   }
   
-  writeSetting("bones_eaten",0);
-  writeSetting("daily_steps",501);
-  writeSetting("goals_reached",0);
   let current_goal = readSetting("current_goal", 500);
   let next_goal = readSetting("next_goal",current_goal);
   let daily_steps = readSetting("daily_steps", 0);
