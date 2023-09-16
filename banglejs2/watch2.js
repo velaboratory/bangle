@@ -1,4 +1,3 @@
-
 NRF.disconnect(); //disconnect at the start.  This removes issues associated with terminals
 Graphics.prototype.setFontAnton = function(scale) {
     g.setFontCustom(atob("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgAAAAAAAAAAA/gAAAAAAAAAAP/gAAAAAAAAAH//gAAAAAAAAB///gAAAAAAAAf///gAAAAAAAP////gAAAAAAD/////gAAAAAA//////gAAAAAP//////gAAAAH///////gAAAB////////gAAAf////////gAAP/////////gAD//////////AA//////////gAA/////////4AAA////////+AAAA////////gAAAA///////wAAAAA//////8AAAAAA//////AAAAAAA/////gAAAAAAA////4AAAAAAAA///+AAAAAAAAA///gAAAAAAAAA//wAAAAAAAAAA/8AAAAAAAAAAA/AAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////AAAAAB///////8AAAAH////////AAAAf////////wAAA/////////4AAB/////////8AAD/////////+AAH//////////AAP//////////gAP//////////gAP//////////gAf//////////wAf//////////wAf//////////wAf//////////wA//8AAAAAB//4A//wAAAAAAf/4A//gAAAAAAP/4A//gAAAAAAP/4A//gAAAAAAP/4A//wAAAAAAf/4A///////////4Af//////////wAf//////////wAf//////////wAf//////////wAP//////////gAP//////////gAH//////////AAH//////////AAD/////////+AAB/////////8AAA/////////4AAAP////////gAAAD///////+AAAAAf//////4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/gAAAAAAAAAAP/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/AAAAAAAAAAA//AAAAAAAAAAA/+AAAAAAAAAAB/8AAAAAAAAAAD//////////gAH//////////gAP//////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH/4AAAAB/gAAD//4AAAAf/gAAP//4AAAB//gAA///4AAAH//gAB///4AAAf//gAD///4AAA///gAH///4AAD///gAP///4AAH///gAP///4AAP///gAf///4AAf///gAf///4AB////gAf///4AD////gA////4AH////gA////4Af////gA////4A/////gA//wAAB/////gA//gAAH/////gA//gAAP/////gA//gAA///8//gA//gAD///w//gA//wA////g//gA////////A//gA///////8A//gA///////4A//gAf//////wA//gAf//////gA//gAf/////+AA//gAP/////8AA//gAP/////4AA//gAH/////gAA//gAD/////AAA//gAB////8AAA//gAA////wAAA//gAAP///AAAA//gAAD//8AAAA//gAAAP+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/+AAAAAD/wAAB//8AAAAP/wAAB///AAAA//wAAB///wAAB//wAAB///4AAD//wAAB///8AAH//wAAB///+AAP//wAAB///+AAP//wAAB////AAf//wAAB////AAf//wAAB////gAf//wAAB////gA///wAAB////gA///wAAB////gA///w//AAf//wA//4A//AAA//wA//gA//AAAf/wA//gB//gAAf/wA//gB//gAAf/wA//gD//wAA//wA//wH//8AB//wA///////////gA///////////gA///////////gA///////////gAf//////////AAf//////////AAP//////////AAP/////////+AAH/////////8AAH///+/////4AAD///+f////wAAA///8P////gAAAf//4H///+AAAAH//gB///wAAAAAP4AAH/8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/wAAAAAAAAAA//wAAAAAAAAAP//wAAAAAAAAB///wAAAAAAAAf///wAAAAAAAH////wAAAAAAA/////wAAAAAAP/////wAAAAAB//////wAAAAAf//////wAAAAH///////wAAAA////////wAAAP////////wAAA///////H/wAAA//////wH/wAAA/////8AH/wAAA/////AAH/wAAA////gAAH/wAAA///4AAAH/wAAA//+AAAAH/wAAA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gAAAAAAAAH/4AAAAAAAAAAH/wAAAAAAAAAAH/wAAAAAAAAAAH/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB//8AAA/////+B///AAA/////+B///wAA/////+B///4AA/////+B///8AA/////+B///8AA/////+B///+AA/////+B////AA/////+B////AA/////+B////AA/////+B////gA/////+B////gA/////+B////gA/////+A////gA//gP/gAAB//wA//gf/AAAA//wA//gf/AAAAf/wA//g//AAAAf/wA//g//AAAA//wA//g//gAAA//wA//g//+AAP//wA//g////////gA//g////////gA//g////////gA//g////////gA//g////////AA//gf///////AA//gf//////+AA//gP//////+AA//gH//////8AA//gD//////4AA//gB//////wAA//gA//////AAAAAAAH////8AAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////gAAAAB///////+AAAAH////////gAAAf////////4AAB/////////8AAD/////////+AAH//////////AAH//////////gAP//////////gAP//////////gAf//////////wAf//////////wAf//////////wAf//////////wAf//////////4A//wAD/4AAf/4A//gAH/wAAP/4A//gAH/wAAP/4A//gAP/wAAP/4A//gAP/4AAf/4A//wAP/+AD//4A///wP//////4Af//4P//////wAf//4P//////wAf//4P//////wAf//4P//////wAP//4P//////gAP//4H//////gAH//4H//////AAH//4D/////+AAD//4D/////8AAB//4B/////4AAA//4A/////wAAAP/4AP////AAAAB/4AD///4AAAAAAAAAH/8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//AAAAAAAAAAA//gAAAAAAAAAA//gAAAAAAAAAA//gAAAAAAADgA//gAAAAAAP/gA//gAAAAAH//gA//gAAAAB///gA//gAAAAP///gA//gAAAD////gA//gAAAf////gA//gAAB/////gA//gAAP/////gA//gAB//////gA//gAH//////gA//gA///////gA//gD///////gA//gf///////gA//h////////gA//n////////gA//////////gAA/////////AAAA////////wAAAA///////4AAAAA///////AAAAAA//////4AAAAAA//////AAAAAAA/////4AAAAAAA/////AAAAAAAA////8AAAAAAAA////gAAAAAAAA///+AAAAAAAAA///4AAAAAAAAA///AAAAAAAAAA//4AAAAAAAAAA/+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//gB///wAAAAP//4H///+AAAA///8P////gAAB///+f////4AAD///+/////8AAH/////////+AAH//////////AAP//////////gAP//////////gAf//////////gAf//////////wAf//////////wAf//////////wA///////////wA//4D//wAB//4A//wB//gAA//4A//gA//gAAf/4A//gA//AAAf/4A//gA//gAAf/4A//wB//gAA//4A///P//8AH//4Af//////////wAf//////////wAf//////////wAf//////////wAf//////////gAP//////////gAP//////////AAH//////////AAD/////////+AAD///+/////8AAB///8f////wAAAf//4P////AAAAH//wD///8AAAAA/+AAf//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH//gAAAAAAAAB///+AA/+AAAAP////gA//wAAAf////wA//4AAB/////4A//8AAD/////8A//+AAD/////+A///AAH/////+A///AAP//////A///gAP//////A///gAf//////A///wAf//////A///wAf//////A///wAf//////A///wA///////AB//4A//4AD//AAP/4A//gAB//AAP/4A//gAA//AAP/4A//gAA/+AAP/4A//gAB/8AAP/4A//wAB/8AAf/4Af//////////wAf//////////wAf//////////wAf//////////wAf//////////wAP//////////gAP//////////gAH//////////AAH/////////+AAD/////////8AAB/////////4AAAf////////wAAAP////////AAAAB///////4AAAAAD/////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/AAB/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="), 46, atob("EiAnGicnJycnJycnEw=="), 78 + (scale << 8) + (1 << 16));
@@ -17,6 +16,7 @@ Graphics.prototype.setFontAnton = function(scale) {
   };
   let writeSetting = function(s,v){
     require("Storage").write("setting_"+s,JSON.stringify(v));
+    return v;
   };
 
   let read_config = function(){
@@ -42,7 +42,7 @@ Graphics.prototype.setFontAnton = function(scale) {
   }
 
   let app_name = "test_app";
-  let app_version = 47;
+  let app_version = 49;
   let version = app_name+app_version;
   let movement_filename = "healthlog"+version; 
   let acceleration_filename = "accellog"+version;
@@ -55,17 +55,14 @@ Graphics.prototype.setFontAnton = function(scale) {
   let timezone = -4;
   let max_chunk = 9000; //the esp has a buffer of 25000, so this leaves some room
   let ble_mtu = 768; //this isn't actually the ble mtu, which is locked at 128.  This is 6*128, 
-  let from_time = require("Storage").read("from_time");
-  if(from_time === undefined){
-    from_time = ""+Math.floor(Date.now() / 1000);
-    require("Storage").write("from_time",from_time);
-  }
-  let current_goal = readSetting("current_goal", 500);
+  let from_time = readSetting("from_time", ""+Math.floor(Date.now() / 1000))
+  let current_goal = readSetting("current_goal", 5000);
   let next_goal = readSetting("next_goal",current_goal);
   let daily_steps = readSetting("daily_steps", 0);
   let goals_reached = readSetting("goals_reached", 0);
-  let goals_file = require("Storage").open(goals_filename,"a");
   let bones_eaten = readSetting("bones_eaten", 0);
+
+  let goals_file = require("Storage").open(goals_filename,"a");
   let num_bones = 0;
   // Dog animation
   let dog_happy_till = 0;
@@ -86,8 +83,6 @@ Graphics.prototype.setFontAnton = function(scale) {
     dog_bowl_empty: require("heatshrink").decompress(atob("kcjwkCkQA/AH4A/AAjOEZZQMB5gADCRIPB4MRAAUcCQIPFkEMB4gSD4AkFgfMCA0R5nAEQs0IAIzF5lEEQsM4lMKwnMA4IiGngaBCQfEogDBEQkgIoItCAAQlDCIgQDAA40EGYQAJESwQKEQgQMCIkMCBY0DEUcAABbSFAH4AkkA")),
     dog_bone: require("heatshrink").decompress(atob("kcjwkBiIA/AH4AxgAGMAAUP+DOEgPwCJP/AAgQKEQoGBIrIA/AH4A/AH4A/ADMQA"))
   };
-
-
   
   var currentframe = 0;
 
@@ -114,22 +109,21 @@ Graphics.prototype.setFontAnton = function(scale) {
   var goal_log_buffer = new ArrayBuffer(6);
     var menu = {
 
-    "Start HRM":function(){
-      if(!Bangle.isHRMOn()){
-        startHRMonitor();
-      }
-    },
-    "Stop HRM": function(){
-       stopHRMonitor();
-    },
+    //"Start HRM":function(){
+    //  if(!Bangle.isHRMOn()){
+    //    startHRMonitor();
+    //  }
+    //},
+    //"Stop HRM": function(){
+    //   stopHRMonitor();
+    //},
     "Set Goal": {
                   value: next_goal,
                   min:5000,
                   max:25000,
                   step:500,
                   onchange: v=> { 
-                    writeSetting("next_goal",v);
-                    next_goal = v;
+                    next_goal = writeSetting("next_goal",v);
                     view = new DataView(goal_log_buffer);
                     view.setUint32(0, Math.floor(Date.now() / 1000), false); 
                     view.setUint16(4, next_goal, false);
@@ -187,8 +181,7 @@ let openMenu = function(){
       view.setUint16(6, movement, false);
       view.setUint8(8,0,false); //padding
       current_movement_file.write(btoa(movement_log_buffer));
-      daily_steps += delta;
-      writeSetting("daily_steps",daily_steps);
+      daily_steps = writeSetting("daily_steps",daily_steps+delta);
 
       
 
@@ -200,9 +193,8 @@ let openMenu = function(){
         setTimeout(function(){Bangle.buzz(500,1);bones_eaten++;drawBowl();},3000);
         setTimeout(function(){Bangle.buzz(500,1);bones_eaten++;drawBowl();},4000);
         setTimeout(function(){Bangle.buzz(500,1);bones_eaten++;drawBowl();writeSetting("bones_eaten",bones_eaten);},5000);
-        goals_reached++; 
         make_dog_happy(5000);    
-        writeSetting("goals_reached",goals_reached);
+        goals_reached = writeSetting("goals_reached",goals_reached+1);
       }
   };
 
@@ -336,6 +328,9 @@ let openMenu = function(){
 
   bone_area_rect = [90,30,175,60]
   let drawBones = function(n){
+    if(config.dog_name == undefined){
+      return; //no dog drawing if no pet name
+    }
         metrics = g.imageMetrics(imgs.dog_bone);
         scale = 2.5;
         w = metrics.width*scale;
@@ -351,6 +346,9 @@ let openMenu = function(){
   };
 
   let drawBowl = function(){
+    if(config.dog_name == undefined){
+      return; //no dog drawing if no pet name
+    }
         metrics = g.imageMetrics(imgs.dog_bowl_empty);
         scale = 2.5;
         w = metrics.width*scale;
@@ -375,6 +373,9 @@ let openMenu = function(){
   let last_dog_rect = []
   let drawDog = function(){
 
+        if(config.dog_name == undefined){
+          return; //no dog drawing if no pet name
+        }
         let frames = [imgs.dog_wag1,imgs.dog_wag2];
         let img;
         if(dog_happy_till > Date.now()){
@@ -427,11 +428,20 @@ let openMenu = function(){
               
     //g.setFontAlign(0, 0).setFont("Anton").drawString(timeStr, x, 165);
     
-    drawDog();
-    drawBowl();
+    
 
-    g.setFontAlign(0, 1).setFont("6x8", 5).drawString(timeStr, x, screen_size-20);
-    g.setFontAlign(0, 1).setFont("6x8", 2).drawString(dateStr, x, screen_size);
+    if(config.dog_name == undefined){
+      g.setFontAlign(0, 0).setFont("6x8", 5).drawString(timeStr, x, y);
+      g.setFontAlign(0, 0).setFont("6x8", 2).drawString(dateStr, x, y+40);
+    }
+    else{
+      drawDog();
+      drawBowl();
+      g.setFontAlign(0, 1).setFont("6x8", 5).drawString(timeStr, x, screen_size-20);
+      g.setFontAlign(0, 1).setFont("6x8", 2).drawString(dateStr, x, screen_size);
+    }
+
+
   };
 
   let drawSyncProgress = function(){
@@ -462,16 +472,11 @@ let openMenu = function(){
     let date_string = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
     if(date_string != current_day){
       //it's a brand new day
-      writeSetting("current_goal",next_goal);
-      current_goal = next_goal;
-      writeSetting("daily_steps", 0);
-      daily_steps = 0;
-      writeSetting("goals_reached", 0);
-      goals_reached = 0;
-      writeSetting("current_day",date_string);
-      current_day = date_string;
-      writeSetting("bones_eaten", 0);
-      bones_eaten = 0;
+      current_goal = writeSetting("current_goal",next_goal);
+      daily_steps = writeSetting("daily_steps", 0);
+      goals_reached = writeSetting("goals_reached", 0);
+      current_day = writeSetting("current_day",date_string);
+      bones_eaten = writeSetting("bones_eaten", 0);
     }
     /* we are not doing this for now.  Uses too much battery life.
     var time = Math.floor(Date.now() / 1000);
@@ -554,6 +559,13 @@ let openMenu = function(){
             
             config = read_config(); 
             
+            if(config.reset == true){
+              daily_steps = writeSetting("daily_steps",0);
+              current_goal = writeSetting("current_goal",5000);
+              goals_reached = writeSetting("goals_reached",0);
+              next_goal = writeSetting("next_goal",current_goal);
+              bones_eaten = writeSetting("bones_eaten", 0);
+            }
             
             reading_config = false;
             Bluetooth.write(3); //got all data
@@ -639,7 +651,7 @@ let openMenu = function(){
             if(debug) print("files erased");
             
             from_time = ""+Math.floor(Date.now() / 1000); //we need to calculate a new from time
-            require("Storage").write("from_time",from_time);
+            writeSetting("from_time",from_time);
 
             //we also need to re-open the movement and acceleration files
             current_movement_file = require("Storage").open(movement_filename,"a");
