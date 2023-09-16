@@ -17,7 +17,7 @@ CREATE TABLE station (
 
 CREATE TABLE data_sync (
     uuid text PRIMARY KEY, 
-    from_time text, 
+    from_time int, 
     dt text, -- the time this sync happened
     device_id text, -- the device doing the syncing
     station_id text, -- the station doing the syncing
