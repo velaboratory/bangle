@@ -160,6 +160,9 @@ def change_app():
     if request.form.get("action",None) == "Delete":
         with dbConnection() as con:
             con.execute("delete from device where id = ?",(id,))
+    elif request.form.get("action",None) == "Reset":
+        with dbConnection() as con:
+            con.execute("update device set wants_sync=1,should_reset=1 where id=?",(id,))
     else:
         with dbConnection() as con:
             con.execute("update device set wants_sync=1,target_app_name=?,target_app_version=? where id = ?",(name,version,id))
