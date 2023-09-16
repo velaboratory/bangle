@@ -8,7 +8,8 @@ CREATE TABLE device (
     target_config_json text,
     wants_sync int default 0, -- a configuration string to update the device to
     target_app_name text default "test", --the app that should be downloaded
-    target_app_version int default -1 --latest
+    target_app_version int default -1,
+    should_reset int default 0 --latest
 );
 
 CREATE TABLE station (
@@ -17,7 +18,7 @@ CREATE TABLE station (
 
 CREATE TABLE data_sync (
     uuid text PRIMARY KEY, 
-    from_time text, 
+    from_time int, 
     dt text, -- the time this sync happened
     device_id text, -- the device doing the syncing
     station_id text, -- the station doing the syncing

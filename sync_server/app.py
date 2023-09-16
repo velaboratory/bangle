@@ -332,12 +332,28 @@ def sync():
             con.execute("insert into data_sync (uuid, from_time, dt,device_id,station_id,data,app_name, app_version, complete) values (?,?,?,?,?,?,?,?,?)",
                     params)
         if complete == 1:
-            #update the last sync for the device
-            con.execute("update device set last_data_sync = ?, wants_sync = 0 where id=?",(datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),device_id))
+            
             #retrieve the new configuration for the watch
-            device_df = pd.read_sql("select target_config_json, target_app_name, target_app_version from device where id=?",
+            device_df = pd.read_sql("select target_config_json, target_app_name, target_app_version, should_reset from device where id=?",
                                 con, params=(device_id,))
-            return success({"sync_id": insert_id, "config_json": base64.b64encode(device_df.iloc[0].target_config_json.encode()).decode(), "target_app_name": device_df.iloc[0].target_app_name, "target_app_version":device_df.iloc[0].target_app_version})
+            target_app_name = device_df.iloc[0].target_app_name
+            target_app_version = device_df.iloc[0].target_app_version
+            should_reset = device_df.iloc[0].should_reset
+            #update the last sync for the device
+            wants_sync = 0
+            if (app_name != target_app_name) or (app_version != target_app_version):
+                wants_sync = 1
+
+            config = device_df.iloc[0].target_config_json
+            
+            if should_reset == 1:
+                config = '{"reset":true}'
+                con.execute("update device set should_reset = 0, last_data_sync = ?, wants_sync = 1 where id=?",(datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),device_id ))
+            else:
+                con.execute("update device set should_reset = 0, last_data_sync = ?, wants_sync = ? where id=?",(datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),wants_sync,device_id ))
+            return success({"sync_id": insert_id, "config_json": base64.b64encode(config.encode()).decode(), "target_app_name": target_app_name, "target_app_version":target_app_version})
+
+            
         else:
             return success({"sync_id": insert_id})
 
