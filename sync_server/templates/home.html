@@ -14,7 +14,7 @@
                 <th>Select Target App</th>
                 <th>Delete</th>
                 <th>Update</th>
-                
+                <th>Reset</th>
             </tr>
         </thead>
         <tbody>
@@ -40,6 +40,7 @@
                             </select></td>
                             <td><input type="submit" name="action" value="Delete"></td>
                             <td><input type="submit" name="action" value="Update"></td>
+                            <td><input type="submit" name="action" value="Reset"></td>
                         </form>
                     </tr>
                 
@@ -66,7 +67,7 @@
 
     <script>
         $(document).ready(function() {
-            $('#deviceTable').DataTable();
+            $('#deviceTable').DataTable({paging: false});
         });
     </script>
 {% endblock %}
