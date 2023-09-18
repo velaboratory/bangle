@@ -13,7 +13,8 @@ import json
 import base64
 import json_minify
 import js2py
-
+minify=False
+file = "watch_hrv_study.js"
 received_data = ""
 def callback(sender,data:bytearray):
     global received_data
@@ -21,13 +22,21 @@ def callback(sender,data:bytearray):
 
 def validate_and_minify(js_data):
     #minify
+    
+   
     res = requests.post("https://www.toptal.com/developers/javascript-minifier/api/raw",{"input":js_data})
     try:
         f = js2py.parse_js(res.text)
     except:
         return None,"invalid javascript"
     
-    to_return = {"minified":res.text, "base64":base64.b64encode(res.text.encode()).decode()}
+    to_return = None
+    if minify:
+        to_return = {"minified":res.text, "base64":base64.b64encode(res.text.encode()).decode()}
+        
+    else:
+        to_return = {"minified":js_data, "base64":base64.b64encode(js_data.encode()).decode()}
+    
     if len(to_return["base64"]) > 40000:
         return None,"too big"
     return to_return, "success"
@@ -57,7 +66,7 @@ async def run():
                         print("reading watch software")
                         # now we can send the data
 
-                        js_data = open("watch2.js").read()
+                        js_data = open(file).read()
                         data, reason = validate_and_minify(js_data)
                         if not data:
                             print(reason)

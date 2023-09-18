@@ -5,7 +5,7 @@ from getmac import get_mac_address
 from bleak import BleakClient, BleakScanner
 import requests
 import base64
-address = "e5:cc:1d:bb:e4:d1"
+
 UUID_NORDIC_TX = "6e400002-b5a3-f393-e0a9-e50e24dcca9e"
 UUID_NORDIC_RX = "6e400003-b5a3-f393-e0a9-e50e24dcca9e"
 import asyncio
@@ -14,7 +14,9 @@ import base64
 import json_minify
 import js2py
 pause=False
-minify=True
+minify=False
+file = "watch_hrv_study.js"
+address = "e5:cc:1d:bb:e4:d1"
 def callback(sender,data:bytearray):
     if data[0] == 19:
         pause = True
@@ -63,7 +65,7 @@ async def run():
                             print("hello")
                             await client.write_gatt_char(UUID_NORDIC_TX,bytearray([4]))
                             print("here")
-                            js_data = open("watch2.js").read()
+                            js_data = open(file).read()
                             data, reason = validate_and_minify(js_data)
                             if not data:
                                 print(reason)
