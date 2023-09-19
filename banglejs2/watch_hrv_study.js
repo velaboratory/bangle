@@ -48,13 +48,14 @@ Graphics.prototype.setFontAnton = function(scale) {
   let acceleration_filename = "accellog"+version;
   let hrm_files_filename = "hrmfileslog"+version;
   let config_filename = "config"+version;
+  let polar_filename = "polar"+version;
   let config = read_config();
   let reading_config = false;
   let reading_firmware = false;
   let timezone = -4;
   let max_chunk = 9000;
   let ble_mtu = 768; 
-  let from_time = readSetting("from_time", ""+Math.floor(Date.now() / 1000))
+  let from_time = readSetting("from_time", ""+Math.floor(Date.now() / 1000));
   let daily_steps = readSetting("daily_steps", 0);
 
   let sync_files = [];
@@ -62,6 +63,7 @@ Graphics.prototype.setFontAnton = function(scale) {
   let current_hrmraw_file = null;
   let current_movement_file = require("Storage").open(movement_filename,"a"); //this can stay on
   let current_acceleration_file = require("Storage").open(acceleration_filename,"a"); //this can stay on
+  let current_polar_file = require("Storage").open(polar_filename,"a");
   let debug = false;
   let last_bpm = 0;
   let last_conf = 0;
@@ -221,6 +223,84 @@ let openMenu = function(){
         }
   });
 
+var polar_log_buffer = new ArrayBuffer(9);
+let polar_callback = function(event) {
+  
+  var view = new DataView(polar_log_buffer);
+  var time = Math.floor(Date.now() / 1000);
+  view.setUint32(0,time);
+  dv = new DataView(event.target.value.buffer);
+  flags = dv.getUint8(0,true);
+
+  format = flags & 0x01;
+  hasRRI = flags & 0x10;
+  if(format == 0){  //normal, not 16 bit
+    hr = dv.getUint8(1,true);
+    rris = [];
+    for(var i = 2;i<event.target.value.buffer.length;i+=2){
+        rris.push(dv.getUint16(i,true));
+    }
+    view.setUint8(4,hr); //0 - 100
+    if(rris.length ==0){
+      view.setUint16(5,0); // 0-100
+      view.setUint16(7,0); // 0-100
+    }else if(rris.length == 1){
+      view.setUint16(5,rris[0]); // 0-100
+      view.setUint16(7,0); // 0-100
+    }else{
+      view.setUint16(5,rris[0]); // 0-100
+      view.setUint16(7,rris[1]); // 0-100
+    }
+    print(""+hr);
+    if(current_polar_file != null){
+       current_polar_file.write(btoa(polar_log_buffer));
+       
+    }
+  }
+};
+
+let connectingToPolar = false;
+let PolarServer;
+
+let disconnectFromServer = function(error){
+    if(PolarServer == undefined){
+      connectingToPolar = false;
+      return;
+    }
+    PolarServer.disconnect()
+    .then(()=>{connectingToPolar=false;PolarServer=undefined;})
+    .catch((error)=>{connectingToPolar=false;PolarServer=undefined;});
+};
+
+let foundDevices = function(devices){
+  if(devices.length > 0){
+    NRF.connect(devices[0].id)
+      .then((gatt)=>{connectingToPolar = false; PolarServer = gatt; return PolarServer.getPrimaryService(SERV_HR);})
+      .then((service)=>{return service.getCharacteristic(CHAR_HR);})
+      .then((characteristic)=>{characteristic.on("characteristicvaluechanged", polar_callback); return characteristic.startNotifications();})
+      .catch((error)=>{disconnectFromServer(error);});
+  }else{
+    connectingToPolar = false;
+  }
+};
+let polarInterval;
+let startPolar = function(){
+  if(connectingToPolar){ //we are in the middle of connecting
+    return;
+  }
+  if(PolarServer!= undefined){
+    if(PolarServer.connected){
+      return;
+    }else{
+      PolarServer = undefined;
+    }
+  }
+  connecting = true; //don't allow the server to start again
+  CHAR_HR = "00002a37-0000-1000-8000-00805f9b34fb";
+  SERV_HR = "0000180d-0000-1000-8000-00805f9b34fb";
+  NRF.findDevices(foundDevices, { active: true, filters: [{namePrefix:"Polar H10"}], timeout: 5000});
+};
+  
   let startHRMonitor = function(){
     if(syncing){ //we don't want the HR monitor to start if we are actively syncing
         return;
@@ -241,13 +321,23 @@ let openMenu = function(){
     require("Storage").write("last_hrm_time",""+last_hrm_reading_time);
     last_bpm = -1;
     last_conf = -1;
+
+    polarInterval = setInterval(startPolar,5000);
+    
     drawWidgets();
 
   };
 
   let stopHRMonitor = function(){
     Bangle.setHRMPower(false,"myapp"); //this should immediately stop raw readings
+    if(PolarServer!=undefined && PolarServer.connected){
+      PolarServer.disconnect().then(()=>{PolarServer=undefined;}).catch((error)=>{PolarServer=undefined;}); //clean up
+    }
     drawWidgets();
+    if(polarInterval != undefined){
+      clearInterval(polarInterval);
+      polarInterval = undefined;
+    }
   };
 
   let drawWidgets = function(){
@@ -435,6 +525,7 @@ let openMenu = function(){
                 sync_files.push(config_filename);
                 sync_files.push(movement_filename);
                 sync_files.push(acceleration_filename);
+                sync_files.push(polar_filename);
                 rawfiles = require("Storage").open(hrm_files_filename,"r");
                 while(true){
                     s = rawfiles.readLine();
@@ -496,6 +587,7 @@ let openMenu = function(){
             //we also need to re-open the movement and acceleration files
             current_movement_file = require("Storage").open(movement_filename,"a");
             current_acceleration_file = require("Storage").open(acceleration_filename,"a");
+            current_polar_file = require("Storage").open(polar_filename,"a");
         }
         if(data.charCodeAt(0) == 3){
             config_buffer = ""; 
