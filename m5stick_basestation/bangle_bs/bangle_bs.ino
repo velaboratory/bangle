@@ -109,9 +109,9 @@ void doWifiWifiSetup(){
 
   IPAddress apIP = WiFi.softAPIP();
 
-  M5.Lcd.println("wifi setup");
-  M5.Lcd.println("Connect Wifi to");
-  M5.Lcd.println("watchconfig and go to");
+  M5.Lcd.println("Connect to wifi");
+  M5.Lcd.println("\"watchconfig\"");
+  M5.Lcd.println("through an external device");
   
   M5.Lcd.println(apIP);
 
@@ -171,16 +171,75 @@ void handle_root(){
     return;
   }
     String HTML = "<!DOCTYPE html>\
-<html>\
-<body>\
-<form action=\"/set\" method=\"POST\">";
+    <html>\
+    <head>\
+    <meta charset=\"UTF-8\">\
+  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\
+  <title>University of Georgia Survey</title>\
+    <style>\
+    body {\
+      font-family: Arial, sans-serif;\
+      background-color: #f4f4f4;\
+      margin: 0;\
+      font-size: 5%;\
+      padding: 0;\
+    }\
+    .container {\
+      max-width: 600px;\
+      margin: 0 auto;\
+      padding: 20px;\
+      background-color: #ffffff;\
+      border-radius: 5px;\
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);\
+    }\
+    .logo {\
+      text-align: center;\
+      margin-bottom: 20px;\
+    }\
+    .logo img {\
+      max-width: 100px;\
+    }\
+    .survey-form {\
+      margin-bottom: 20px;\
+    }\
+    .survey-form label {\
+      display: block;\
+      margin-bottom: 10px;\
+      font-weight: bold;\
+    }\
+    .survey-form input[type=\"text\"],\
+    .survey-form textarea {\
+      width: 100%;\
+      padding: 10px;\
+      border: 1px solid #ccc;\
+      border-radius: 5px;\
+      font-size: 16px;\
+      margin-bottom: 15px;\
+    }\
+    .survey-form button {\
+      background-color: #007a72;\
+      color: #ffffff;\
+      border: none;\
+      padding: 10px 20px;\
+      border-radius: 5px;\
+      font-size: 16px;\
+      cursor: pointer;\
+    }\
+    </style>\
+    </head>\
+    <body>\
+    <header>\
+    <div class=\"container\">\
+    <h1>Bangle.JS Basestation WIFI Setup<h1/>\
+    <form action=\"post\" method=\"post\">\
+    SSID (Which WiFi you would like to connect to)<br>";
 
   int n = WiFi.scanNetworks();
   for(int i=0;i<n;i++){
     String ssid = WiFi.SSID(i);
     HTML = HTML + "<input type=\"radio\" name=\"ssid\" value=\"" + ssid + "\">"+ssid+"<br>"; 
   }
-HTML = HTML + "password<input type=\"text\" name=\"password\"/><br>\
+HTML = HTML + "password (Password of the WiFi you are trying to connect to)<input type=\"text\" name=\"password\"/><br>\
 username (only if enterprise, blank otherwise)<input type=\"text\" name=\"username\"/><br>\
 <input type=\"submit\">\
 </body>\
@@ -282,7 +341,7 @@ bool connectWifi(){
     delay(1000);
     num_attempts++;
 
-    if(num_attempts > 60){
+    if(num_attempts > 150){
       ESP.restart();
     }
   }
