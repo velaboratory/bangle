@@ -82,10 +82,10 @@ def apps():
 def validate_and_minify(js_data):
     #minify
     res = requests.post("https://www.toptal.com/developers/javascript-minifier/api/raw",{"input":js_data})
-    try:
-        f = js2py.parse_js(res.text)
-    except:
-        return None,"invalid javascript"
+    # try:
+    #     f = js2py.parse_js(res.text)
+    # except:
+    #     return None,"invalid javascript"
     
     
 
