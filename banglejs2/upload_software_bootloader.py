@@ -14,7 +14,7 @@ import base64
 import json_minify
 import js2py
 minify=False
-file = "watch_hrv_study.js"
+file = "watch_life_study.js"
 received_data = ""
 def callback(sender,data:bytearray):
     global received_data
@@ -50,7 +50,8 @@ async def run():
             for d,adv in devices.values():
                 received_data = ""
                 print(d.name)
-                if d.name and ("Bangle.js" in d.name) and (d.address.lower() == address.lower()): # this approach should work on windows or mac
+                #if d.name and ("Bangle.js" in d.name) and (d.address.lower() == address.lower()): # this approach should work on windows or mac
+                if d.name and ("Bangle.js" in d.name): # this approach should work on windows or mac
                     async with BleakClient(d) as client:
                         print("starting sync")
                         await client.start_notify(UUID_NORDIC_RX,callback)

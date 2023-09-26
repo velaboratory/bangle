@@ -31,7 +31,8 @@ def validate_and_minify(js_data):
     try:
         f = js2py.parse_js(res.text)
     except:
-        return None,"invalid javascript"
+        pass
+        #return None,"invalid javascript"
     
     to_return = None
     if minify:

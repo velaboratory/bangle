@@ -42,7 +42,7 @@ Graphics.prototype.setFontAnton = function(scale) {
   }
 
   let app_name = "hrv_test";
-  let app_version = 1;
+  let app_version = 2;
   let version = app_name+app_version;
   let movement_filename = "healthlog"+version; 
   let acceleration_filename = "accellog"+version;
@@ -251,7 +251,6 @@ let polar_callback = function(event) {
       view.setUint16(5,rris[0]); // 0-100
       view.setUint16(7,rris[1]); // 0-100
     }
-    print(""+hr);
     if(current_polar_file != null){
        current_polar_file.write(btoa(polar_log_buffer));
        
@@ -267,9 +266,14 @@ let disconnectFromServer = function(error){
       connectingToPolar = false;
       return;
     }
+  try{
     PolarServer.disconnect()
     .then(()=>{connectingToPolar=false;PolarServer=undefined;})
     .catch((error)=>{connectingToPolar=false;PolarServer=undefined;});
+  }catch(e){
+    connectingToPolar=false;PolarServer=undefined;
+    return;
+  }
 };
 
 let foundDevices = function(devices){
@@ -322,7 +326,7 @@ let startPolar = function(){
     last_bpm = -1;
     last_conf = -1;
 
-    polarInterval = setInterval(startPolar,5000);
+    startPolar();
     
     drawWidgets();
 
@@ -330,14 +334,9 @@ let startPolar = function(){
 
   let stopHRMonitor = function(){
     Bangle.setHRMPower(false,"myapp"); //this should immediately stop raw readings
-    if(PolarServer!=undefined && PolarServer.connected){
-      PolarServer.disconnect().then(()=>{PolarServer=undefined;}).catch((error)=>{PolarServer=undefined;}); //clean up
-    }
+    disconnectFromServer();
     drawWidgets();
-    if(polarInterval != undefined){
-      clearInterval(polarInterval);
-      polarInterval = undefined;
-    }
+    
   };
 
   let drawWidgets = function(){
@@ -347,14 +346,16 @@ let startPolar = function(){
         var cx = w/2;
         var cy = h/2; 
         g.clearRect(0,0,w,20); //reserve 20 pixels
+        polarConnected = PolarServer!=undefined && PolarServer.connected;
         if(Bangle.isHRMOn()){
             if(last_bpm >= 0 || last_conf >= 0) {
-                g.setFontAlign(0, 0).setFont("6x8", 2).drawString(last_bpm+":"+last_conf, cx, 10);
+                g.setFontAlign(0, 0).setFont("6x8", 2).drawString(last_bpm+":"+last_conf+":"+(polarConnected?1:0), cx, 10);
             }
             else{
                 g.setFontAlign(0, 0).setFont("6x8", 2).drawString("<3 on", cx, 10);
             }
         }
+
         g.setFontAlign(1, 0).setFont("6x8",2).drawString(""+E.getBattery(), 170, 10);
         g.setFontAlign(-1, 0).setFont("6x8",2).drawString(""+daily_steps, 5, 10);
   };
