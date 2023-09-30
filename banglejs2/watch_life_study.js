@@ -40,7 +40,7 @@ NRF.disconnect(); //disconnect at the start.  This removes issues associated wit
   }
 
   let app_name = "test_app";
-  let app_version = 49;
+  let app_version = 51;
   let version = app_name+app_version;
   let movement_filename = "healthlog"+version; 
   let acceleration_filename = "accellog"+version;
