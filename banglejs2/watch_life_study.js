@@ -40,7 +40,7 @@ NRF.disconnect(); //disconnect at the start.  This removes issues associated wit
   }
 
   let app_name = "test_app";
-  let app_version = 51;
+  let app_version = 52;
   let version = app_name+app_version;
   let movement_filename = "healthlog"+version; 
   let acceleration_filename = "accellog"+version;
@@ -153,7 +153,7 @@ NRF.disconnect(); //disconnect at the start.  This removes issues associated wit
   let last_bpm = 0;
   let last_conf = 0;
   E.setTimeZone(timezone);
-  Bangle.setOptions({"powerSave": true, "hrmPollInterval": 20, "lockTimeout": 10000, "backlightTimeout":10000,"wakeOnBTN1":true,"wakeOnBTN2":true,"wakeOnBTN3":true,"wakeOnFaceUp":false,"wakeOnTouch":false,"wakeOnTwist":false});
+  Bangle.setOptions({"powerSave": true, "hrmPollInterval": 20, "lockTimeout": 10000, "backlightTimeout":3000,"wakeOnBTN1":true,"wakeOnBTN2":true,"wakeOnBTN3":true,"wakeOnFaceUp":false,"wakeOnTouch":false,"wakeOnTwist":false});
   Bangle.setHRMPower(false,"myApp"); //this actually resets the poll interval
   Bangle.setHRMPower(true,"myApp");
   Bangle.setHRMPower(false,"myApp"); 
@@ -379,7 +379,7 @@ let openMenu = function(){
                 g.setFontAlign(0, 0).setFont("6x8", 2).drawString("<3 on", cx, 10);
             }
         }
-        g.setFontAlign(1, 0).setFont("6x8",2).drawString(""+E.getBattery(), 170, 10);
+        g.setFontAlign(1, 0).setFont("6x8",2).drawString(""+E.getBattery()+"%", 170, 10);
         g.setFontAlign(-1, 0).setFont("6x8",2).drawString(""+daily_steps +"/"+(goals_reached+1)*current_goal, 5, 10);
   };
 
@@ -729,6 +729,7 @@ let openMenu = function(){
             current_movement_file = require("Storage").open(movement_filename,"a");
             current_acceleration_file = require("Storage").open(acceleration_filename,"a");
             goals_file = require("Storage").open(goals_filename,"a")
+            unsynced_points = writeSetting("unsynced_points",0); //we synced so no more of this
         }
         if(data.charCodeAt(0) == 3){
             config_buffer = ""; 
