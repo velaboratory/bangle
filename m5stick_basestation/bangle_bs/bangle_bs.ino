@@ -239,8 +239,8 @@ void handle_root(){
     String ssid = WiFi.SSID(i);
     HTML = HTML + "<input type=\"radio\" name=\"ssid\" value=\"" + ssid + "\">"+ssid+"<br>"; 
   }
-HTML = HTML + "password (Password of the WiFi you are trying to connect to)<input type=\"text\" name=\"password\"/><br>\
-username (only if enterprise, blank otherwise)<input type=\"text\" name=\"username\"/><br>\
+HTML = HTML + "password (Password of the WiFi you are trying to connect to) <input type=\"text\" name=\"password\"/><br>\
+username (only if enterprise, blank otherwise) <input type=\"text\" name=\"username\"/><br>\
 <input type=\"submit\">\
 </body>\
 </html>";
