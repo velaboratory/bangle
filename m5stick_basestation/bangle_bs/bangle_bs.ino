@@ -381,24 +381,24 @@ bool getSoftwareUpdates(){
   http.begin((update_route+"?"+urlEncoded).c_str());
   int httpResponseCode = http.GET();
   if(httpResponseCode==200){
+    long num_to_read = http.getSize();
     Serial.println(http.getSize());
     WiFiClient * stream = http.getStreamPtr();
     buffer_index = 0;
-    while(true){
-      int b = stream->read();
-      if(b < 0){
-        buffer[buffer_index+1] = 0;
-        http.end();
-        //we need to find the beginning and the end of the program if the result is successful
-        Serial.println((char*)buffer);
-        if(strstr((char*)buffer,search_string)){
-          return true;
-        }
-        return false;
-      }else{
+    while(http.connected() && buffer_index < num_to_read){
+      if(stream->available() > 0){
+        int b = stream->read();
         buffer[buffer_index++] = b;
       }
     }
+     buffer[buffer_index+1] = 0;
+    http.end();
+    //we need to find the beginning and the end of the program if the result is successful
+    Serial.println((char*)buffer);
+    if(strstr((char*)buffer,search_string)){
+      return true;
+    }
+    return false;
   }
   Serial.println("failed to download software");
   http.end();
@@ -552,6 +552,7 @@ void onRX(NimBLERemoteCharacteristic* pRemoteCharacteristic, uint8_t* pData, siz
     }
   }else if(updating){
     Serial.println("Got RX in updating");
+    Serial.println(pData[0]);
     if(pData[0] == 4){
       updating = false;
     }
