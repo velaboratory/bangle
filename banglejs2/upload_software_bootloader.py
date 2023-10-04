@@ -13,22 +13,27 @@ import json
 import base64
 import json_minify
 import js2py
-minify=False
+minify=True
 file = "watch_hrv_study.js"
 received_data = ""
+pause = False
 def callback(sender,data:bytearray):
-    global received_data
+    global received_data, pause
     received_data += data.decode()
+    if data[0] == 19:
+        pause = True
+    if data[0] == 17:
+        pause = False
 
 def validate_and_minify(js_data):
     #minify
     
    
     res = requests.post("https://www.toptal.com/developers/javascript-minifier/api/raw",{"input":js_data})
-    try:
-        f = js2py.parse_js(res.text)
-    except:
-        return None,"invalid javascript"
+    # try:
+    #     f = js2py.parse_js(res.text)
+    # except:
+    #     return None,"invalid javascript"
     
     to_return = None
     if minify:
@@ -42,7 +47,7 @@ def validate_and_minify(js_data):
     return to_return, "success"
 
 async def run():
-    global received_data
+    global received_data, pause
     while True:
 
         try:
@@ -50,7 +55,8 @@ async def run():
             for d,adv in devices.values():
                 received_data = ""
                 print(d.name)
-                if d.name and ("Bangle.js" in d.name) and (d.address.lower() == address.lower()): # this approach should work on windows or mac
+                #if d.name and ("Bangle.js" in d.name) and (d.address.lower() == address.lower()): # this approach should work on windows or mac
+                if d.name and ("Bangle.js" in d.name): # this approach should work on windows or mac
                     async with BleakClient(d) as client:
                         print("starting sync")
                         await client.start_notify(UUID_NORDIC_RX,callback)
@@ -74,12 +80,16 @@ async def run():
 
                         #print("E.setBootCode("+json.dumps(data["minified"])+");load()\n")
 
-                        to_send = "E.setBootCode("+json.dumps(data["minified"])+");load()\n"
+                        to_send = "E.setBootCode("+json.dumps(data["minified"])+");E.reboot();\n"
+
+                         
 
                         for r in range(0,len(to_send),50):
                             print(to_send[r:r+50])
+                            while pause:
+                                await asyncio.sleep(.05) #seems good enough
                             await client.write_gatt_char(UUID_NORDIC_TX,to_send[r:r+50].encode())
-                            await asyncio.sleep(.02) #seems good enough
+                            
 
                         while True:
                             if client.is_connected:

@@ -1,7 +1,5 @@
 NRF.disconnect(); //disconnect at the start.  This removes issues associated with terminals
-Graphics.prototype.setFontAnton = function(scale) {
-    g.setFontCustom(atob("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgAAAAAAAAAAA/gAAAAAAAAAAP/gAAAAAAAAAH//gAAAAAAAAB///gAAAAAAAAf///gAAAAAAAP////gAAAAAAD/////gAAAAAA//////gAAAAAP//////gAAAAH///////gAAAB////////gAAAf////////gAAP/////////gAD//////////AA//////////gAA/////////4AAA////////+AAAA////////gAAAA///////wAAAAA//////8AAAAAA//////AAAAAAA/////gAAAAAAA////4AAAAAAAA///+AAAAAAAAA///gAAAAAAAAA//wAAAAAAAAAA/8AAAAAAAAAAA/AAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////AAAAAB///////8AAAAH////////AAAAf////////wAAA/////////4AAB/////////8AAD/////////+AAH//////////AAP//////////gAP//////////gAP//////////gAf//////////wAf//////////wAf//////////wAf//////////wA//8AAAAAB//4A//wAAAAAAf/4A//gAAAAAAP/4A//gAAAAAAP/4A//gAAAAAAP/4A//wAAAAAAf/4A///////////4Af//////////wAf//////////wAf//////////wAf//////////wAP//////////gAP//////////gAH//////////AAH//////////AAD/////////+AAB/////////8AAA/////////4AAAP////////gAAAD///////+AAAAAf//////4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/gAAAAAAAAAAP/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/AAAAAAAAAAA//AAAAAAAAAAA/+AAAAAAAAAAB/8AAAAAAAAAAD//////////gAH//////////gAP//////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH/4AAAAB/gAAD//4AAAAf/gAAP//4AAAB//gAA///4AAAH//gAB///4AAAf//gAD///4AAA///gAH///4AAD///gAP///4AAH///gAP///4AAP///gAf///4AAf///gAf///4AB////gAf///4AD////gA////4AH////gA////4Af////gA////4A/////gA//wAAB/////gA//gAAH/////gA//gAAP/////gA//gAA///8//gA//gAD///w//gA//wA////g//gA////////A//gA///////8A//gA///////4A//gAf//////wA//gAf//////gA//gAf/////+AA//gAP/////8AA//gAP/////4AA//gAH/////gAA//gAD/////AAA//gAB////8AAA//gAA////wAAA//gAAP///AAAA//gAAD//8AAAA//gAAAP+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/+AAAAAD/wAAB//8AAAAP/wAAB///AAAA//wAAB///wAAB//wAAB///4AAD//wAAB///8AAH//wAAB///+AAP//wAAB///+AAP//wAAB////AAf//wAAB////AAf//wAAB////gAf//wAAB////gA///wAAB////gA///wAAB////gA///w//AAf//wA//4A//AAA//wA//gA//AAAf/wA//gB//gAAf/wA//gB//gAAf/wA//gD//wAA//wA//wH//8AB//wA///////////gA///////////gA///////////gA///////////gAf//////////AAf//////////AAP//////////AAP/////////+AAH/////////8AAH///+/////4AAD///+f////wAAA///8P////gAAAf//4H///+AAAAH//gB///wAAAAAP4AAH/8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/wAAAAAAAAAA//wAAAAAAAAAP//wAAAAAAAAB///wAAAAAAAAf///wAAAAAAAH////wAAAAAAA/////wAAAAAAP/////wAAAAAB//////wAAAAAf//////wAAAAH///////wAAAA////////wAAAP////////wAAA///////H/wAAA//////wH/wAAA/////8AH/wAAA/////AAH/wAAA////gAAH/wAAA///4AAAH/wAAA//+AAAAH/wAAA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gAAAAAAAAH/4AAAAAAAAAAH/wAAAAAAAAAAH/wAAAAAAAAAAH/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB//8AAA/////+B///AAA/////+B///wAA/////+B///4AA/////+B///8AA/////+B///8AA/////+B///+AA/////+B////AA/////+B////AA/////+B////AA/////+B////gA/////+B////gA/////+B////gA/////+A////gA//gP/gAAB//wA//gf/AAAA//wA//gf/AAAAf/wA//g//AAAAf/wA//g//AAAA//wA//g//gAAA//wA//g//+AAP//wA//g////////gA//g////////gA//g////////gA//g////////gA//g////////AA//gf///////AA//gf//////+AA//gP//////+AA//gH//////8AA//gD//////4AA//gB//////wAA//gA//////AAAAAAAH////8AAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////gAAAAB///////+AAAAH////////gAAAf////////4AAB/////////8AAD/////////+AAH//////////AAH//////////gAP//////////gAP//////////gAf//////////wAf//////////wAf//////////wAf//////////wAf//////////4A//wAD/4AAf/4A//gAH/wAAP/4A//gAH/wAAP/4A//gAP/wAAP/4A//gAP/4AAf/4A//wAP/+AD//4A///wP//////4Af//4P//////wAf//4P//////wAf//4P//////wAf//4P//////wAP//4P//////gAP//4H//////gAH//4H//////AAH//4D/////+AAD//4D/////8AAB//4B/////4AAA//4A/////wAAAP/4AP////AAAAB/4AD///4AAAAAAAAAH/8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//AAAAAAAAAAA//gAAAAAAAAAA//gAAAAAAAAAA//gAAAAAAADgA//gAAAAAAP/gA//gAAAAAH//gA//gAAAAB///gA//gAAAAP///gA//gAAAD////gA//gAAAf////gA//gAAB/////gA//gAAP/////gA//gAB//////gA//gAH//////gA//gA///////gA//gD///////gA//gf///////gA//h////////gA//n////////gA//////////gAA/////////AAAA////////wAAAA///////4AAAAA///////AAAAAA//////4AAAAAA//////AAAAAAA/////4AAAAAAA/////AAAAAAAA////8AAAAAAAA////gAAAAAAAA///+AAAAAAAAA///4AAAAAAAAA///AAAAAAAAAA//4AAAAAAAAAA/+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//gB///wAAAAP//4H///+AAAA///8P////gAAB///+f////4AAD///+/////8AAH/////////+AAH//////////AAP//////////gAP//////////gAf//////////gAf//////////wAf//////////wAf//////////wA///////////wA//4D//wAB//4A//wB//gAA//4A//gA//gAAf/4A//gA//AAAf/4A//gA//gAAf/4A//wB//gAA//4A///P//8AH//4Af//////////wAf//////////wAf//////////wAf//////////wAf//////////gAP//////////gAP//////////AAH//////////AAD/////////+AAD///+/////8AAB///8f////wAAAf//4P////AAAAH//wD///8AAAAA/+AAf//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH//gAAAAAAAAB///+AA/+AAAAP////gA//wAAAf////wA//4AAB/////4A//8AAD/////8A//+AAD/////+A///AAH/////+A///AAP//////A///gAP//////A///gAf//////A///wAf//////A///wAf//////A///wAf//////A///wA///////AB//4A//4AD//AAP/4A//gAB//AAP/4A//gAA//AAP/4A//gAA/+AAP/4A//gAB/8AAP/4A//wAB/8AAf/4Af//////////wAf//////////wAf//////////wAf//////////wAf//////////wAP//////////gAP//////////gAH//////////AAH/////////+AAD/////////8AAB/////////4AAAf////////wAAAP////////AAAAB///////4AAAAAD/////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/AAB/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="), 46, atob("EiAnGicnJycnJycnEw=="), 78 + (scale << 8) + (1 << 16));
-  };
+
   
   { // must be inside our own scope here so that when we are unloaded everything disappears
     // we also define functions using 'let fn = function() {..}' for the same reason. function decls are global
@@ -42,7 +40,7 @@ Graphics.prototype.setFontAnton = function(scale) {
   }
 
   let app_name = "test_app";
-  let app_version = 49;
+  let app_version = 52;
   let version = app_name+app_version;
   let movement_filename = "healthlog"+version; 
   let acceleration_filename = "accellog"+version;
@@ -61,27 +59,87 @@ Graphics.prototype.setFontAnton = function(scale) {
   let daily_steps = readSetting("daily_steps", 0);
   let goals_reached = readSetting("goals_reached", 0);
   let bones_eaten = readSetting("bones_eaten", 0);
-
   let goals_file = require("Storage").open(goals_filename,"a");
+  let unsynced_points = readSetting("unsynced_points", 0);
   let num_bones = 0;
   // Dog animation
   let dog_happy_till = 0;
   let make_dog_happy = function(for_time){
     dog_happy_till = Date.now() + for_time;  //5 seconds
-        drawDog();
+    drawScreen();
   }
-  Bangle.on("lock", function(on){
-    if(!on){
-        make_dog_happy(10000);
+
+  Bangle.on('touch', function(button, xy) { 
+    if(dog_happy_till < Date.now()){
+      make_dog_happy(2000);
+    }
+  });
+  Bangle.on('charging', function(charging) { 
+    drawScreen();
+  });
+
+  Bangle.on('swipe', function(directionLR, directionUD) { 
+    if(directionLR != 0){
+      if(!menu_active){
+        openMenu();
+      }
     }
   });
   
   var imgs = {
-    dog_idle: require("heatshrink").decompress(atob("iMUwkBBpNEAAdAA4MEogBDCBdAAwQQBgMQCAsRiIdBCoIIBgMRCAQaDCAYxCCAohFKIoQBiMM5gACA4QZC8gYDFQYABPIIHFGRYQHOwxtCgiHCPYJLGJgIA=")),
-    dog_wag1: require("heatshrink").decompress(atob("i0UwkBBY8BiMRgEEogADBQwBDCqFABAICBBQcRCooJDBQVAgAKIGoQKTFY5sIAQMQ5gAC4ASCoAKBDoPkIgIGCCoQqDJ4JpBGw5aBFoQKFgkAJhEECgUQEAwUCGoMEV4Q0DBQLQGBQQ=")),
-    dog_wag2: require("heatshrink").decompress(atob("icUwkBBY8BiEAogADoEAiMAglEAIYSNoAHCCQURiASFiIABEIIYBBIIRBCQYdDCQg3CCQwlGLo4JBhnMAARTCDgfkDYUEE4IsCAAIdBBYQvEBAQ4GoAbGJwIIBQgx6DgiXCRIJUHRoQ=")),
+    dogs: [
+      { //normal beagle
+        idle: require("heatshrink").decompress(atob("kcjwkGswA/AHqKHQ5EFqFVAAYFBCI9gokEolUAIUEoAiHBINEAAYFBERVAl//kAiKKANEo32/8koBXJGoMvmEAmwyIGoYyBmM2+0gRhUP/4ADERciAAYiLVpwACgIhCkIQLsBED+DkLgQQC+QiLgFPCIVANBadBCAMkgAiO+wiLgEWGYX2iARJsEzg0DAQUwTh6dMAH4A/VIoA==")),  
+        wag1: require("heatshrink").decompress(atob("kcjwkGswA/AHqKHQ5EFqFVAAYFBCI9gokEolUAIUEoAiHBINEAAYFBERVAl//kAiKKANEo32/8koBXJGoMvmEAmwyIGoYyBmM2+0gRhUP/4ADERciAAYiLVpwACgIhCkMGgA0KIgfwsFQCJMCCAXyg0EGpMAp4RCTgKuIGYKdBCAMkCBQiE+1Ah4zKiwzC+0QCBNgmcGgYCCmCcPTpgA/AH6pFA=")),  
+        wag2: require("heatshrink").decompress(atob("kcjwkGswA/AHqKHQ5EFqFVAAYFBCI9gokEolUAIUEoAiHBINEAAYFBERVAl//kAiKKANEo3//8koBXJGoMvmEAn4yIGoYyBmM/+0gRhUPGQIACERciAAYiLVo4kJgIhCkIOBgA0JIgfwAwNQCJECCAXyg1giQ0IgFPCIScBocWGZCdBVwUACQJoJEQX2oEPM5MAiwzC+0QCBNgmcGgYCCmCcPeZQA/AH6pHA")),
+        sleeping: require("heatshrink").decompress(atob("kcjwkBiIA/AH4A/AATRJCA0QoFEAAUEggDBb44LDolAoH0onwERQNBgkP+n/EQ8AgkA//wCAP/AgJXHiALBBwPwAgIiIiIdCAAJnCERJ2ELgPwERIbBAQKLKEQUBAQTj/AH4A/AHcQA=")) 
+      },
+      { //blonde beagle
+        idle: require("heatshrink").decompress(atob("kcjwcBkmSpIC/ATdANAhlGjcN23btuw7ESDQmN4/4v/G/l8hIaEo3j9////un0EEwkjsPw//+m8bgQmEyEA/YZB/eAU49/+EDv/BLg8//8N//gNY8fEwP/+B3HxpoDQZh0FAQVtDQNgTxBBB//4VpBBC/gmJBgP9wIaHmwMB/3AEw8b//2/8AEw8BOoXAWwomCjFtwy2GAQL4LAX4ClkAA==")),
+        wag1: require("heatshrink").decompress(atob("kcjwcBkmSpIC/ATdANAhlGjcN23btuw7ESDQmN4/4v/G/l8hIaEo3j9////un0EEwkjsPw//+m8bgQmEyEA/YZB/eAU49/+EDv/BLg8//8N//gNY8fEwP/+B3HxpoDQZh0FAQVtDQNgoBBJ//4kBoFIIn8iOBEw4MB/uA4AmGmwMB/3DEw8b//2/8BEw8BOoXAWwomCjFtwy2GAQL4LAX4ClkAA=")), 
+        wag2: require("heatshrink").decompress(atob("kcjwcBkmSpIC/ATdANAhlGjcN23btuw7ESDQmN4/4v/G/l8hIaEo3j9////un0EEwkjsPw//+m8bgQmEyEA/YZB/eAU49/+EDv/BLg8//8N//gNY8fEwP/+B3HxpoDQZkSoIOGtoaBsFJgBBI//4kmAQYpBD/kSgyDFEwIMB/uA/CqFyU2BgP+4cAEw0b//2/8BwJNGgJ1C4AyGEwMYtuGWwwCBfBYC/AUsg")),  
+        sleeping: require("heatshrink").decompress(atob("kcjwcBkmSpIC/AX4CPTo0CBwmOn////Hjf/4IaEo8fBgPjx/28AmEkcN2//sOH/fwEwmQg0D/0Gj9/+BBFkdt4/bh/3/kSDQmRGYP/4EAhkJDQlILIdt2EENYt+hMfwBoHyUAgmAgK8/AX4C8kA=")) 
+      },
+      { //doberman
+        idle: require("heatshrink").decompress(atob("kcj4cA///A4PDjHHzVGvWkrNmwWCiBT/AD0JkmSpICBpAMFn+f6v/6v5/mABgkUxQYD0lABgkKos3iVR2lSkAMEgsi+Vt22zlKaFgVJpu27dtiRBGgGm88+m2ILg9Wt0o71EBg8po3buMiBg8f6u2NAKDMOgoAC+tt2tyTxFS1u6yIMIlNW7tIExGkyt1khoIqSqCNBJOCNBH0LQWXWwoABs/00mN/y2FAAL4LAH4AmA")),
+        wag1: require("heatshrink").decompress(atob("kcj4cA///A4PDjHHzVGvWkrNmwUFuRT/AD0JkmSpICBpAMFlMUytJqmRpGABgkUxQYD0lABgkKos36Vd2lSkAMEgsi+Vt22zlMQBgkCpNN23btsSII0A035k+2xBcHq1v13eogMHlNG7dxkQMHNAO26mRQZh0FAAWltu1kUJBg9S9u+yMFNApBCq3dpGCLg+kyt1kmJLg9SVQVFExBOCkQmHyhaCyK2FAANiqmkxtKEw74LAH4Am")),
+        wag2: require("heatshrink").decompress(atob("kcj4cA///A4PDjHHzVGvWkrNmwUFuRT/AD0JkmSpICBpAMFlMUytJqmRpGABgkUxQYD0lABgkKos36Vd2lSkAMEgsi+Vt22zlMQBgkCpNN23btsSII0A035k+2xBcHq1v13eogMHlNG7dxkQMHNAO26mRQZmAhANG0tt2omBkgMGqXt3wmBiSDFIINW7qbBpSDFgGkyt1kmJVQwmBVQVFExBOCkSDHyhaCyIyGgFiqmkxtKWwoABfBYA/AEw")),
+        sleeping: require("heatshrink").decompress(atob("kcj4cA///A4PDjHHzRL/AH4AakmSpICDyAMEilSBIOKlMkxAMEhQIByVFimSogMEgsU7dN2WKpMiBgkCpUl21KDoORIIsFk3LtImBpGADQuTtu0xMkylABgkBLIekyMgE4umoEtiRoHgFJkESpC6/AH4A9A=")) 
+      },
+      { //husky
+        idle: require("heatshrink").decompress(atob("kcj4kA///A4IDBlFC221Jv4A/ACcBiIAHCI8TmMzAAYFBiAiHmcTCIgYBETYMBkYCBERJPBmciAAISBiIiHGoUikMRCIIPJGoIgBkICCRpUSGYQABERoACERasFERQ0FCBcBolERgTlLikzmUiogiLiAgBNB1CB4TRBERSuBCQJIBERURIYIABkEhCJJnBiUSmkQiQ0KTgqdMAH4A/AAoA==")),
+        wag1: require("heatshrink").decompress(atob("kcj4kA///A4IDBlFC221Jv4A/ACcBiIAHCI8TmMzAAYFBiAiHmcTCIgYBETYMBkYCBERJPBmciAAISBiIiHGoUikMRCIIPJGoIgBkICCRpUSGYQABERoACERasFERQ0FiASKgNEoiMCgKLIAAMUmcykVEiETERMQEAI0CiIiJgNCB4TRBGZSuBCQJIBGZURIYIABkEhM5cSiU0iESGZScFTpgA/AH4AF")),
+        wag2: require("heatshrink").decompress(atob("kcj4kA///A4IDBlFC221Jv4A/ACcBiIAHCI8TmMzAAYFBiAiHmcTCIgYBETYMBkYCBERJPBmciAAISBiIiHGoUikMRCIIPJGoIgBkICCRpUSGYQABERoACERasFEQIkJGggOBNJMBolERgQGBoIiIikzmUiokQgMSEREQEAI0CiM0GZNCB4TRBV4KuKCQJIBiZnJiJDBAAMgkIQJM4MSiRBBiTzITg7zKAH4A/AA4A==")),
+        sleeping: require("heatshrink").decompress(atob("kcj4kA///A4IDB221lFCJv4A/AH4AZiIAICA0BoNEAAUUiUkkUQCI0UigQCoNBCAMhER0iERERikREIIQBmUkmJXHgNEoUSCQMimQiIgAuCAAJnCERJ2EiczmIiIidBNgMxRZQiCiACCcf4A/AH4A8A="))
+      },
+      { //chocolate lab
+        idle: require("heatshrink").decompress(atob("kcj4kA///4+aI/4A/ADMCkQAHCI8hiURAAYFBkAiHiMhCIgYBETYSCAQIiJJ4IiFkQiHGoQNCCIIPJGoQyCAQKNKNAoiNIoYiKVgoiKGgoQLGggzLESJoiESDRGCJL1CEgICBGhScFTpgA/AH4AF")),
+        wag1: require("heatshrink").decompress(atob("kcj4kA///4+aI/4A/ADMCkQAHCI8hiURAAYFBkAiHiMhCIgYBETYSCAQIiJJ4IiFkQiHGoQNCCIIPJGoQyCAQKNKNAoiNIoYiKVgoiKGgsgCRQ0EiUCGpQiFkKLLAAciERJoGGZ7RBGZLRGM5chEgICBGZScFTpgA/AH4AFA")),
+        wag2: require("heatshrink").decompress(atob("kcj4kA///4+aI/4A/ADMCkQAHCI8hiURAAYFBkAiHiMhCIgYBETYSCAQIiJJ4IiFkQiHGoQNCCIIPJGoQyCAQKNKNAoiNIoYiKVgoiBK5YzENJI0EGYMCGxIiFgUhERBoFRwIzNGgKhBRZwyJMAIiFCBL1CEgICBTpScFeZQA/AH4AHA")),
+        sleeping: require("heatshrink").decompress(atob("kcj4kA///A4PHzXimEjoOkrOhkGGxVGvVhiHltMFuVAiEluUCnPClBj/AH4A/AAcRABAQGgO2uUiAANK+8ilEQCI0bs4QCkmvCwOBEQ9ZvGCkWIovnERMBi/klGDnc4EwIiHCINyk9SkUjotV1AiHgEXIoUimMRjIiJ8lEAANJitVqYiIiuhgFq18R+czRY4iBt8Qhn/yDj/AH4A/AHg"))
+      },
+      { //dalmation
+        idle: require("heatshrink").decompress(atob("kcjwcBkmSpIC/ATdANAhlGgEP//nx/4gESDQmAg/8v/H/kAhImFgf/AAP+gEEEwkggP4BYM/gECEwmQgAZC/+AU49/8ECv/BLg8//0J//gNY8fEwXwO4+OnAMB/CDMOgoCCQYImJyRcB/04VpEAvySBExF/EwOPNBE4/l+gBoIgC2BR4ImHgJ1C4C2FR4UQv/Ej+CEw74KAX4ClkAA==")),
+        wag1: require("heatshrink").decompress(atob("kcjwcBkmSpIC/ATdANAhlGgEP//nx/4gESDQmAg/8v/H/kAhImFgf/AAP+gEEEwkggP4BYM/gECEwmQgAZC/+AU49/8ECv/BLg8//0J//gNY8fEwXwO4+OnAMB/CDMOgoCCQYImBoAaHLgP+nEjwQaGgF+SQMRLg9/EwOP4BcHnH8v0A8YmIWwP/wImHgJ1C4C2FR4UQv/Ej4mIfBQC/AUsg")), 
+        wag2: require("heatshrink").decompress(atob("kcjwcBkmSpIC/ATdANAhlGgEP//nx/4gESDQmAg/8v/H/kAhImFgf/AAP+gEEEwkggP4BYM/gECEwmQgAZC/+AU49/8ECv/BLg8//0J//gNY8fEwXwO4+OnAMB/CDMiVBBwyDBEwUADQxcB/04RIKDFCgN+SQMSg6DFNAImBx/ABwImFnH8v0A8YmIWwP/wKDHgJ1C4AyGR4MQv/Ej+CQYz4LAX4ClkA")),
+        sleeping: require("heatshrink").decompress(atob("kcjwcBkmSpIC/AX4CPTo0CBwmAn////AjkP4IaEoEfBgPgh/HgAmEkEPBgPwg//wAmEyEHgf+g8cv04IIsj//H/+P4/8iQaEyImBIIMAh0JDQlILId//EENYt+hMfwBoHyUAgmAgK8/AX4C8kAA="))
+      }, 
+      { //blue healer
+        idle: require("heatshrink").decompress(atob("kcj4kA///A4NP8vDjGLxcooXO4koweCiGu3mLpXlsNM2mO3miiFKpRj/AH0RAA0QCA8YwOIAAYFBCI8BmcTmezAIUTmIiHBIMzmdaqczAoIiKm861U3ERRQBEIOq1VTmJXJGoO2qMRq2zB5I1B2UmqdWkWxRhUSkUtpsikQiLu4ADuKvQERUAi4iDCBcBoRDBkVBchcfCIVPERcVr4RBp9VNBdVCIIQBqIiLqoADERUYqv1B4P1rARJgPFmnlqvkmvBTh6dMAH4A/AAo")),
+        wag1: require("heatshrink").decompress(atob("kcj4kA///A4NP8vDjGLxcooXO4koweCiGu3mLpVM2mO3miiHHnPlsJj/AH0RAA0QCA8YwOIAAYFBCI8BmcTn3zmf+AoMxEQ4JBmcz9XjmYFBERU39Wq84iKKAIhB1Wq8cxK5I1B+1RiNW+YPJGoPyk1Tq0i+KMKiUillMkUiERd3AAdxV6AiKgEXEQcQiI0KoRDBkVBgKLIAAMVCIVFiEeGpMeqoRBoteiPhGZNVCINFqtRCBIzBCIIACiozJjFV0oPB0tYCBMB30073u6k+2KcPTpgA/AH4AFA=")),
+        wag2: require("heatshrink").decompress(atob("kcj4kA///A4NP8vDjGLxcooXO4koweCiGu3mLpVM2mO3miiHlsPHnJj/AH0RAA0QCA8YwOIAAYFBCI8BmcTn/jmfvAoMxEQ4JBmcz/XzmYFBERU3/Wq+4iKKAIhB1Wq+cxK5I1B81RiNW8YPJGoPik1Tq0i8KMKiUillMkUiERd3AAdxV6AiBEhMXEQYOBiI0JoRDBkVBgEIRhEAioRCosQgPfGhEfqoRBotfiP/wAzIqoRBotVqPxIpMVCIIACipnJjFV0oPB0tYCBMB3807//6k/2KcPeZQA/AH4AH")),
+        sleeping: require("heatshrink").decompress(atob("kcj4kA///A4PDjFP8vu5mLpUmrXN5mKzcJoUt1mCiHLzdBhHFpNLvZj/AH4A/AAcRABAQGgO9kQAC7fZqtZiARGjfSCAUt3uVquREQ+xlcuyW77clERMBiXurNe8QzBERARBsc/9Uz4UpzOZEQ8Aikzp8zmfhiMdERNms3ms1iiWZ8QiIjGBgEox0RNgKLHEQMuiEL92wcf4A/AH4A8A"))
+      },
+      { //german shephard
+        idle: require("heatshrink").decompress(atob("kcj4kA///A4Or1YFBlFCJv4A/ACcBiIAHCI8SmMiAAchkcQEQ8yiUiAIcTkIiHiYiGmYiJDgIPBoMjERJPBmQQBklEoMREQ41CmUxiNEogPJGoMzmlBCANBRpUTBwIACERYQEERasFERQ0BmYABmAQLgMiCAMyRJAiEkUjmTPIAAcUoaeBPoJoMCIMzNBkUoUjmcjRZcRoZoCmdBCJMBkcSPYICBNJScFTpgA/AH4AFA")),
+        wag1: require("heatshrink").decompress(atob("kcj4kA///A4Or1YFBlFCJv4A/ACcBiIAHCI8SmMiAAchkcQEQ8yiUiAIcTkIiHiYiGmYiJDgIPBoMjERJPBmQQBklEoMREQ41CmUxiNEogPJGoMzmlBCANBRpUTBwIACERYQEERasFERQ0BmYABmEQCRUBkQQBmUhgI1KicikcyZ4MUERMUoaeBPoMRERJoBCIMzNAIzKilCkczkdEiYzJiNDNAUzoJnKkcSPYICBeZCcHTpgA/AH4AF")),
+        wag2: require("heatshrink").decompress(atob("kcj4kA///A4Or1YFBlFCJv4A/ACcBiIAHCI8SmMiAAchkcQEQ8yiUiAIcTkIiHiYiGmYiJDgIPBoMjERJPBmQQBklEoMREQ41CmUxiNEogPJGoMzmlBCANBRpUTBwIACERYQEERasFEQJXKmYABmAOBNJMBkQQBmSJBgI2JicikcyZ4MBiYiIilDTwJ9BiNDGZNECIMzNAKvBGZEUoUjmcjogyJMANDNAUzoIQJgMjiR7BAQLzITg7zKAH4A/AA4")),
+        sleeping: require("heatshrink").decompress(atob("kcj4kA///A4Or1YFBlFCJv4A/AH4AZiIAICA0BmMiAAUTikymcQCI0SiQQCkMhmUjmIiHkIiDiUTmYiIiMSiMioMUicjmkhK48BEAMUolBmcjEREAFwNEAAJnCoIiIOwkUmcxEREUHwMSoKLKEQUQAQTj/AH4A/AHgA=")) 
+      }
+    ],
     dog_bowl_empty: require("heatshrink").decompress(atob("kcjwkCkQA/AH4A/AAjOEZZQMB5gADCRIPB4MRAAUcCQIPFkEMB4gSD4AkFgfMCA0R5nAEQs0IAIzF5lEEQsM4lMKwnMA4IiGngaBCQfEogDBEQkgIoItCAAQlDCIgQDAA40EGYQAJESwQKEQgQMCIkMCBY0DEUcAABbSFAH4AkkA")),
-    dog_bone: require("heatshrink").decompress(atob("kcjwkBiIA/AH4AxgAGMAAUP+DOEgPwCJP/AAgQKEQoGBIrIA/AH4A/AH4A/ADMQA"))
+    dog_bone: require("heatshrink").decompress(atob("kcjwkBiIA/AH4AxgAGMAAUP+DOEgPwCJP/AAgQKEQoGBIrIA/AH4A/AH4A/ADMQA")),
+    heart: atob("CgrBAP//APgACEc5/n+Pw/B4DAAA")
   };
   
   var currentframe = 0;
@@ -95,7 +153,7 @@ Graphics.prototype.setFontAnton = function(scale) {
   let last_bpm = 0;
   let last_conf = 0;
   E.setTimeZone(timezone);
-  Bangle.setOptions({"powerSave": true, "hrmPollInterval": 20, "lockTimeout": 10000, "backlightTimeout":10000,"wakeOnBTN1":true,"wakeOnBTN2":true,"wakeOnBTN3":true,"wakeOnFaceUp":false,"wakeOnTouch":false,"wakeOnTwist":false});
+  Bangle.setOptions({"powerSave": true, "hrmPollInterval": 20, "lockTimeout": 10000, "backlightTimeout":3000,"wakeOnBTN1":true,"wakeOnBTN2":true,"wakeOnBTN3":true,"wakeOnFaceUp":false,"wakeOnTouch":false,"wakeOnTwist":false});
   Bangle.setHRMPower(false,"myApp"); //this actually resets the poll interval
   Bangle.setHRMPower(true,"myApp");
   Bangle.setHRMPower(false,"myApp"); 
@@ -128,22 +186,20 @@ Graphics.prototype.setFontAnton = function(scale) {
                     view.setUint32(0, Math.floor(Date.now() / 1000), false); 
                     view.setUint16(4, next_goal, false);
                     goals_file.write(btoa(goal_log_buffer));
+                    closeMenu();
                   }
-                },
+    },
+    "Show Stats": function(){
+      watch_points = unsynced_points + Math.floor(((goals_reached > 0)?current_goal/300:0) + (daily_steps/300) + ((daily_steps > 1000)?10:0));
+      E.showPrompt("ID: " + config.id + "\nLevel:" + config.dog_level +"\n" + "Bank: " + config.current_points + "\nWatch: " + watch_points,{buttons: {"OK":0}}).then(function(v) {
+        closeMenu();
+      });
+    },
     "Exit": function(){
       closeMenu();
     }
 
   };
-
-  setWatch(function(e){
-    if(!menu_active){
-      openMenu();
-    }else{
-      closeMenu();
-    }
-  }, BTN1, {repeat:true});
-
 
 let openMenu = function(){
       if(menu_active){
@@ -195,6 +251,7 @@ let openMenu = function(){
         setTimeout(function(){Bangle.buzz(500,1);bones_eaten++;drawBowl();writeSetting("bones_eaten",bones_eaten);},5000);
         make_dog_happy(5000);    
         goals_reached = writeSetting("goals_reached",goals_reached+1);
+        
       }
   };
 
@@ -322,7 +379,7 @@ let openMenu = function(){
                 g.setFontAlign(0, 0).setFont("6x8", 2).drawString("<3 on", cx, 10);
             }
         }
-        g.setFontAlign(1, 0).setFont("6x8",2).drawString(""+E.getBattery(), 170, 10);
+        g.setFontAlign(1, 0).setFont("6x8",2).drawString(""+E.getBattery()+"%", 170, 10);
         g.setFontAlign(-1, 0).setFont("6x8",2).drawString(""+daily_steps +"/"+(goals_reached+1)*current_goal, 5, 10);
   };
 
@@ -338,7 +395,7 @@ let openMenu = function(){
         x = 95; //top left
         y = 45;
         
-      g.clearRect(bone_area_rect[0],bone_area_rect[1],bone_area_rect[2],bone_area_rect[3])
+      
       for(var i =0;i<n;i++){
         g.drawImage(imgs.dog_bone,x-(10*(i%2)),y-10*(i),{scale:scale} ); 
       }
@@ -349,25 +406,28 @@ let openMenu = function(){
     if(config.dog_name == undefined){
       return; //no dog drawing if no pet name
     }
-        metrics = g.imageMetrics(imgs.dog_bowl_empty);
-        scale = 2.5;
-        w = metrics.width*scale;
-        h = metrics.height*scale;
-        x = 90; //top left
-        y = 40;
-        if(!menu_active){
-            g.clearRect(x,y,x+w,y+h/2);
-            g.drawImage(imgs.dog_bowl_empty,x,y,{scale:scale} );
-            num_bones = Math.floor(daily_steps / (current_goal / 5)); 
-            drawBones(num_bones-bones_eaten);
+    metrics = g.imageMetrics(imgs.dog_bowl_empty);
+    scale = 2.5;
+    w = metrics.width*scale;
+    h = metrics.height*scale;
+    x = 90; //top left
+    y = 40;
+    if(!menu_active){
+        //g.clearRect(x,y,x+w,y+h/2);
+        g.drawImage(imgs.dog_bowl_empty,x,y,{scale:scale} );
+        for(var i=0;i<goals_reached;i++){
+          g.drawImage(imgs.heart, x+20*i,y-20,{scale: 2});
         }
-        if(config.dog_name!=undefined){
-          if(config.dog_name.length < 8){
-            g.setFontAlign(0, 0).setFont("4x6", 2).drawString(config.dog_name, x+38, y+55);
-          }else{
-            g.setFontAlign(0, 0).setFont("6x8", 1).drawString(config.dog_name, x+38, y+55);
-          }
-        }
+        num_bones = Math.floor(daily_steps / (current_goal / 5)); 
+        drawBones(num_bones-bones_eaten);
+    }
+    if(config.dog_name!=undefined){
+      if(config.dog_name.length < 8){
+        g.setFontAlign(0, 0).setFont("4x6", 2).drawString(config.dog_name, x+38, y+55);
+      }else{
+        g.setFontAlign(0, 0).setFont("6x8", 1).drawString(config.dog_name, x+38, y+55);
+      }
+    }
   };
   let drawDogTimeout;
   let last_dog_rect = []
@@ -376,34 +436,32 @@ let openMenu = function(){
         if(config.dog_name == undefined){
           return; //no dog drawing if no pet name
         }
-        let frames = [imgs.dog_wag1,imgs.dog_wag2];
+        dog_images = imgs.dogs[config.texture_id];
+        let frames = [dog_images.wag1,dog_images.wag2];
         let img;
         if(dog_happy_till > Date.now()){
-            if(drawDogTimeout != undefined){
-                clearTimeout(drawDogTimeout);
-            }
-            drawDogTimeout = setTimeout(drawDog,400);
             currentframe = (currentframe + 1)% frames.length;
             img = frames[currentframe];
         }else{
-            img = imgs.dog_idle;
+            if(Bangle.isCharging()){
+              img = dog_images.sleeping;
+            }else{
+              img = dog_images.idle;
+            }
         }
 
         metrics = g.imageMetrics(img);
         dog_scale = 4;
         dog_w = metrics.width*dog_scale;
         dog_h = metrics.height*dog_scale;
-        dog_x = 10;
-        dog_y = 30;
+        dog_x = -20;
+        dog_y = 0;
         if(!menu_active){
-          if(last_dog_rect.length > 0){
-            g.clearRect(last_dog_rect[0],last_dog_rect[1]-10,last_dog_rect[2],last_dog_rect[3]);
-          }
+          // if(last_dog_rect.length > 0){
+          //   g.clearRect(last_dog_rect[0],last_dog_rect[1]-10,last_dog_rect[2],last_dog_rect[3]);
+          // }
           last_dog_rect = [dog_x,dog_y,dog_x+dog_w,dog_y+dog_h]
           g.drawImage(img,dog_x,dog_y,{scale:dog_scale} ); 
-          
-          
-          
         }
 
   }
@@ -456,22 +514,36 @@ let openMenu = function(){
     g.fillRect(left,cy-height/2,left+(total_sent/total_to_send)*width,cy+height/2); 
   };
 
-
-  // Actually draw the watch face
-  let draw = function() {
-    if(syncing) return;
-    
+   // Actually draw the watch face
+  let drawScreen = function(){
     if(!menu_active){
       drawClockFace();
       drawWidgets();
     }
+
+    if(drawDogTimeout != undefined){
+      clearTimeout(drawDogTimeout);
+    }
+    if(dog_happy_till > Date.now()){
+      drawDogTimeout = setTimeout(drawScreen,400);
+    }
+  };
+
+ 
+  //this is more of an update clock
+  let draw = function() {
+    if(syncing) return;
+    
+    drawScreen();
    
     writeMovementLog();
     
     let dt = new Date();
     let date_string = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
     if(date_string != current_day){
-      //it's a brand new day
+      //it's a brand new day, update things
+      todays_points = Math.floor(((goals_reached > 0)?current_goal/300:0) + (daily_steps/300) + ((daily_steps > 1000)?10:0));
+      unsynced_points = writeSetting("unsynced_points", unsynced_points + todays_points); //add to points
       current_goal = writeSetting("current_goal",next_goal);
       daily_steps = writeSetting("daily_steps", 0);
       goals_reached = writeSetting("goals_reached", 0);
@@ -657,6 +729,7 @@ let openMenu = function(){
             current_movement_file = require("Storage").open(movement_filename,"a");
             current_acceleration_file = require("Storage").open(acceleration_filename,"a");
             goals_file = require("Storage").open(goals_filename,"a")
+            unsynced_points = writeSetting("unsynced_points",0); //we synced so no more of this
         }
         if(data.charCodeAt(0) == 3){
             config_buffer = ""; 

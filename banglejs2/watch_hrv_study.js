@@ -1,10 +1,8 @@
-NRF.disconnect(); //disconnect at the start.  This removes issues associated with terminals
-Graphics.prototype.setFontAnton = function(scale) {
+{ 
+
+  Graphics.prototype.setFontAnton = function(scale) {
     g.setFontCustom(atob("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgAAAAAAAAAAA/gAAAAAAAAAAP/gAAAAAAAAAH//gAAAAAAAAB///gAAAAAAAAf///gAAAAAAAP////gAAAAAAD/////gAAAAAA//////gAAAAAP//////gAAAAH///////gAAAB////////gAAAf////////gAAP/////////gAD//////////AA//////////gAA/////////4AAA////////+AAAA////////gAAAA///////wAAAAA//////8AAAAAA//////AAAAAAA/////gAAAAAAA////4AAAAAAAA///+AAAAAAAAA///gAAAAAAAAA//wAAAAAAAAAA/8AAAAAAAAAAA/AAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////AAAAAB///////8AAAAH////////AAAAf////////wAAA/////////4AAB/////////8AAD/////////+AAH//////////AAP//////////gAP//////////gAP//////////gAf//////////wAf//////////wAf//////////wAf//////////wA//8AAAAAB//4A//wAAAAAAf/4A//gAAAAAAP/4A//gAAAAAAP/4A//gAAAAAAP/4A//wAAAAAAf/4A///////////4Af//////////wAf//////////wAf//////////wAf//////////wAP//////////gAP//////////gAH//////////AAH//////////AAD/////////+AAB/////////8AAA/////////4AAAP////////gAAAD///////+AAAAAf//////4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/gAAAAAAAAAAP/gAAAAAAAAAAf/gAAAAAAAAAAf/gAAAAAAAAAAf/AAAAAAAAAAA//AAAAAAAAAAA/+AAAAAAAAAAB/8AAAAAAAAAAD//////////gAH//////////gAP//////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH/4AAAAB/gAAD//4AAAAf/gAAP//4AAAB//gAA///4AAAH//gAB///4AAAf//gAD///4AAA///gAH///4AAD///gAP///4AAH///gAP///4AAP///gAf///4AAf///gAf///4AB////gAf///4AD////gA////4AH////gA////4Af////gA////4A/////gA//wAAB/////gA//gAAH/////gA//gAAP/////gA//gAA///8//gA//gAD///w//gA//wA////g//gA////////A//gA///////8A//gA///////4A//gAf//////wA//gAf//////gA//gAf/////+AA//gAP/////8AA//gAP/////4AA//gAH/////gAA//gAD/////AAA//gAB////8AAA//gAA////wAAA//gAAP///AAAA//gAAD//8AAAA//gAAAP+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/+AAAAAD/wAAB//8AAAAP/wAAB///AAAA//wAAB///wAAB//wAAB///4AAD//wAAB///8AAH//wAAB///+AAP//wAAB///+AAP//wAAB////AAf//wAAB////AAf//wAAB////gAf//wAAB////gA///wAAB////gA///wAAB////gA///w//AAf//wA//4A//AAA//wA//gA//AAAf/wA//gB//gAAf/wA//gB//gAAf/wA//gD//wAA//wA//wH//8AB//wA///////////gA///////////gA///////////gA///////////gAf//////////AAf//////////AAP//////////AAP/////////+AAH/////////8AAH///+/////4AAD///+f////wAAA///8P////gAAAf//4H///+AAAAH//gB///wAAAAAP4AAH/8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/wAAAAAAAAAA//wAAAAAAAAAP//wAAAAAAAAB///wAAAAAAAAf///wAAAAAAAH////wAAAAAAA/////wAAAAAAP/////wAAAAAB//////wAAAAAf//////wAAAAH///////wAAAA////////wAAAP////////wAAA///////H/wAAA//////wH/wAAA/////8AH/wAAA/////AAH/wAAA////gAAH/wAAA///4AAAH/wAAA//+AAAAH/wAAA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gA///////////gAAAAAAAAH/4AAAAAAAAAAH/wAAAAAAAAAAH/wAAAAAAAAAAH/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB//8AAA/////+B///AAA/////+B///wAA/////+B///4AA/////+B///8AA/////+B///8AA/////+B///+AA/////+B////AA/////+B////AA/////+B////AA/////+B////gA/////+B////gA/////+B////gA/////+A////gA//gP/gAAB//wA//gf/AAAA//wA//gf/AAAAf/wA//g//AAAAf/wA//g//AAAA//wA//g//gAAA//wA//g//+AAP//wA//g////////gA//g////////gA//g////////gA//g////////gA//g////////AA//gf///////AA//gf//////+AA//gP//////+AA//gH//////8AA//gD//////4AA//gB//////wAA//gA//////AAAAAAAH////8AAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////gAAAAB///////+AAAAH////////gAAAf////////4AAB/////////8AAD/////////+AAH//////////AAH//////////gAP//////////gAP//////////gAf//////////wAf//////////wAf//////////wAf//////////wAf//////////4A//wAD/4AAf/4A//gAH/wAAP/4A//gAH/wAAP/4A//gAP/wAAP/4A//gAP/4AAf/4A//wAP/+AD//4A///wP//////4Af//4P//////wAf//4P//////wAf//4P//////wAf//4P//////wAP//4P//////gAP//4H//////gAH//4H//////AAH//4D/////+AAD//4D/////8AAB//4B/////4AAA//4A/////wAAAP/4AP////AAAAB/4AD///4AAAAAAAAAH/8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//AAAAAAAAAAA//gAAAAAAAAAA//gAAAAAAAAAA//gAAAAAAADgA//gAAAAAAP/gA//gAAAAAH//gA//gAAAAB///gA//gAAAAP///gA//gAAAD////gA//gAAAf////gA//gAAB/////gA//gAAP/////gA//gAB//////gA//gAH//////gA//gA///////gA//gD///////gA//gf///////gA//h////////gA//n////////gA//////////gAA/////////AAAA////////wAAAA///////4AAAAA///////AAAAAA//////4AAAAAA//////AAAAAAA/////4AAAAAAA/////AAAAAAAA////8AAAAAAAA////gAAAAAAAA///+AAAAAAAAA///4AAAAAAAAA///AAAAAAAAAA//4AAAAAAAAAA/+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//gB///wAAAAP//4H///+AAAA///8P////gAAB///+f////4AAD///+/////8AAH/////////+AAH//////////AAP//////////gAP//////////gAf//////////gAf//////////wAf//////////wAf//////////wA///////////wA//4D//wAB//4A//wB//gAA//4A//gA//gAAf/4A//gA//AAAf/4A//gA//gAAf/4A//wB//gAA//4A///P//8AH//4Af//////////wAf//////////wAf//////////wAf//////////wAf//////////gAP//////////gAP//////////AAH//////////AAD/////////+AAD///+/////8AAB///8f////wAAAf//4P////AAAAH//wD///8AAAAA/+AAf//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH//gAAAAAAAAB///+AA/+AAAAP////gA//wAAAf////wA//4AAB/////4A//8AAD/////8A//+AAD/////+A///AAH/////+A///AAP//////A///gAP//////A///gAf//////A///wAf//////A///wAf//////A///wAf//////A///wA///////AB//4A//4AD//AAP/4A//gAB//AAP/4A//gAA//AAP/4A//gAA/+AAP/4A//gAB/8AAP/4A//wAB/8AAf/4Af//////////wAf//////////wAf//////////wAf//////////wAf//////////wAP//////////gAP//////////gAH//////////AAH/////////+AAD/////////8AAB/////////4AAAf////////wAAAP////////AAAAB///////4AAAAAD/////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/AAB/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAA//AAD/8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="), 46, atob("EiAnGicnJycnJycnEw=="), 78 + (scale << 8) + (1 << 16));
   };
-  
-  { // must be inside our own scope here so that when we are unloaded everything disappears
-    // we also define functions using 'let fn = function() {..}' for the same reason. function decls are global
 
   let readSetting = function(s, default_value){
     var f = require("Storage").read("setting_"+s);
@@ -42,7 +40,7 @@ Graphics.prototype.setFontAnton = function(scale) {
   }
 
   let app_name = "hrv_test";
-  let app_version = 1;
+  let app_version = 2;
   let version = app_name+app_version;
   let movement_filename = "healthlog"+version; 
   let acceleration_filename = "accellog"+version;
@@ -69,7 +67,7 @@ Graphics.prototype.setFontAnton = function(scale) {
   let last_conf = 0;
   E.setTimeZone(timezone);
   
-  Bangle.setOptions({"powerSave": true, "hrmPollInterval": 20, "lockTimeout": 10000, "backlightTimeout":10000,"wakeOnBTN1":true,"wakeOnBTN2":true,"wakeOnBTN3":true,"wakeOnFaceUp":false,"wakeOnTouch":false,"wakeOnTwist":false});
+  Bangle.setOptions({"powerSave": true, "hrmPollInterval": 40, "lockTimeout": 10000, "backlightTimeout":10000,"wakeOnBTN1":true,"wakeOnBTN2":true,"wakeOnBTN3":true,"wakeOnFaceUp":false,"wakeOnTouch":false,"wakeOnTwist":false});
   Bangle.setHRMPower(false,"myApp"); //this actually resets the poll interval
   Bangle.setHRMPower(true,"myApp");
   Bangle.setHRMPower(false,"myApp"); 
@@ -84,12 +82,14 @@ Graphics.prototype.setFontAnton = function(scale) {
   var menu = {
 
     "Start HRM":function(){
-     if(!Bangle.isHRMOn()){
-       startHRMonitor();
-     }
+    if(!Bangle.isHRMOn()){
+      startHRMonitor();
+      closeMenu();
+    }
     },
     "Stop HRM": function(){
       stopHRMonitor();
+      closeMenu();
     },
     
     "Exit": function(){
@@ -119,7 +119,7 @@ let openMenu = function(){
     }
     menu_active = false;
     E.showMenu();
-    draw();
+    drawClockFace();
   };
 
   var movement_log_buffer = new ArrayBuffer(9);
@@ -188,25 +188,28 @@ let openMenu = function(){
         if(current_hrm_file != null){
             current_hrm_file.write(btoa(hrm_log_buffer));
         }
-        drawWidgets();
+        drawClockFace();
   });
 
+  let raw_reading_buffer = [];
   let last_time = 0;
-  var hrm_raw_log_buffer = new ArrayBuffer(3);  //might be able to go down to 3 or even 2
+  let hrm_raw_log_buffer = new ArrayBuffer(3);  //might be able to go down to 3 or even 2
+  let last_pixel = 0;
+  let avg_hrm = 0;
   Bangle.on("HRM-raw", function(hrm) { 
         var time = Date.now()/1000;
         if((time-last_hrm_reading_time) > 60*3){
             stopHRMonitor();
-            drawWidgets();
+            drawClockFace();
             return;
         }
         // var time_delta =  (time-last_time)%256; 
         // last_time = time;
         var view = new DataView(hrm_raw_log_buffer);
-        var acc = Bangle.getAccel().diff*200;
-        if(acc > 255){
-            acc = 255; //we don't want to write 255, because that's a special encoded value
-        }
+        // var acc = Bangle.getAccel().diff*200;
+        // if(acc > 255){
+        //     acc = 255; //we don't want to write 255, because that's a special encoded value
+        // }
 
         var time_ms = Date.now();
         var time_delta = time_ms - last_time;
@@ -221,9 +224,28 @@ let openMenu = function(){
         if(current_hrmraw_file != null){
             current_hrmraw_file.write(btoa(hrm_raw_log_buffer)); //add to the buffer
         }
+        // raw_reading_buffer.push(hrm.raw);
+        // if(raw_reading_buffer.length > 30){
+        //   raw_reading_buffer.shift();
+        // }
+      // min_value = raw_reading_buffer.reduce((a, b) => Math.min(a, b), Infinity);
+      // max_value = raw_reading_buffer.reduce((a, b) => Math.max(a, b), -Infinity);
+      // range = max_value-min_value;
+        to_draw = (hrm.raw-hrm.avg)/2;
+        g.clearRect(0,0,175,20);
+        g.setFontAlign(-1, 0).setFont("6x8",2).drawString(""+to_draw, 5, 10);
+        // //g.setClipRect(0,125,175,175); //only scroll the bottom of the screen
+        // //g.setColor(g.theme.bg).drawLine(last_pixel,125,last_pixel,175); //should be hrm value
+        g.drawLine(last_pixel,88,last_pixel,88+Math.floor(to_draw)); //should be hrm value
+        last_pixel = (last_pixel+1)%176;
+        if(last_pixel == 0){
+          g.clearRect(0,20,175,175);
+        }
+        //g.scroll(-1,0);
+        //g.setClipRect(0,0,175,175);
   });
 
-var polar_log_buffer = new ArrayBuffer(9);
+let polar_log_buffer = new ArrayBuffer(9);
 let polar_callback = function(event) {
   
   var view = new DataView(polar_log_buffer);
@@ -251,10 +273,9 @@ let polar_callback = function(event) {
       view.setUint16(5,rris[0]); // 0-100
       view.setUint16(7,rris[1]); // 0-100
     }
-    print(""+hr);
     if(current_polar_file != null){
-       current_polar_file.write(btoa(polar_log_buffer));
-       
+      current_polar_file.write(btoa(polar_log_buffer));
+      
     }
   }
 };
@@ -267,9 +288,14 @@ let disconnectFromServer = function(error){
       connectingToPolar = false;
       return;
     }
+  try{
     PolarServer.disconnect()
     .then(()=>{connectingToPolar=false;PolarServer=undefined;})
     .catch((error)=>{connectingToPolar=false;PolarServer=undefined;});
+  }catch(e){
+    connectingToPolar=false;PolarServer=undefined;
+    return;
+  }
 };
 
 let foundDevices = function(devices){
@@ -322,22 +348,17 @@ let startPolar = function(){
     last_bpm = -1;
     last_conf = -1;
 
-    polarInterval = setInterval(startPolar,5000);
+    startPolar();
     
-    drawWidgets();
+    drawClockFace();
 
   };
 
   let stopHRMonitor = function(){
     Bangle.setHRMPower(false,"myapp"); //this should immediately stop raw readings
-    if(PolarServer!=undefined && PolarServer.connected){
-      PolarServer.disconnect().then(()=>{PolarServer=undefined;}).catch((error)=>{PolarServer=undefined;}); //clean up
-    }
-    drawWidgets();
-    if(polarInterval != undefined){
-      clearInterval(polarInterval);
-      polarInterval = undefined;
-    }
+    disconnectFromServer();
+    drawClockFace();
+    
   };
 
   let drawWidgets = function(){
@@ -347,40 +368,55 @@ let startPolar = function(){
         var cx = w/2;
         var cy = h/2; 
         g.clearRect(0,0,w,20); //reserve 20 pixels
-        if(Bangle.isHRMOn()){
-            if(last_bpm >= 0 || last_conf >= 0) {
-                g.setFontAlign(0, 0).setFont("6x8", 2).drawString(last_bpm+":"+last_conf, cx, 10);
-            }
-            else{
-                g.setFontAlign(0, 0).setFont("6x8", 2).drawString("<3 on", cx, 10);
-            }
-        }
+        
+
         g.setFontAlign(1, 0).setFont("6x8",2).drawString(""+E.getBattery(), 170, 10);
         g.setFontAlign(-1, 0).setFont("6x8",2).drawString(""+daily_steps, 5, 10);
   };
 
   let drawClockFace = function(){
+    if(menu_active || Bangle.isHRMOn()){
+      return;
+    }
     var x = g.getWidth() / 2;
     var y = g.getHeight() / 2;
     var screen_size = 175;
-    g.reset().clearRect(Bangle.appRect); // clear whole background (w/o widgets)
-    var date = new Date(); //timezone aware
-    var hour = date.getHours() % 12;
-    var minuteStr = (""+date.getMinutes()).padStart(2,"0");
+    g.clearRect(Bangle.appRect); // clear whole background (w/o widgets)
 
-    var timeStr = (hour == 0?"12":(""+hour)) + ":"+minuteStr;
-    //var timeStr = locale.time(date, 1); // Hour and minute
     
-    // Show date and day of week
-    var dow = date.getDay();
-    days_of_week = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-    var dateStringFull = date.toString();
-    var parts = dateStringFull.split(" ");
-    var dateStr = days_of_week[dow] + " " + parts[1]+" " + parts[2];
-              
-    g.setFontAlign(0, 0).setFont("Anton").drawString(timeStr, x, y);
-    g.setFontAlign(0, 0).setFont("6x8", 2).drawString(dateStr, x, y+40);
+    if(Bangle.isHRMOn()){
+        var time = Date.now()/1000;
+        var time_left = 60*3 - Math.floor(time-last_hrm_reading_time);
+        polarConnected = PolarServer!=undefined && PolarServer.connected;
+        g.setFontAlign(0, 0).setFont("6x8", 2).drawString(""+time_left, x, y+20);
+        if(last_bpm >= 0 || last_conf >= 0) {
+            g.setFontAlign(0, 0).setFont("6x8", 2).drawString(last_bpm+":"+last_conf+":"+(polarConnected?1:0), x, y);
+            
+        }
+        else{
+            g.setFontAlign(0, 0).setFont("6x8", 2).drawString("<3 on", x, y);
+        }
 
+
+    }else{
+      var date = new Date(); //timezone aware
+      var hour = date.getHours() % 12;
+      var minuteStr = (""+date.getMinutes()).padStart(2,"0");
+
+      var timeStr = (hour == 0?"12":(""+hour)) + ":"+minuteStr;
+      //var timeStr = locale.time(date, 1); // Hour and minute
+      
+      // Show date and day of week
+      var dow = date.getDay();
+      days_of_week = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+      var dateStringFull = date.toString();
+      var parts = dateStringFull.split(" ");
+      var dateStr = days_of_week[dow] + " " + parts[1]+" " + parts[2];
+                
+      g.setFontAlign(0, 0).setFont("Anton").drawString(timeStr, x, y);
+      g.setFontAlign(0, 0).setFont("6x8", 2).drawString(dateStr, x, y+40);
+    }
+    drawWidgets();
   };
 
   let drawSyncProgress = function(){
@@ -401,10 +437,10 @@ let startPolar = function(){
     if(syncing) return;
     
     if(!menu_active){
+      
       drawClockFace();
-      drawWidgets();
     }
-   
+  
     writeMovementLog();
     
     let dt = new Date();
@@ -438,7 +474,7 @@ let startPolar = function(){
   let total_to_send = 0;
   let total_sent = 0;
   let sendData = function(){
-       
+      
 
         while(true){
             s = storageFile.read(ble_mtu);
@@ -509,10 +545,11 @@ let startPolar = function(){
         if(parts.length > 1){
             print("got everything");
             reading_firmware = false;
-            Bluetooth.write(4); //got all data
             firmware_file = require("Storage").open("firmware","r");
-            program = atob(firmware_file.read(10000000));
+            program = firmware_file.read(10000000)+"\n";
             E.setBootCode(program);
+
+            Bluetooth.write(4); //got all data
         }
     }else{
         if(data.charCodeAt(0) == 1){ 
@@ -604,8 +641,9 @@ let startPolar = function(){
             reading_firmware = true;
             if(debug) print("firmware read");
         }
-        if(data.charCodeAt(0) == 5){
-            load(); //we are done
+        if(data.charCodeAt(0) == 5){ //used to end firmware upload
+            E.reboot();
+            
         }
         if(data.charCodeAt(0) == 7){ //a sync is going to start
 
@@ -646,5 +684,5 @@ let startPolar = function(){
   });
   setupServer();
   draw();
-  }
+}
   
