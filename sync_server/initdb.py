@@ -17,4 +17,4 @@ def initdb():
             except Exception as e:
                 print(e)
     print("db initialized")
-initdb();
+initdb()

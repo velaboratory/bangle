@@ -53,6 +53,6 @@ CREATE TABLE request_log (
 CREATE TABLE app (
     name TEXT,
     version int,
-    code_base64 TEXT,
+    code_base64 TEXT, -- probably don't need this
     primary key(name,version)
 );
