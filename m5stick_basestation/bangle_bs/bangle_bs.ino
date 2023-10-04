@@ -105,7 +105,7 @@ void doWifiWifiSetup(){
 
   
   WiFi.mode(WIFI_AP);
-  WiFi.softAP("watchconfig", "password");
+  WiFi.softAP("watchconfig");
 
   IPAddress apIP = WiFi.softAPIP();
 
@@ -235,8 +235,26 @@ void handle_root(){
     SSID (Which WiFi you would like to connect to)<br>";
 
   int n = WiFi.scanNetworks();
-  for(int i=0;i<n;i++){
-    String ssid = WiFi.SSID(i);
+  String ssids[n];
+  int ssidExists = 0;
+  int incrementor = 0;
+  for(int j=0;j<n;j++){
+    ssidExists = 0;
+    char* setSsid = WiFi.SSID(j);
+    for(int k=0;k<n;k++){
+      char* setArr = ssids[k];
+      if(strcmp(setArr, setSsid) == 1){
+        ssidExists = 1;        
+      }
+    }
+    if(!ssidExists){
+      ssids[incrementor] = WiFi.SSID(j);
+      incrementor = incrementor + 1;
+    }
+  }
+  String ssid;
+  for(int i=0;i<n;i++){ 
+    ssid = ssids[i];
     HTML = HTML + "<input type=\"radio\" name=\"ssid\" value=\"" + ssid + "\">"+ssid+"<br>"; 
   }
 HTML = HTML + "password (Password of the WiFi you are trying to connect to) <input type=\"text\" name=\"password\"/><br>\
