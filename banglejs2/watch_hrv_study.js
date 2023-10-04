@@ -40,7 +40,7 @@
   }
 
   let app_name = "hrv_test";
-  let app_version = 2;
+  let app_version = 3;
   let version = app_name+app_version;
   let movement_filename = "healthlog"+version; 
   let acceleration_filename = "accellog"+version;
@@ -196,9 +196,11 @@ let openMenu = function(){
   let hrm_raw_log_buffer = new ArrayBuffer(3);  //might be able to go down to 3 or even 2
   let last_pixel = 0;
   let avg_hrm = 0;
+  let hr_max_time = 120;
   Bangle.on("HRM-raw", function(hrm) { 
         var time = Date.now()/1000;
-        if((time-last_hrm_reading_time) > 60*3){
+        var time_left = hr_max_time - (time-last_hrm_reading_time)
+        if(time_left < 0){
             stopHRMonitor();
             drawClockFace();
             return;
@@ -233,7 +235,8 @@ let openMenu = function(){
       // range = max_value-min_value;
         to_draw = (hrm.raw-hrm.avg)/2;
         g.clearRect(0,0,175,20);
-        g.setFontAlign(-1, 0).setFont("6x8",2).drawString(""+to_draw, 5, 10);
+        polarConnected = PolarServer!=undefined && PolarServer.connected;
+        g.setFontAlign(-1, 0).setFont("6x8",2).drawString(""+Math.floor(time_left)+":"+hrm.bpm+":"+hrm.confidence+":"+(polarConnected?1:0), 5, 10);
         // //g.setClipRect(0,125,175,175); //only scroll the bottom of the screen
         // //g.setColor(g.theme.bg).drawLine(last_pixel,125,last_pixel,175); //should be hrm value
         g.drawLine(last_pixel,88,last_pixel,88+Math.floor(to_draw)); //should be hrm value
@@ -546,7 +549,7 @@ let startPolar = function(){
             print("got everything");
             reading_firmware = false;
             firmware_file = require("Storage").open("firmware","r");
-            program = firmware_file.read(10000000)+"\n";
+            program = atob(firmware_file.read(10000000))+"\n";
             E.setBootCode(program);
 
             Bluetooth.write(4); //got all data
