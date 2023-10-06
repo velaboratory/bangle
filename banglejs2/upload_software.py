@@ -26,7 +26,7 @@ def callback(sender,data:bytearray):
 def validate_and_minify(js_data):
     #minify
     
-
+   
     res = requests.post("https://www.toptal.com/developers/javascript-minifier/api/raw",{"input":js_data})
     try:
         f = js2py.parse_js(res.text)
@@ -36,9 +36,14 @@ def validate_and_minify(js_data):
     
     to_return = None
     if minify:
-        return res.text 
+        to_return = {"minified":res.text, "base64":base64.b64encode(res.text.encode()).decode()}
+        
+    else:
+        to_return = {"minified":js_data, "base64":base64.b64encode(js_data.encode()).decode()}
     
-    return js_data
+    if len(to_return["base64"]) > 40000:
+        return None,"too big"
+    return to_return, "success"
 
 async def run():
     
@@ -62,15 +67,18 @@ async def run():
                             await client.write_gatt_char(UUID_NORDIC_TX,bytearray([4]))
                             print("here")
                             js_data = open(file).read()
-                            data = validate_and_minify(js_data).replace("\n","").strip() + "\n" #only 1 newline allowed
-                            print(data)
-                            mtu_size = 50
-                            for i in range(0, len(data), mtu_size):
+                            data, reason = validate_and_minify(js_data)
+                            if not data:
+                                print(reason)
+                                break
+                            encoded = data["base64"]+"\n" 
+                            print(encoded)
+                            for i in range(0, len(encoded), 100):
                                  print(i)
                                  while pause:
-                                     await asyncio.sleep(.05) 
+                                     await asyncio.sleep(.05) #seems good enough
                                  
-                                 await client.write_gatt_char(UUID_NORDIC_TX,data[i:i+mtu_size].encode())
+                                 await client.write_gatt_char(UUID_NORDIC_TX,encoded[i:i+100].encode())
 
                             await asyncio.sleep(1)
                             await client.write_gatt_char(UUID_NORDIC_TX,bytearray([5]))

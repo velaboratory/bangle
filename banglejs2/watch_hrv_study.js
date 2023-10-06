@@ -40,7 +40,7 @@
   }
 
   let app_name = "hrv_test";
-  let app_version = 3;
+  let app_version = 4;
   let version = app_name+app_version;
   let movement_filename = "healthlog"+version; 
   let acceleration_filename = "accellog"+version;
@@ -65,6 +65,7 @@
   let debug = false;
   let last_bpm = 0;
   let last_conf = 0;
+  let polar_hr = 0;
   E.setTimeZone(timezone);
   
   Bangle.setOptions({"powerSave": true, "hrmPollInterval": 40, "lockTimeout": 10000, "backlightTimeout":10000,"wakeOnBTN1":true,"wakeOnBTN2":true,"wakeOnBTN3":true,"wakeOnFaceUp":false,"wakeOnTouch":false,"wakeOnTwist":false});
@@ -236,7 +237,7 @@ let openMenu = function(){
         to_draw = (hrm.raw-hrm.avg)/2;
         g.clearRect(0,0,175,20);
         polarConnected = PolarServer!=undefined && PolarServer.connected;
-        g.setFontAlign(-1, 0).setFont("6x8",2).drawString(""+Math.floor(time_left)+":"+hrm.bpm+":"+hrm.confidence+":"+(polarConnected?1:0), 5, 10);
+        g.setFontAlign(-1, 0).setFont("6x8",2).drawString(""+Math.floor(time_left)+":"+hrm.bpm+":"+hrm.confidence+":"+(polarConnected?polar_hr:0), 5, 10);
         // //g.setClipRect(0,125,175,175); //only scroll the bottom of the screen
         // //g.setColor(g.theme.bg).drawLine(last_pixel,125,last_pixel,175); //should be hrm value
         g.drawLine(last_pixel,88,last_pixel,88+Math.floor(to_draw)); //should be hrm value
@@ -260,12 +261,12 @@ let polar_callback = function(event) {
   format = flags & 0x01;
   hasRRI = flags & 0x10;
   if(format == 0){  //normal, not 16 bit
-    hr = dv.getUint8(1,true);
+    polar_hr = dv.getUint8(1,true);
     rris = [];
     for(var i = 2;i<event.target.value.buffer.length;i+=2){
         rris.push(dv.getUint16(i,true));
     }
-    view.setUint8(4,hr); //0 - 100
+    view.setUint8(4,polar_hr); //0 - 100
     if(rris.length ==0){
       view.setUint16(5,0); // 0-100
       view.setUint16(7,0); // 0-100
