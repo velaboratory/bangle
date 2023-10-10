@@ -240,10 +240,10 @@ void handle_root(){
   int incrementor = 0;
   for(int j=0;j<n;j++){
     ssidExists = 0;
-    char* setSsid = WiFi.SSID(j);
+    String setSsid = WiFi.SSID(j);
     for(int k=0;k<n;k++){
-      char* setArr = ssids[k];
-      if(strcmp(setArr, setSsid) == 1){
+      String setArr = ssids[k];
+      if(setArr == setSsid){
         ssidExists = 1;        
       }
     }
@@ -253,7 +253,7 @@ void handle_root(){
     }
   }
   String ssid;
-  for(int i=0;i<n;i++){ 
+  for(int i=0;i<ssids.length;i++){ 
     ssid = ssids[i];
     HTML = HTML + "<input type=\"radio\" name=\"ssid\" value=\"" + ssid + "\">"+ssid+"<br>"; 
   }
