@@ -69,6 +69,14 @@ NRF.disconnect(); //disconnect at the start.  This removes issues associated wit
     drawScreen();
   }
 
+  //awesome new function that Bryan wrote (requires latest firmware)
+  Bangle.on('accelCalc', function(data) {
+    if(syncing){
+      return; //for now (should do something like heart rate eventually)
+    }
+    current_acceleration_file.write(btoa(data.accelSampleData));
+  });
+
   Bangle.on('touch', function(button, xy) { 
     if(dog_happy_till < Date.now()){
       make_dog_happy(2000);
@@ -255,37 +263,37 @@ let openMenu = function(){
       }
   };
 
-  let accel_log_buffer = new ArrayBuffer(18);
-  let accumulated_movement = 0;
-  let last_diff = 0;
-  let accumulated_jitter = 0;
-  let num_samples = 0;
-  let last_sample_time = 0;
-  Bangle.on("accel", function(data){
-    if(syncing){
-        return; //for now (should do something like heart rate eventually)
-    }
-    var time = Math.floor(Date.now() / 1000);
-    num_samples++;
-    accumulated_jitter += Math.abs(data.diff - last_diff);
-    last_diff = data.diff;
-    accumulated_movement += last_diff;
+  // let accel_log_buffer = new ArrayBuffer(18);
+  // let accumulated_movement = 0;
+  // let last_diff = 0;
+  // let accumulated_jitter = 0;
+  // let num_samples = 0;
+  // let last_sample_time = 0;
+  // Bangle.on("accel", function(data){
+  //   if(syncing){
+  //       return; //for now (should do something like heart rate eventually)
+  //   }
+  //   var time = Math.floor(Date.now() / 1000);
+  //   num_samples++;
+  //   accumulated_jitter += Math.abs(data.diff - last_diff);
+  //   last_diff = data.diff;
+  //   accumulated_movement += last_diff;
 
-    if(time - last_sample_time > 60){
-        last_sample_time = time;
-        var view = new DataView(accel_log_buffer);
-        var time_s = Math.floor(time);
-        view.setUint32(0,time_s);
-        view.setUint32(4,Math.floor(accumulated_movement*1000)); 
-        view.setUint32(8,num_samples); 
-        view.setUint32(12,Math.floor(accumulated_jitter*1000)); 
-        //+2 so we fall on the 3 boundary
-        current_acceleration_file.write(btoa(accel_log_buffer));
-        accumulated_movement = 0;
-        accumulated_jitter = 0;
-        num_samples = 0;
-    }
-  });
+  //   if(time - last_sample_time > 60){
+  //       last_sample_time = time;
+  //       var view = new DataView(accel_log_buffer);
+  //       var time_s = Math.floor(time);
+  //       view.setUint32(0,time_s);
+  //       view.setUint32(4,Math.floor(accumulated_movement*1000)); 
+  //       view.setUint32(8,num_samples); 
+  //       view.setUint32(12,Math.floor(accumulated_jitter*1000)); 
+  //       //+2 so we fall on the 3 boundary
+  //       current_acceleration_file.write(btoa(accel_log_buffer));
+  //       accumulated_movement = 0;
+  //       accumulated_jitter = 0;
+  //       num_samples = 0;
+  //   }
+  // });
   
   var hrm_log_buffer = new ArrayBuffer(6);
   Bangle.on("HRM", function(hrm) { 
