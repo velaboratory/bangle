@@ -383,7 +383,7 @@ ServerResponseDiscovered sendServerDiscovered(){
   return res;
 
 }
-
+int num_issues = 0;
 void sendSyncDataToServer(bool complete){
 
 
@@ -416,9 +416,12 @@ void sendSyncDataToServer(bool complete){
               sync_success = true;
           }
         }else{
-          Serial.print("restarting");
-          delay(1000);
-          ESP.restart(); //not successful, just restart
+          num_issues++;
+          if(num_issues > 5){
+            Serial.print("restarting");
+            delay(1000);
+            ESP.restart(); //not successful, just restart
+          }
         }
        
   }
@@ -426,7 +429,12 @@ void sendSyncDataToServer(bool complete){
     Serial.print("Error code: ");
     Serial.println(httpResponseCode);
     M5.Lcd.println("fail server");
-    ESP.restart();
+    num_issues++;
+    if(num_issues > 5){
+      Serial.print("restarting");
+      delay(1000);
+      ESP.restart(); //not successful, just restart
+    }
   }
   // Free resources
   http.end();
