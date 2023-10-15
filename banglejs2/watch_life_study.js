@@ -100,49 +100,96 @@ NRF.disconnect(); //disconnect at the start.  This removes issues associated wit
         idle: require("heatshrink").decompress(atob("kcjwkGswA/AHqKHQ5EFqFVAAYFBCI9gokEolUAIUEoAiHBINEAAYFBERVAl//kAiKKANEo32/8koBXJGoMvmEAmwyIGoYyBmM2+0gRhUP/4ADERciAAYiLVpwACgIhCkIQLsBED+DkLgQQC+QiLgFPCIVANBadBCAMkgAiO+wiLgEWGYX2iARJsEzg0DAQUwTh6dMAH4A/VIoA==")),  
         wag1: require("heatshrink").decompress(atob("kcjwkGswA/AHqKHQ5EFqFVAAYFBCI9gokEolUAIUEoAiHBINEAAYFBERVAl//kAiKKANEo32/8koBXJGoMvmEAmwyIGoYyBmM2+0gRhUP/4ADERciAAYiLVpwACgIhCkMGgA0KIgfwsFQCJMCCAXyg0EGpMAp4RCTgKuIGYKdBCAMkCBQiE+1Ah4zKiwzC+0QCBNgmcGgYCCmCcPTpgA/AH6pFA=")),  
         wag2: require("heatshrink").decompress(atob("kcjwkGswA/AHqKHQ5EFqFVAAYFBCI9gokEolUAIUEoAiHBINEAAYFBERVAl//kAiKKANEo3//8koBXJGoMvmEAn4yIGoYyBmM/+0gRhUPGQIACERciAAYiLVo4kJgIhCkIOBgA0JIgfwAwNQCJECCAXyg1giQ0IgFPCIScBocWGZCdBVwUACQJoJEQX2oEPM5MAiwzC+0QCBNgmcGgYCCmCcPeZQA/AH6pHA")),
-        sleeping: require("heatshrink").decompress(atob("kcjwkBiIA/AH4A/AATRJCA0QoFEAAUEggDBb44LDolAoH0onwERQNBgkP+n/EQ8AgkA//wCAP/AgJXHiALBBwPwAgIiIiIdCAAJnCERJ2ELgPwERIbBAQKLKEQUBAQTj/AH4A/AHcQA=")) 
+        sleeping: require("heatshrink").decompress(atob("kcjwkBiIA/AH4A/AATRJCA0QoFEAAUEggDBb44LDolAoH0onwERQNBgkP+n/EQ8AgkA//wCAP/AgJXHiALBBwPwAgIiIiIdCAAJnCERJ2ELgPwERIbBAQKLKEQUBAQTj/AH4A/AHcQA=")),
+        walk1:
+require("heatshrink").decompress(atob("kcjwkGswA/AHqKHQ5EFqFVAAYFBCI9gokEolUAIUEoAiHBINEAAYFBERVAl//kAiKKANECAP/klAK5NmgX/mEAn/yd5VgEAMxn//+CMKh4RBAAQiLkQADkCvQERRXBEQYQLK4QABKxdmgKLCkIiMgIQB+MAJgIiKoX/+VBgEEqAiJilQgFUiFE+Y2JgMjg0DkJ7LsEfmFgn8QNBcPFwMDX5YiBmcgsEjmAiLIAIUBX5gA/AEVgA=")),
+        walk2:       require("heatshrink").decompress(atob("kcjwkGswA/AHqKHQ5EFqFVAAYFBCI9gokEolUAIUEoAiHBINEAAYFBERVAl//kAiKKANECAP/klAK5I1Bl8wgE/kjvKsAhBmM/GoKMKh4yBAAQiLkQADERatOAAUCEQYQLsBED+FgCRUBRYUhgFDCJNggIQB+MAsMwERVC//yoIiMilQgFUiDiIEQcjg0DIoKdLj8wsE/iB5KYAPzg0CmaLMma8BVwIiLBpoA/AEtgA=")),
+        walk3:
+require("heatshrink").decompress(atob("kcjwkGswA/AHqKHQ5EFqFVAAYFBCI9gokEolUAIUEoAiHBINEAAYFBERVAl//kAiKKANECAP/klAK5NmgX/mEAn/yd5VgEAMxn//+CMKh4RBAAQiLkQADkCvQERRXBEQYQLK4QABKxdmgKLCkIiBEhNggIQB+MAdYIRJgNC//yoMAgkwERMUqEAqkQogQJEQMjg0DkJ7BNBUTkFgn8QNBYdCga/LEokjIZQRFX5gA/AEVgA="))
       },
       { //blonde beagle
         idle: require("heatshrink").decompress(atob("kcjwcBkmSpIC/ATdANAhlGjcN23btuw7ESDQmN4/4v/G/l8hIaEo3j9////un0EEwkjsPw//+m8bgQmEyEA/YZB/eAU49/+EDv/BLg8//8N//gNY8fEwP/+B3HxpoDQZh0FAQVtDQNgTxBBB//4VpBBC/gmJBgP9wIaHmwMB/3AEw8b//2/8AEw8BOoXAWwomCjFtwy2GAQL4LAX4ClkAA==")),
         wag1: require("heatshrink").decompress(atob("kcjwcBkmSpIC/ATdANAhlGjcN23btuw7ESDQmN4/4v/G/l8hIaEo3j9////un0EEwkjsPw//+m8bgQmEyEA/YZB/eAU49/+EDv/BLg8//8N//gNY8fEwP/+B3HxpoDQZh0FAQVtDQNgoBBJ//4kBoFIIn8iOBEw4MB/uA4AmGmwMB/3DEw8b//2/8BEw8BOoXAWwomCjFtwy2GAQL4LAX4ClkAA=")), 
         wag2: require("heatshrink").decompress(atob("kcjwcBkmSpIC/ATdANAhlGjcN23btuw7ESDQmN4/4v/G/l8hIaEo3j9////un0EEwkjsPw//+m8bgQmEyEA/YZB/eAU49/+EDv/BLg8//8N//gNY8fEwP/+B3HxpoDQZkSoIOGtoaBsFJgBBI//4kmAQYpBD/kSgyDFEwIMB/uA/CqFyU2BgP+4cAEw0b//2/8BwJNGgJ1C4AyGEwMYtuGWwwCBfBYC/AUsg")),  
-        sleeping: require("heatshrink").decompress(atob("kcjwcBkmSpIC/AX4CPTo0CBwmOn////Hjf/4IaEo8fBgPjx/28AmEkcN2//sOH/fwEwmQg0D/0Gj9/+BBFkdt4/bh/3/kSDQmRGYP/4EAhkJDQlILIdt2EENYt+hMfwBoHyUAgmAgK8/AX4C8kA=")) 
+        sleeping: require("heatshrink").decompress(atob("kcjwcBkmSpIC/AX4CPTo0CBwmOn////Hjf/4IaEo8fBgPjx/28AmEkcN2//sOH/fwEwmQg0D/0Gj9/+BBFkdt4/bh/3/kSDQmRGYP/4EAhkJDQlILIdt2EENYt+hMfwBoHyUAgmAgK8/AX4C8kA=")),
+        walk1:
+require("heatshrink").decompress(atob("kcj4kA///A4Mz+/N0mBiGy80rxnEnPz+2Mzku2sItcT+9hiFP8tAhBj/AH0RAA0QCA8W0OqAAeh0wRHgPiiUu2Ui30iiXhEQ8ekPO8sikvu4MuERE+jmnkUik+sj0xKxPO9lVrgiBK5MAiUi0kU0UiB5I1BGQM3mUikKMKEQIADERdmAAdhV6AiKgHWEQfQCBUEIYVYkjkL6oQBqvCoAQKhvuqUs4XtJgIRJ73sEYPu6NF0IiJ8UxiMyknu5RqJoXDiETkVBPZUEx0xgM4NBlCxIiBrBoMmexgOznoiLXgLVBX5gA/AEYA==")),
+  walk2:
+require("heatshrink").decompress(atob("kcj4kA///A4Mz+/z+3P4uBiGy80rxnEnOMzku2uknMT+8ggFhiFP8pj/AH0RAA0QCA8X1uqAAet04RHgNC6UkuUiuki6VBEQ8UlvP+0ik3/5skERGv7mokUilGs7+hKxPP/lmtn/4JXJgESkWliuikQPJGoIyB1AQBkKMKEQIADERd3AAdxV6AiKgHnEQfgCBUFIYUmmsBEZXmCAUyrtJCJMO/9ikUy/0IaJAAB9/8EYP/9tkERXy0MR0Ul/RFKqXKiEa4VRCBUFn+RgOmmp5KEQM5iEX1SLLh2ZXgKuBERYNNAH4AmA")),
+        walk3:
+require("heatshrink").decompress(atob("kcj4kA///A4Mz++BiGy80rxnEnPN0mMzku2vP4sT+/qwdhiFP8vz+xj/AH0RAA0QCA8VyOZAAeRyoRHgOiiUq4Ui5UiiWhEQ8akO+8kiknu2MqERF+jeWkUik2bj1xKxO+9dEpYiBK5MAiUiycTyUiB5I1BGQN2uUikKMKEQIADERdVAAdRV6AiKgHVEQfQCBUDIYVPkbkL6gQBomymEAGpMN91Cley9sAs4RJ73rEYPu6M0yIiJ8VxiNykfuehAABmX1iEX2UxiIQJhupqMBunzNBaZBgEXkRoBABkB499CBoRBX5gA/AEY")) 
       },
       { //doberman
         idle: require("heatshrink").decompress(atob("kcj4cA///A4PDjHHzVGvWkrNmwWCiBT/AD0JkmSpICBpAMFn+f6v/6v5/mABgkUxQYD0lABgkKos3iVR2lSkAMEgsi+Vt22zlKaFgVJpu27dtiRBGgGm88+m2ILg9Wt0o71EBg8po3buMiBg8f6u2NAKDMOgoAC+tt2tyTxFS1u6yIMIlNW7tIExGkyt1khoIqSqCNBJOCNBH0LQWXWwoABs/00mN/y2FAAL4LAH4AmA")),
         wag1: require("heatshrink").decompress(atob("kcj4cA///A4PDjHHzVGvWkrNmwUFuRT/AD0JkmSpICBpAMFlMUytJqmRpGABgkUxQYD0lABgkKos36Vd2lSkAMEgsi+Vt22zlMQBgkCpNN23btsSII0A035k+2xBcHq1v13eogMHlNG7dxkQMHNAO26mRQZh0FAAWltu1kUJBg9S9u+yMFNApBCq3dpGCLg+kyt1kmJLg9SVQVFExBOCkQmHyhaCyK2FAANiqmkxtKEw74LAH4Am")),
         wag2: require("heatshrink").decompress(atob("kcj4cA///A4PDjHHzVGvWkrNmwUFuRT/AD0JkmSpICBpAMFlMUytJqmRpGABgkUxQYD0lABgkKos36Vd2lSkAMEgsi+Vt22zlMQBgkCpNN23btsSII0A035k+2xBcHq1v13eogMHlNG7dxkQMHNAO26mRQZmAhANG0tt2omBkgMGqXt3wmBiSDFIINW7qbBpSDFgGkyt1kmJVQwmBVQVFExBOCkSDHyhaCyIyGgFiqmkxtKWwoABfBYA/AEw")),
-        sleeping: require("heatshrink").decompress(atob("kcj4cA///A4PDjHHzRL/AH4AakmSpICDyAMEilSBIOKlMkxAMEhQIByVFimSogMEgsU7dN2WKpMiBgkCpUl21KDoORIIsFk3LtImBpGADQuTtu0xMkylABgkBLIekyMgE4umoEtiRoHgFJkESpC6/AH4A9A=")) 
+        sleeping: require("heatshrink").decompress(atob("kcj4cA///A4PDjHHzRL/AH4AakmSpICDyAMEilSBIOKlMkxAMEhQIByVFimSogMEgsU7dN2WKpMiBgkCpUl21KDoORIIsFk3LtImBpGADQuTtu0xMkylABgkBLIekyMgE4umoEtiRoHgFJkESpC6/AH4A9A=")), 
+        walk1:
+require("heatshrink").decompress(atob("kcj4cA///A4PDjHHzVEnOkrOCiEFuRT/AD0JkmSpICBpAMFncd0vbrOx7GABgkUxVKkmipGkoAMEhVFm/Sru0qUgBgkFkWatu2zUpiAMEgVJBYPbtpBHgGo/073GILg9Ut+u7lEBg8po3buMiBg8dyu26uxQZh0FAAXltu1sSeIqlt28RBhEpq3dpAmIimVuskoEkBg0KYYUk1iqFTwMspPJimWVQqeBBAPkxJcHgNLiFyR5EA5GIlVCBhF/wkZ/IMIkmQgKPJAH4AKA")),        
+        walk2:
+require("heatshrink").decompress(atob("kcj4cA///A4PDjHHzWkrOCiEFuVmwRT/AD0JkmSpICBpAMFm2bqm24tp2mABgkUxQYD0lABgkKos3yVZ2lSkAMEgsi3Vt226lMQBgkCpILB7dtII8A0n1m80xBcHqXvln6ogMHlNG7dxkQMHjdUyVFtKDMOgoAC6skyNSTxFUtu3iMEDQ5BB7lIzZoHimUuMkoJcHhSqCkpcHgsqpOpiiDHgWVkHUxK2FAAMBpWQqSPIgHIxEzsQMIu2EZAIMIkmQBRAA/ABgA==")),        
+        walk3:
+require("heatshrink").decompress(atob("kcj4cA///A4PDjHHzWkrOCiEFuVmwRT/AD0JkmSpICBpAMFm2bqm24tp2mABgkUxQYD0lABgkKos3yVZ2lSkAMEgsi3Vt226lMQBgkCpILB7dtII8A0n1m80xBcHqXvln6ogMHlNG7dxkQMHjdUyVFtKDMOgoAC6skyNSTxFUtu3iIMIIIPcpGAhAMGimUuMkoE0Go0KVQUk1SqFTwMqpOpimREw0CyUg6mJkgMGgP+iFqR5EAyVAlVCBhAABjOxBhUBR5IA/ABQ"))
       },
       { //husky
         idle: require("heatshrink").decompress(atob("kcj4kA///A4IDBlFC221Jv4A/ACcBiIAHCI8TmMzAAYFBiAiHmcTCIgYBETYMBkYCBERJPBmciAAISBiIiHGoUikMRCIIPJGoIgBkICCRpUSGYQABERoACERasFERQ0FCBcBolERgTlLikzmUiogiLiAgBNB1CB4TRBERSuBCQJIBERURIYIABkEhCJJnBiUSmkQiQ0KTgqdMAH4A/AAoA==")),
         wag1: require("heatshrink").decompress(atob("kcj4kA///A4IDBlFC221Jv4A/ACcBiIAHCI8TmMzAAYFBiAiHmcTCIgYBETYMBkYCBERJPBmciAAISBiIiHGoUikMRCIIPJGoIgBkICCRpUSGYQABERoACERasFERQ0FiASKgNEoiMCgKLIAAMUmcykVEiETERMQEAI0CiIiJgNCB4TRBGZSuBCQJIBGZURIYIABkEhM5cSiU0iESGZScFTpgA/AH4AF")),
         wag2: require("heatshrink").decompress(atob("kcj4kA///A4IDBlFC221Jv4A/ACcBiIAHCI8TmMzAAYFBiAiHmcTCIgYBETYMBkYCBERJPBmciAAISBiIiHGoUikMRCIIPJGoIgBkICCRpUSGYQABERoACERasFEQIkJGggOBNJMBolERgQGBoIiIikzmUiokQgMSEREQEAI0CiM0GZNCB4TRBV4KuKCQJIBiZnJiJDBAAMgkIQJM4MSiRBBiTzITg7zKAH4A/AA4A==")),
-        sleeping: require("heatshrink").decompress(atob("kcj4kA///A4IDB221lFCJv4A/AH4AZiIAICA0BoNEAAUUiUkkUQCI0UigQCoNBCAMhER0iERERikREIIQBmUkmJXHgNEoUSCQMimQiIgAuCAAJnCERJ2EiczmIiIidBNgMxRZQiCiACCcf4A/AH4A8A="))
+        sleeping: require("heatshrink").decompress(atob("kcj4kA///A4IDB221lFCJv4A/AH4AZiIAICA0BoNEAAUUiUkkUQCI0UigQCoNBCAMhER0iERERikREIIQBmUkmJXHgNEoUSCQMimQiIgAuCAAJnCERJ2EiczmIiIidBNgMxRZQiCiACCcf4A/AH4A8A=")),
+        walk1:
+require("heatshrink").decompress(atob("kcjxH+AH4A/AH4A9gAAPEKMrlYCCABAODEX4ibAQOB6+BBAoiSAAUrq1W64ADAwIfBV6YlCEAWsDQWsEgQfTEQZBDMwJqBAAQibAAwiXwIAJES4ALESpGKEK4iB1gABRThFDq1WZ4QFCETPXIoZoGRyr1FwImCD4Mr1hKURYJiCAAJoB1ghBqxRBESgbBMQQiBDoT3XNAQiFaLQ+BEUGBQQIiCfALRDESyAFQ64A/AH4A/ABIA==")),
+        walk2:
+require("heatshrink").decompress(atob("kcjxH+AH4A/AH4A9gAAPEKMrlYCCABAODEX4ibAQOB6+BBAoiSAAUrq1W64ADAwIfBV6YlCEAWsDQWsEgQfTEQZBDMwJqBAAQibAAwiXwIAJES4ALESpGKEK4iB1gABRQ5HWIoNWqzPCAoQgBAgIjUaQJFDNAsr1giWAAeBEwRFBqwiW1hiDMYQeBlcrRawbBMQQiBN4L1YNAQiFaIT0XHwIiDJYKHVegsrdQZlCETIbaAH4A/AH4AMA")),
+        walk3:
+require("heatshrink").decompress(atob("kcjxH+AH4A/AH4A9gAAPEKMrlYCCABAODEX4ibAQOB6+BBAoiSAAUrq1W64ADAwIfBV6YlCEAWsDQWsEgQfTEQZBDMwJqBAAQibAAwiXwIAJES4ALESpGKEK4iB1gABRThFDq1WZ4QFCEQYmUaQJFDNA0rE4j1VwImCVwMrFwIiU1hiCAAJrCEINWEKgiBC4JiCa4QeBey5FCEQhjVEQo7ENAgiXNw7REEbqIXAH4A/AH4AI"))
       },
       { //chocolate lab
         idle: require("heatshrink").decompress(atob("kcj4kA///4+aI/4A/ADMCkQAHCI8hiURAAYFBkAiHiMhCIgYBETYSCAQIiJJ4IiFkQiHGoQNCCIIPJGoQyCAQKNKNAoiNIoYiKVgoiKGgoQLGggzLESJoiESDRGCJL1CEgICBGhScFTpgA/AH4AF")),
         wag1: require("heatshrink").decompress(atob("kcj4kA///4+aI/4A/ADMCkQAHCI8hiURAAYFBkAiHiMhCIgYBETYSCAQIiJJ4IiFkQiHGoQNCCIIPJGoQyCAQKNKNAoiNIoYiKVgoiKGgsgCRQ0EiUCGpQiFkKLLAAciERJoGGZ7RBGZLRGM5chEgICBGZScFTpgA/AH4AFA")),
         wag2: require("heatshrink").decompress(atob("kcj4kA///4+aI/4A/ADMCkQAHCI8hiURAAYFBkAiHiMhCIgYBETYSCAQIiJJ4IiFkQiHGoQNCCIIPJGoQyCAQKNKNAoiNIoYiKVgoiBK5YzENJI0EGYMCGxIiFgUhERBoFRwIzNGgKhBRZwyJMAIiFCBL1CEgICBTpScFeZQA/AH4AHA")),
-        sleeping: require("heatshrink").decompress(atob("kcj4kA///A4PHzXimEjoOkrOhkGGxVGvVhiHltMFuVAiEluUCnPClBj/AH4A/AAcRABAQGgO2uUiAANK+8ilEQCI0bs4QCkmvCwOBEQ9ZvGCkWIovnERMBi/klGDnc4EwIiHCINyk9SkUjotV1AiHgEXIoUimMRjIiJ8lEAANJitVqYiIiuhgFq18R+czRY4iBt8Qhn/yDj/AH4A/AHg"))
+        sleeping: require("heatshrink").decompress(atob("kcj4kA///A4PHzXimEjoOkrOhkGGxVGvVhiHltMFuVAiEluUCnPClBj/AH4A/AAcRABAQGgO2uUiAANK+8ilEQCI0bs4QCkmvCwOBEQ9ZvGCkWIovnERMBi/klGDnc4EwIiHCINyk9SkUjotV1AiHgEXIoUimMRjIiJ8lEAANJitVqYiIiuhgFq18R+czRY4iBt8Qhn/yDj/AH4A/AHg")),
+        walk1:
+require("heatshrink").decompress(atob("kcj4UA///4+aBIMFuRK+hWqAAOoBAe+KAP+/AHCgXZqtVrPgBAULsoIBs+ABAUty1VsueEQeqCANWFYkJr2trA9Ekte6tgBAmVDQIqDHoJFCK44qEIwIRBDIgrBHgJyFFYI8FgQzBsGgJwgIB1JxDEQPq61XFgmXxdaHokCr0tL4sJvG1Iosv8RfFRgMCL4oAyA=")),
+        walk2:
+require("heatshrink").decompress(atob("kcj4UA///4+aBIMFuRK+hWqAAOoBAe+KAP+/AHCgXZqtVrPgBAULsoIBs+ABAUty1VsueEQeqCANWFYkJr2trA9Ekte6tgBAmVDQIqDHoJFCK44qEIwIRBDIgrBHgMoFY1aNAYrBGYNiNAZOBBAOnEYkl9XWK4uXxdaJwtelpfFhN435FFl/g1S4FAwwAzA=")),
+        walk3:
+require("heatshrink").decompress(atob("kcj4UA///4+aBIMFuRK+hWqAAOoBAe+KAP+/AHCgXZqtVrPgBAULsoIBs+ABAUty1VsueEQeqCANWFYkJr2trA9Ekte6tgBAmVDQIqDHoJFCK44qEIwIRBDIgrBHgMoFY1aNAYrBGYNiNAZOBBAOnEYkl9XWK4uXxdaJwtelpfFhN435FFl/g1S4FAwwAzA="))
       },
       { //dalmation
         idle: require("heatshrink").decompress(atob("kcjwcBkmSpIC/ATdANAhlGgEP//nx/4gESDQmAg/8v/H/kAhImFgf/AAP+gEEEwkggP4BYM/gECEwmQgAZC/+AU49/8ECv/BLg8//0J//gNY8fEwXwO4+OnAMB/CDMOgoCCQYImJyRcB/04VpEAvySBExF/EwOPNBE4/l+gBoIgC2BR4ImHgJ1C4C2FR4UQv/Ej+CEw74KAX4ClkAA==")),
         wag1: require("heatshrink").decompress(atob("kcjwcBkmSpIC/ATdANAhlGgEP//nx/4gESDQmAg/8v/H/kAhImFgf/AAP+gEEEwkggP4BYM/gECEwmQgAZC/+AU49/8ECv/BLg8//0J//gNY8fEwXwO4+OnAMB/CDMOgoCCQYImBoAaHLgP+nEjwQaGgF+SQMRLg9/EwOP4BcHnH8v0A8YmIWwP/wImHgJ1C4C2FR4UQv/Ej4mIfBQC/AUsg")), 
         wag2: require("heatshrink").decompress(atob("kcjwcBkmSpIC/ATdANAhlGgEP//nx/4gESDQmAg/8v/H/kAhImFgf/AAP+gEEEwkggP4BYM/gECEwmQgAZC/+AU49/8ECv/BLg8//0J//gNY8fEwXwO4+OnAMB/CDMiVBBwyDBEwUADQxcB/04RIKDFCgN+SQMSg6DFNAImBx/ABwImFnH8v0A8YmIWwP/wKDHgJ1C4AyGR4MQv/Ej+CQYz4LAX4ClkA")),
-        sleeping: require("heatshrink").decompress(atob("kcjwcBkmSpIC/AX4CPTo0CBwmAn////AjkP4IaEoEfBgPgh/HgAmEkEPBgPwg//wAmEyEHgf+g8cv04IIsj//H/+P4/8iQaEyImBIIMAh0JDQlILId//EENYt+hMfwBoHyUAgmAgK8/AX4C8kAA="))
+        sleeping: require("heatshrink").decompress(atob("kcjwcBkmSpIC/AX4CPTo0CBwmAn////AjkP4IaEoEfBgPgh/HgAmEkEPBgPwg//wAmEyEHgf+g8cv04IIsj//H/+P4/8iQaEyImBIIMAh0JDQlILId//EENYt+hMfwBoHyUAgmAgK8/AX4C8kAA=")),
+        walk1:
+require("heatshrink").decompress(atob("kcjxH+AH4A/AH4A9gAAPEKmsABIjTCYfX6+sqwDBwOsAYPXETIAIETGslYfElZHBIuwlDDQWfDQWfEQb2WDQXJvUrvXJETvQAAYiawIAJES4ALESpGKEK6MEAAdW1giZqwiF1itXEQUrDwOBlcrEIIiDRypoHEQQtCSCgiCC4IABwIiCNwYiU1krHQQiBNQL3YLoNWEQaNCejZFEVwgiWvV6qAiCqAGBETKAFQ64A/AH4A/ABIA=")),
+        walk2:
+require("heatshrink").decompress(atob("kcjxH+AH4A/AH4A9gAAPEKmsABIjTCYfX6+sqwDB69W1gDBETIAIETGslYfElZGBIuwlDDQWfDQWfEQb2WDQXJvUrvXJETvQAAYiawIAJES4ALESpGKEK6MEAAdW1giBI60AqwiF1itBgGsJKsAlYeBwMrlYhBaAQFBESpoGEQQKBETBeBAAOBEQQhWEQOslaBCEQJkCeq6LBqwiDkiHWNBDXCz+fETN6vVQDgRlCETIbaAH4A/AH4AM")),
+        walk3:
+require("heatshrink").decompress(atob("kcjxH+AH4A/AH4A9gAAPEKmsABIjTCYfX6+sqwDB69W1gDBETIAIETGslYfElZGBIuwlDDQWfDQWfEQb2WDQXJvUrvXJETvQAAYiawIAJES4ALESpGKEK6MEAAdW1giZqwiF1itEEykAlYeBwMrlYhBEQcrNqhoHEQQtCNqkA1g6CAAOBEQRtCNCskp5dCEQJqBezEA0ulvQiCRoTRZHYhoEES4oGqF6JYQjeRC4A/AH4A/ABAA="))        
       }, 
       { //blue healer
         idle: require("heatshrink").decompress(atob("kcj4kA///A4NP8vDjGLxcooXO4koweCiGu3mLpXlsNM2mO3miiFKpRj/AH0RAA0QCA8YwOIAAYFBCI8BmcTmezAIUTmIiHBIMzmdaqczAoIiKm861U3ERRQBEIOq1VTmJXJGoO2qMRq2zB5I1B2UmqdWkWxRhUSkUtpsikQiLu4ADuKvQERUAi4iDCBcBoRDBkVBchcfCIVPERcVr4RBp9VNBdVCIIQBqIiLqoADERUYqv1B4P1rARJgPFmnlqvkmvBTh6dMAH4A/AAo")),
         wag1: require("heatshrink").decompress(atob("kcj4kA///A4NP8vDjGLxcooXO4koweCiGu3mLpVM2mO3miiHHnPlsJj/AH0RAA0QCA8YwOIAAYFBCI8BmcTn3zmf+AoMxEQ4JBmcz9XjmYFBERU39Wq84iKKAIhB1Wq8cxK5I1B+1RiNW+YPJGoPyk1Tq0i+KMKiUillMkUiERd3AAdxV6AiKgEXEQcQiI0KoRDBkVBgKLIAAMVCIVFiEeGpMeqoRBoteiPhGZNVCINFqtRCBIzBCIIACiozJjFV0oPB0tYCBMB30073u6k+2KcPTpgA/AH4AFA=")),
         wag2: require("heatshrink").decompress(atob("kcj4kA///A4NP8vDjGLxcooXO4koweCiGu3mLpVM2mO3miiHlsPHnJj/AH0RAA0QCA8YwOIAAYFBCI8BmcTn/jmfvAoMxEQ4JBmcz/XzmYFBERU3/Wq+4iKKAIhB1Wq+cxK5I1B81RiNW8YPJGoPik1Tq0i8KMKiUillMkUiERd3AAdxV6AiBEhMXEQYOBiI0JoRDBkVBgEIRhEAioRCosQgPfGhEfqoRBotfiP/wAzIqoRBotVqPxIpMVCIIACipnJjFV0oPB0tYCBMB3807//6k/2KcPeZQA/AH4AH")),
-        sleeping: require("heatshrink").decompress(atob("kcj4kA///A4PDjFP8vu5mLpUmrXN5mKzcJoUt1mCiHLzdBhHFpNLvZj/AH4A/AAcRABAQGgO9kQAC7fZqtZiARGjfSCAUt3uVquREQ+xlcuyW77clERMBiXurNe8QzBERARBsc/9Uz4UpzOZEQ8Aikzp8zmfhiMdERNms3ms1iiWZ8QiIjGBgEox0RNgKLHEQMuiEL92wcf4A/AH4A8A"))
+        sleeping: require("heatshrink").decompress(atob("kcj4kA///A4PDjFP8vu5mLpUmrXN5mKzcJoUt1mCiHLzdBhHFpNLvZj/AH4A/AAcRABAQGgO9kQAC7fZqtZiARGjfSCAUt3uVquREQ+xlcuyW77clERMBiXurNe8QzBERARBsc/9Uz4UpzOZEQ8Aikzp8zmfhiMdERNms3ms1iiWZ8QiIjGBgEox0RNgKLHEQMuiEL92wcf4A/AH4A8A")),
+        walk1:
+require("heatshrink").decompress(atob("kcj4kA///A4NP8vDjGu3kooUoweO3lllNnsUggGCiEDlPGoOiiFLvZj/AH0RAA0QCA8b2O75u73vLAoIRHgMzicz4YBCicxEQ4JBmYADAoIiK5M4rE54YiJKAMznFVrAiBK5I1BntajVdGRA1DnMkqdUlIyIAAUZkUn+8ilIiLswADsKvQERUA0wiD0AQKhciAAUrchevCAUvERcKr4QCrRMBCJOlCIMvquh0uBERNVwMRwtaYYJqJ0oLBjAiBPZQiCgIiBNBYiENBmImMBnGKERa8BaoK/MAH4AjA==")),
+        walk2:
+require("heatshrink").decompress(atob("kcj4kA///A4NP8vDjEoweu3kooWO3lllOCiFnsUggEDlPGoOiiFLvZj/AH0RAA0QCA8ZyOZ5uZzvJAoIRHgMzicz4YBCicxEQ4JBmYADAoIiK5U4tE64YiJKAMznFmtAiBK5I1BntrjdtGRA1DnUlsdllQyIAAUakUn+8ilQiLogADoKvQERUA2giD2AQKhMiAAUpgIjK34QCl+x7ARJhdvCAVrhPRERO2CIMvs2xtoiKs2BiOGtdmIpW2tEQjAiBCBQiCgIiBPJQiDjndRZcLxDfBVwIiLBpoA/AEw=")),
+        walk3:
+require("heatshrink").decompress(atob("kcj4kA///A4NP8vDjEoweu3kooWO3lllOCiFnsUggEDlOiiFLvdIpRj/AH0RAA0QCA8ZyOZ5WZzXJAoIRHgMzicz4YBCicxEQ4JBmYADAoIiK5U4/E64YiJKAMznH//AiBK5I1Bm37jf2GRA1DnUl+f1lQyIAAUakUn88ilQiLogADoKvQERUA2giD2AQKhMiAAUpche+CAUuEQI1Jhf+CAX7gGYCJO/CIMu/+x22BERP/wMRx/7/9hIpO//EQjAiBiIQJhdmwMBEQJoLTIMAEQKLLYYc4xYQNCIK/MAH4Aj"))
       },
       { //german shephard
         idle: require("heatshrink").decompress(atob("kcj4kA///A4Or1YFBlFCJv4A/ACcBiIAHCI8SmMiAAchkcQEQ8yiUiAIcTkIiHiYiGmYiJDgIPBoMjERJPBmQQBklEoMREQ41CmUxiNEogPJGoMzmlBCANBRpUTBwIACERYQEERasFERQ0BmYABmAQLgMiCAMyRJAiEkUjmTPIAAcUoaeBPoJoMCIMzNBkUoUjmcjRZcRoZoCmdBCJMBkcSPYICBNJScFTpgA/AH4AFA")),
         wag1: require("heatshrink").decompress(atob("kcj4kA///A4Or1YFBlFCJv4A/ACcBiIAHCI8SmMiAAchkcQEQ8yiUiAIcTkIiHiYiGmYiJDgIPBoMjERJPBmQQBklEoMREQ41CmUxiNEogPJGoMzmlBCANBRpUTBwIACERYQEERasFERQ0BmYABmEQCRUBkQQBmUhgI1KicikcyZ4MUERMUoaeBPoMRERJoBCIMzNAIzKilCkczkdEiYzJiNDNAUzoJnKkcSPYICBeZCcHTpgA/AH4AF")),
         wag2: require("heatshrink").decompress(atob("kcj4kA///A4Or1YFBlFCJv4A/ACcBiIAHCI8SmMiAAchkcQEQ8yiUiAIcTkIiHiYiGmYiJDgIPBoMjERJPBmQQBklEoMREQ41CmUxiNEogPJGoMzmlBCANBRpUTBwIACERYQEERasFEQJXKmYABmAOBNJMBkQQBmSJBgI2JicikcyZ4MBiYiIilDTwJ9BiNDGZNECIMzNAKvBGZEUoUjmcjogyJMANDNAUzoIQJgMjiR7BAQLzITg7zKAH4A/AA4")),
-        sleeping: require("heatshrink").decompress(atob("kcj4kA///A4Or1YFBlFCJv4A/AH4AZiIAICA0BmMiAAUTikymcQCI0SiQQCkMhmUjmIiHkIiDiUTmYiIiMSiMioMUicjmkhK48BEAMUolBmcjEREAFwNEAAJnCoIiIOwkUmcxEREUHwMSoKLKEQUQAQTj/AH4A/AHgA=")) 
+        sleeping: require("heatshrink").decompress(atob("kcj4kA///A4Or1YFBlFCJv4A/AH4AZiIAICA0BmMiAAUTikymcQCI0SiQQCkMhmUjmIiHkIiDiUTmYiIiMSiMioMUicjmkhK48BEAMUolBmcjEREAFwNEAAJnCoIiIOwkUmcxEREUHwMSoKLKEQUQAQTj/AH4A/AHgA=")),
+        walk1:
+require("heatshrink").decompress(atob("kcj4cA///A4Or1YFBlFCqutjfvhOTKf4AehMkyVJAQNIBgsyz53B//5+mABgkbpQYD8lABgkOsonDr0gBgkHkW5pMuvcvyAMEgVJC4OUyUSII0A29pk1JhBcHr2yjMkwgMHmxOCoQMHC4JOBkKDMOgoAC7dt23STxFrBgPpBhE623b3gmIj2rut4oEkBg0MxMs0kk5CqFgEGpFJ28ZjqqFgEDy8g63JLg8Bt2QtdkJxHnpE3mQMIsvkj5oJkmQgKPJAH4AKA")),        
+        walk2:
+require("heatshrink").decompress(atob("kcj4cA///A4Or1YFBlFCquthOTwUQKf4AehMkyVJAQNIBgsyzu27dt2PUwAMEjdKDAe0oAMEhtlE4ddkAMEg2i29Jlvzl6aFgVJtMkymSiRBGgG3tMmpMILg9b2V5kmEBg825JCBoQMHjJOCkKDMOgoABgaBB23eDI8B9YMB98EDQ/uToO4zJoHjmrutoo+kBg0MxMq0kmLg8GpFJ2v5QY8O60g635WwoABg9uyFrvhbHge3pErrwMHgFl4jIBBhEkyAKIAH4AMA")),        
+        walk3:
+require("heatshrink").decompress(atob("kcj4cA///A4Or1YFBlFC8cojfvhOTKf4AehMkyVJAQNIBgszj53B//59GABgkcxQYD8lABgkOsonDr0gBgkHkX9pMvvcvyAMEgVJtMkymSiRBGgG2yMmpMILg9e6VZkmEBg86JwVCBg8btu27dpQZh0FAAWkBgMiTxFzE4PxBhEjm3b7WALg8Y2d5v1Amg1GhmJlmkk28VQsAg1IpOSjMxEw0Dy8g8upkgMGgOZiFzuhOIyVAnc6BhAABj/RBhUBR5IA/ABQ"))        
       }
     ],
     dog_bowl_empty: require("heatshrink").decompress(atob("kcjwkCkQA/AH4A/AAjOEZZQMB5gADCRIPB4MRAAUcCQIPFkEMB4gSD4AkFgfMCA0R5nAEQs0IAIzF5lEEQsM4lMKwnMA4IiGngaBCQfEogDBEQkgIoItCAAQlDCIgQDAA40EGYQAJESwQKEQgQMCIkMCBY0DEUcAABbSFAH4AkkA")),
