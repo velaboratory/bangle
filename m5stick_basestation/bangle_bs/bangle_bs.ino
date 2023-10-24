@@ -253,7 +253,7 @@ void handle_root(){
     }
   }
   String ssid;
-  for(int i=0;i<incrementor+1;i++){ 
+  for(int i=0;i<incrementor;i++){ 
     ssid = ssids[i];
     HTML = HTML + "<input type=\"radio\" name=\"ssid\" value=\"" + ssid + "\">"+ssid+"<br>"; 
   }
