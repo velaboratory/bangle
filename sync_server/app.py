@@ -240,12 +240,13 @@ def get_devices():
 @app.route("/getsyncs", methods = ["GET"])
 def get_syncs():
     from_time = request.values.get("from_time", 0,type=int) #utc timestamp
+    to_time = request.values.get("to_time", 2147483647, type=int) #highest utc timestamp if not provided
     device_id = request.values.get("device_id", None)
     app_name = request.values.get("app_name", None)
     if not all([device_id,app_name]):
         return failure("invalid request")
     with dbConnection() as con:
-        df = pd.read_sql("select uuid, from_time as dt_start,dt as dt_sync, device_id, station_id, data from data_sync where device_id = ? and from_time > ? and app_name = ? and complete=1", con = con, params = (device_id, from_time,app_name))
+        df = pd.read_sql("select uuid, from_time as dt_start,dt as dt_sync, device_id, station_id, data from data_sync where device_id = ? and from_time > ? and to_time < ? and app_name = ? and complete=1", con = con, params = (device_id, from_time, to_time, app_name))
     to_return = json.loads(df.to_json(orient="records"))
     return success({"syncs":to_return})
 
