@@ -1,3 +1,7 @@
+if (typeof navigator == "undefined"){
+
+}
+var d = new Date();
 //instantiating the web bluetooth handler to take care of tx and rx communications and maintain the connection
 var WebBluetooth = {
     name : "Web Bluetooth",
@@ -112,6 +116,7 @@ var WebBluetooth = {
             console.log(2, "RX characteristic:"+JSON.stringify(rxCharacteristic));
             //Will execute on the reading of a packet in order to parse it for the pause signal to stop the process
             rxCharacteristic.addEventListener('characteristicvaluechanged', function(event) {
+                console.log("rx change")
                 var dataview = event.target.value;
                 if (dataview.byteLength > chunkSize) {
                     console.log(2, "Received packet of length " + dataview.byteLength + ", increasing chunk size");
@@ -157,81 +162,6 @@ var WebBluetooth = {
         return connection;
     }
 };
-//Used to set the ports and specifics used in the tx and rx characteristics in the WebBluetooth module
-var WebSerial = {
-    name : "Web Serial",
-    description : "USB connected devices",
-    connect : function(connection, callback) {
-        var serialPort;
-        function disconnected() {
-            connection.isOpening = false;
-            if (connection.isOpen) {
-                console.log(1, "Disconnected");
-                connection.isOpen = false;
-                connection.emit('close');
-            }
-        }
-        //Requests the digital port that will be used for the serial communication from the navigator class
-        navigator.serial.requestPort({}).then(function(port) {
-            console.log(1, "Connecting to serial port");
-            serialPort = port;
-            //Opens the port with a baudrate of 115200
-            return port.open({ baudRate: 115200 });
-        }).then(function () {
-            //Saves the stream that will read data over the port than proceeds to update the already read data
-            function readLoop() {
-                var reader = serialPort.readable.getReader();
-                reader.read().then(function ({ value, done }) {
-                    reader.releaseLock();
-                    //Saves the read stream as data in the case that it is specified as such
-                    if (value) {
-                        var str = ab2str(value.buffer);
-                        console.log(3, "Received "+JSON.stringify(str));
-                        connection.emit('data', str);
-                    }
-                    //Closes the connection if the serial port is done being used
-                    if (done) {
-                        disconnected();
-                    }
-                    //Reiterates the function to perpetually read values from the readable stream
-                    else {
-                        readLoop();
-                    }
-                });
-            }
-            readLoop();
-            console.log(1,"Serial connected. Receiving data...");
-            connection.txInProgress = false;
-            connection.isOpen = true;
-            connection.isOpening = false;
-            callback(connection);
-        }).catch(function(error) {
-            console.log(0, 'ERROR: ' + error);
-            disconnected();
-        });
-        //Used to close the digital port in the case of a disconnection
-        connection.close = function(callback) {
-            if (serialPort) {
-                serialPort.close();
-                serialPort = undefined;
-            }
-            disconnected();
-        };
-        //Creates a Writer on the serial port to send data over the tx channel
-        connection.write = function(data, callback) {
-            var writer = serialPort.writable.getWriter();
-            writer.write(str2ab(data)).then(function() {
-                callback();
-            }).catch(function(error) {
-                console.log(0,'SEND ERROR: ' + error);
-                closeSerial();
-            });
-            writer.releaseLock();
-        };
-
-        return connection;
-    }
-};
 //Used to convert from arraybuffer to string
 function ab2str(buf) {
     return String.fromCharCode.apply(null, new Uint8Array(buf));
@@ -243,4 +173,30 @@ function str2ab(str) {
     for (var i=0, strLen=str.length; i<strLen; i++)
         bufView[i] = str.charCodeAt(i);
     return buf;
+}
+function start() {
+    var connection = connect(function () {
+        connection.received = "";
+        connection.on('data', function (d) {
+            connection.received += d;
+            connection.hadData = true;
+            if (connection.cb) connection.cb(d);
+        });
+        connection.on('close', function (d) {
+            connection = undefined;
+        });
+        isBusy = true;
+        connection.write(data, onWritten);
+    });
+}
+function connect(callback) {
+    var connection = {
+        on : function(evt,cb) { this["on"+evt]=cb; },
+        emit : function(evt,data) { if (this["on"+evt]) this["on"+evt](data); },
+        isOpen : false,
+        isOpening : true,
+        txInProgress : false
+    };
+    connection = WebBluetooth.connect(connection, callback);
+    return connection;
 }
