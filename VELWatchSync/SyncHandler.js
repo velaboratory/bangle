@@ -154,7 +154,7 @@ var WebBluetooth = {
             callback(connection);
             connection.emit('open');
             // if we had any writes queued, do them now
-            connection.write();
+            //connection.write();
         }).catch(function(error) {
             console.log(1, 'ERROR: ' + error);
             connection.close();
