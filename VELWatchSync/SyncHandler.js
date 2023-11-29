@@ -1,6 +1,6 @@
 if (typeof navigator == "undefined"){
 
-}
+}var isBusy = false;
 var d = new Date();
 //instantiating the web bluetooth handler to take care of tx and rx communications and maintain the connection
 var WebBluetooth = {
@@ -40,6 +40,7 @@ var WebBluetooth = {
 
         //Function that handles the writing of the data on the tx channel (used after the server variable has been instantiated and the txCharacteristic has been set)
         connection.write = function (data, callback) {
+            console.log("write");
             if (data) txDataQueue.push({data: data, callback: callback, maxLength: data.length});
             //Adds data used to the txqueue to be sent
             if (connection.isOpen && !connection.txInProgress) writeChunk();
@@ -151,10 +152,11 @@ var WebBluetooth = {
             connection.isOpening = false;
             isBusy = false;
             queue = [];
+            console.log(callback.name);
             callback(connection);
             connection.emit('open');
             // if we had any writes queued, do them now
-            //connection.write();
+            connection.write();
         }).catch(function(error) {
             console.log(1, 'ERROR: ' + error);
             connection.close();
@@ -174,25 +176,77 @@ function str2ab(str) {
         bufView[i] = str.charCodeAt(i);
     return buf;
 }
-function start() {
-    var connection = connect(function () {
-        connection.received = "";
-        connection.on('data', function (d) {
-            connection.received += d;
-            connection.hadData = true;
-            if (connection.cb) connection.cb(d);
+    function writei(data, callback, callbackNewline) {
+        if (isBusy) {
+            log(3, "Busy - adding write to queue");
+            queue.push({type: "write", data: data, callback: callback, callbackNewline: callbackNewline});
+            return;
+        }
+
+        var cbTimeout;
+
+        function onWritten() {
+            if (callbackNewline) {
+                connection.cb = function (d) {
+                    var newLineIdx = connection.received.indexOf("\n");
+                    if (newLineIdx >= 0) {
+                        var l = connection.received.substr(0, newLineIdx);
+                        connection.received = connection.received.substr(newLineIdx + 1);
+                        connection.cb = undefined;
+                        if (cbTimeout) clearTimeout(cbTimeout);
+                        cbTimeout = undefined;
+                        if (callback)
+                            callback(l);
+                        isBusy = false;
+                        handleQueue();
+                    }
+                };
+            }
+            // wait for any received data if we have a callback...
+            var maxTime = 300; // 30 sec - Max time we wait in total, even if getting data
+            var dataWaitTime = callbackNewline ? 100/*10 sec  if waiting for newline*/ : 3/*300ms*/;
+            var maxDataTime = dataWaitTime; // max time we wait after having received data
+            cbTimeout = setTimeout(function timeout() {
+                cbTimeout = undefined;
+                if (maxTime) maxTime--;
+                if (maxDataTime) maxDataTime--;
+                if (connection.hadData) maxDataTime = dataWaitTime;
+                if (maxDataTime && maxTime) {
+                    cbTimeout = setTimeout(timeout, 100);
+                } else {
+                    connection.cb = undefined;
+                    if (callbackNewline)
+                        log(2, "write waiting for newline timed out");
+                    if (callback)
+                        callback(connection.received);
+                    isBusy = false;
+                    handleQueue();
+                    connection.received = "";
+                }
+                connection.hadData = false;
+            }, 100);
+        }
+
+
+        connection = connect(function () {
+            connection.received = "";
+            connection.on('data', function (d) {
+                connection.received += d;
+                connection.hadData = true;
+                if (connection.cb) connection.cb(d);
+            });
+            connection.on('close', function (d) {
+                connection = undefined;
+            });
+            isBusy = true;
+            connection.write(data, onWritten);
         });
-        connection.on('close', function (d) {
-            connection = undefined;
-        });
-        isBusy = true;
-        connection.write(data, onWritten);
-    });
-}
+    }
 function connect(callback) {
     var connection = {
         on : function(evt,cb) { this["on"+evt]=cb; },
-        emit : function(evt,data) { if (this["on"+evt]) this["on"+evt](data); },
+        emit : function(evt,data) { if (this["on"+evt]) this["on"+evt](data)
+            console.log("emit"); },
         isOpen : false,
         isOpening : true,
         txInProgress : false
