@@ -123,27 +123,17 @@ var WebBluetooth = {
                     console.log(2, "Received packet of length " + dataview.byteLength + ", increasing chunk size");
                     chunkSize = dataview.byteLength;
                 }
-                    for (var i=0;i<dataview.byteLength;i++) {
-                        var ch = dataview.getUint8(i);
-                        if(ch==1){
-                            console.log("packet");
-                            const file = JSON.stringify(dataview);
-                            //send to server
-                        }
-                        if(ch==2){
-                            console.log("finished sync");
-                            const file = JSON.stringify(dataview);
-                            //send to server
-                        }
-                        if (ch==17) { // XON
-                            console.log(2,"XON received => resume upload");
-                            flowControlXOFF = false;
-                        }
-                        if (ch==19) { // XOFF
-                            console.log(2,"XOFF received => pause upload");
-                            flowControlXOFF = true;
-                        }
+                for (var i=0;i<dataview.byteLength;i++) {
+                    var ch = dataview.getUint8(i);
+                    if (ch==17) { // XON
+                        console.log(2,"XON received => resume upload");
+                        flowControlXOFF = false;
                     }
+                    if (ch==19) { // XOFF
+                        console.log(2,"XOFF received => pause upload");
+                        flowControlXOFF = true;
+                    }
+                }
                 var str = ab2str(dataview.buffer);
                 console.log(3, "Received "+JSON.stringify(str));
                 connection.emit('data', str);
@@ -186,72 +176,72 @@ function str2ab(str) {
         bufView[i] = str.charCodeAt(i);
     return buf;
 }
-    function writei(data, callback, callbackNewline) {
-        if (isBusy) {
-            log(3, "Busy - adding write to queue");
-            queue.push({type: "write", data: data, callback: callback, callbackNewline: callbackNewline});
-            return;
-        }
+function writei(data, callback, callbackNewline) {
+    if (isBusy) {
+        log(3, "Busy - adding write to queue");
+        queue.push({type: "write", data: data, callback: callback, callbackNewline: callbackNewline});
+        return;
+    }
 
-        var cbTimeout;
+    var cbTimeout;
 
-        function onWritten() {
-            if (callbackNewline) {
-                connection.cb = function (d) {
-                    var newLineIdx = connection.received.indexOf("\n");
-                    if (newLineIdx >= 0) {
-                        var l = connection.received.substr(0, newLineIdx);
-                        connection.received = connection.received.substr(newLineIdx + 1);
-                        connection.cb = undefined;
-                        if (cbTimeout) clearTimeout(cbTimeout);
-                        cbTimeout = undefined;
-                        if (callback)
-                            callback(l);
-                        isBusy = false;
-                        handleQueue();
-                    }
-                };
-            }
-            // wait for any received data if we have a callback...
-            var maxTime = 300; // 30 sec - Max time we wait in total, even if getting data
-            var dataWaitTime = callbackNewline ? 100/*10 sec  if waiting for newline*/ : 3/*300ms*/;
-            var maxDataTime = dataWaitTime; // max time we wait after having received data
-            cbTimeout = setTimeout(function timeout() {
-                cbTimeout = undefined;
-                if (maxTime) maxTime--;
-                if (maxDataTime) maxDataTime--;
-                if (connection.hadData) maxDataTime = dataWaitTime;
-                if (maxDataTime && maxTime) {
-                    cbTimeout = setTimeout(timeout, 100);
-                } else {
+    function onWritten() {
+        if (callbackNewline) {
+            connection.cb = function (d) {
+                var newLineIdx = connection.received.indexOf("\n");
+                if (newLineIdx >= 0) {
+                    var l = connection.received.substr(0, newLineIdx);
+                    connection.received = connection.received.substr(newLineIdx + 1);
                     connection.cb = undefined;
-                    if (callbackNewline)
-                        log(2, "write waiting for newline timed out");
+                    if (cbTimeout) clearTimeout(cbTimeout);
+                    cbTimeout = undefined;
                     if (callback)
-                        callback(connection.received);
+                        callback(l);
                     isBusy = false;
                     handleQueue();
-                    connection.received = "";
                 }
-                connection.hadData = false;
-            }, 100);
+            };
         }
-
-
-        connection = connect(function () {
-            connection.received = "";
-            connection.on('data', function (d) {
-                connection.received += d;
-                connection.hadData = true;
-                if (connection.cb) connection.cb(d);
-            });
-            connection.on('close', function (d) {
-                connection = undefined;
-            });
-            isBusy = true;
-            connection.write(data, onWritten);
-        });
+        // wait for any received data if we have a callback...
+        var maxTime = 300; // 30 sec - Max time we wait in total, even if getting data
+        var dataWaitTime = callbackNewline ? 100/*10 sec  if waiting for newline*/ : 3/*300ms*/;
+        var maxDataTime = dataWaitTime; // max time we wait after having received data
+        cbTimeout = setTimeout(function timeout() {
+            cbTimeout = undefined;
+            if (maxTime) maxTime--;
+            if (maxDataTime) maxDataTime--;
+            if (connection.hadData) maxDataTime = dataWaitTime;
+            if (maxDataTime && maxTime) {
+                cbTimeout = setTimeout(timeout, 100);
+            } else {
+                connection.cb = undefined;
+                if (callbackNewline)
+                    log(2, "write waiting for newline timed out");
+                if (callback)
+                    callback(connection.received);
+                isBusy = false;
+                handleQueue();
+                connection.received = "";
+            }
+            connection.hadData = false;
+        }, 100);
     }
+
+
+    connection = connect(function () {
+        connection.received = "";
+        connection.on('data', function (d) {
+            connection.received += d;
+            connection.hadData = true;
+            if (connection.cb) connection.cb(d);
+        });
+        connection.on('close', function (d) {
+            connection = undefined;
+        });
+        isBusy = true;
+        connection.write(data, onWritten);
+    });
+}
 function connect(callback) {
     var connection = {
         on : function(evt,cb) { this["on"+evt]=cb; },
