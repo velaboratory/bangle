@@ -69,7 +69,7 @@ var WebBluetooth = {
                 }
                 //Ensures the rest of the program can recognize that the program is sending data over tx, so it does not start any processes that could sabotage the writing
                 connection.txInProgress = true;
-                log(2, "Sending " + JSON.stringify(chunk));
+                console.log(2, "Sending " + JSON.stringify(chunk));
                 //Writes the saved chunk to the bluetooth server on the corresponding device in the form of an array buffer
                 txCharacteristic.writeValue(str2ab(chunk)).then(function () {
                     console.log(3, "Sent");
@@ -127,6 +127,7 @@ var WebBluetooth = {
                         var ch = dataview.getUint8(i);
                         if(ch==1){
                             console.log("packet");
+                            console.log(dataview);
                             const file = JSON.stringify(dataview);
                             //send to server
                         }
@@ -208,7 +209,6 @@ function str2ab(str) {
                         if (callback)
                             callback(l);
                         isBusy = false;
-                        handleQueue();
                     }
                 };
             }
@@ -230,7 +230,6 @@ function str2ab(str) {
                     if (callback)
                         callback(connection.received);
                     isBusy = false;
-                    handleQueue();
                     connection.received = "";
                 }
                 connection.hadData = false;
