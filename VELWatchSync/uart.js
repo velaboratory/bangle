@@ -47,6 +47,7 @@ ChangeLog:
       Drop UART.debug to 1 (less info printed)
       Fixed flow control on BLE
 */
+
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.

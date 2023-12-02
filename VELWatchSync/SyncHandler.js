@@ -1,8 +1,12 @@
+
 if (typeof navigator == "undefined"){
 
 }var isBusy = false;
 var d = new Date();
 //instantiating the web bluetooth handler to take care of tx and rx communications and maintain the connection
+function start(){
+    writei()
+}
 var WebBluetooth = {
     name : "Web Bluetooth",
     description : "Bluetooth LE devices",
@@ -17,7 +21,6 @@ var WebBluetooth = {
         var txCharacteristic;
         var rxCharacteristic;
         //Queue used to handle the data that will be sent on the tx channel
-        var txDataQueue = [];
         var flowControlXOFF = false;
         var chunkSize = 20;
 
@@ -39,51 +42,34 @@ var WebBluetooth = {
         };
 
         //Function that handles the writing of the data on the tx channel (used after the server variable has been instantiated and the txCharacteristic has been set)
-        connection.write = function (data, callback) {
+        connection.write = function (callback) {
             console.log("write");
-            if (data) txDataQueue.push({data: data, callback: callback, maxLength: data.length});
             //Adds data used to the txqueue to be sent
-            if (connection.isOpen && !connection.txInProgress) writeChunk();
+            if (connection.isOpen && !connection.txInProgress){
+                writeChunk(7);
+                setTimeout(() => { writeChunk(1); }, 20000);
+            }
 
-            function writeChunk() {
+            function writeChunk(data) {
                 //Prevents the writing of data if Flow control is set to off (will wait 50 then retry to check if Flow Control has been turned on)
                 if (flowControlXOFF) { // flow control - try again later
                     setTimeout(writeChunk, 50);
                     return;
                 }
-                var chunk;
                 //Prevents the writing of data and ends the write process if there is nothing in the queue
-                if (!txDataQueue.length) {
-                    return;
-                }
-                var txItem = txDataQueue[0];
+
                 //If the next item can be written in one chunk it is set to be sent
-                if (txItem.data.length <= chunkSize) {
-                    chunk = txItem.data;
-                    txItem.data = undefined;
-                }
-                //If the next item is bigger than a chunk it is divided and the rest is sent on the iteration
-                else {
-                    chunk = txItem.data.substr(0, chunkSize);
-                    txItem.data = txItem.data.substr(chunkSize);
-                }
+                chunk = data;
+                data = undefined;
                 //Ensures the rest of the program can recognize that the program is sending data over tx, so it does not start any processes that could sabotage the writing
                 connection.txInProgress = true;
                 console.log(2, "Sending " + JSON.stringify(chunk));
                 //Writes the saved chunk to the bluetooth server on the corresponding device in the form of an array buffer
                 txCharacteristic.writeValue(str2ab(chunk)).then(function () {
                     console.log(3, "Sent");
-                    if (!txItem.data) {
-                        txDataQueue.shift(); // remove this element
-                        if (txItem.callback)
-                            txItem.callback();
-                    }
                     connection.txInProgress = false;
-                    //Reiterates the process to send the rest of the data in the queue
-                    writeChunk();
                 }).catch(function (error) {
                     console.log(1, 'SEND ERROR: ' + error);
-                    txDataQueue = [];
                     connection.close();
                 });
             }
@@ -119,22 +105,18 @@ var WebBluetooth = {
             rxCharacteristic.addEventListener('characteristicvaluechanged', function(event) {
                 console.log("rx change")
                 var dataview = event.target.value;
-                if (dataview.byteLength > chunkSize) {
-                    console.log(2, "Received packet of length " + dataview.byteLength + ", increasing chunk size");
-                    chunkSize = dataview.byteLength;
-                }
+                const buffer = [];
                     for (var i=0;i<dataview.byteLength;i++) {
                         var ch = dataview.getUint8(i);
                         if(ch==1){
                             console.log("packet");
                             console.log(dataview);
-                            const file = JSON.stringify(dataview);
-                            //send to server
+                            buffer.push(dataview);
                         }
                         if(ch==2){
                             console.log("finished sync");
                             const file = JSON.stringify(dataview);
-                            //send to server
+                            buffer.push(dataview);
                         }
                         if (ch==17) { // XON
                             console.log(2,"XON received => resume upload");
@@ -146,6 +128,7 @@ var WebBluetooth = {
                         }
                     }
                 var str = ab2str(dataview.buffer);
+                    //send to server
                 console.log(3, "Received "+JSON.stringify(str));
                 connection.emit('data', str);
             });
@@ -189,8 +172,7 @@ function str2ab(str) {
 }
     function writei(data, callback, callbackNewline) {
         if (isBusy) {
-            log(3, "Busy - adding write to queue");
-            queue.push({type: "write", data: data, callback: callback, callbackNewline: callbackNewline});
+            setTimeout(writei(data, callback, callbackNewline), 50);
             return;
         }
 
@@ -248,7 +230,7 @@ function str2ab(str) {
                 connection = undefined;
             });
             isBusy = true;
-            connection.write(data, onWritten);
+            connection.write(onWritten);
         });
     }
 function connect(callback) {
