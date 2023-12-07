@@ -46,7 +46,7 @@ var WebBluetooth = {
             console.log("write");
             //Adds data used to the txqueue to be sent
             if (connection.isOpen && !connection.txInProgress){
-                writeChunk(7);
+                writeChunk(7 + Date.now());
                 setTimeout(() => { writeChunk(1); }, 20000);
             }
 
