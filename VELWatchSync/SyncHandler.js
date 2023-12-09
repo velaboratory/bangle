@@ -46,7 +46,7 @@ var WebBluetooth = {
             console.log("write");
             //Adds data used to the txqueue to be sent
             if (connection.isOpen && !connection.txInProgress){
-                writeChunk(7 + Date.now());
+                writeChunk(1);
                 setTimeout(() => { writeChunk(1); }, 20000);
             }
 
@@ -65,7 +65,7 @@ var WebBluetooth = {
                 connection.txInProgress = true;
                 console.log(2, "Sending " + JSON.stringify(chunk));
                 //Writes the saved chunk to the bluetooth server on the corresponding device in the form of an array buffer
-                txCharacteristic.writeValue(str2ab(chunk)).then(function () {
+                txCharacteristic.writeValueWithResponse(str2ab(chunk)).then(function () {
                     console.log(3, "Sent");
                     connection.txInProgress = false;
                 }).catch(function (error) {
