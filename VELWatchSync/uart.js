@@ -88,7 +88,7 @@ ChangeLog:
   }
 
   function log(level, s) {
-    if (uart.log) uart.log(level, s);
+    console.log(level, s);
   }
 
   var endpoints = [];
