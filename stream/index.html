@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bluetooth Data Plotter</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+</head>
+<body>
+    <div>
+        <canvas id="bangleChart"></canvas>
+    </div>
+    <div>
+        <canvas id="polarChart"></canvas>
+        <p id="hrm"></p>
+    </div>
+    <button id="bangleButton" onclick="startBangle()">Start Bangle</button>
+    <button id="polarButton" onclick="startPolar()">Start Polar</button>
+    <button id="recordButton" onclick="startRecord()">Start Record</button>"
+    <script>
+        let connectedToBangle = false;
+        let connectedToPolar = false;
+        let isRecording = false;
+        let polarSamples = [];
+        let polarHRMSamples = [];
+        let bangleSamples = [];
+        let bangleDevice;
+        let polarDevice;
+        const canvasBangle = document.getElementById('bangleChart');
+        canvasBangle.height = 75;
+
+        const bangleValues = [];
+        let last_index = 0;
+        const dataBangle = {
+            datasets: [{
+                label: 'Test',
+                backgroundColor: 'rgb(255, 99, 132)',
+                borderColor: 'rgb(255, 99, 132)',
+                data: bangleValues,
+            }]
+        };
+
+        const configBangle = {
+            type: 'line',
+            data: dataBangle,
+            options: {
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        bounds: 'data'
+                    }
+                }
+            }
+        };
+
+        const chartBangle = new Chart(
+            canvasBangle,
+            configBangle
+        );
+
+        // function to update the chart 
+        function addDataBangle(chart, label, data) {
+
+            
+            bangleValues.push({x: label, y: data});
+            while(true){
+                var first = bangleValues[0];
+                var last = bangleValues[bangleValues.length-1];
+                if(last.x - first.x > 5000){
+                    bangleValues.shift();
+                }else{
+                    break;
+                }
+            }
+            
+            
+        }
+        var bangleT = 0;
+        function updateChartBangle(t, newData) {
+            addDataBangle(chartBangle,t,newData)
+            
+        }
+
+        const canvasPolar = document.getElementById('polarChart');
+        canvasPolar.height = 75;
+
+        const polarValues = [];
+        const dataPolar = {
+            datasets: [{
+                label: 'Test',
+                backgroundColor: 'rgb(255, 99, 132)',
+                borderColor: 'rgb(255, 99, 132)',
+                data: polarValues,
+            }]
+        };
+
+        const configPolar = {
+            type: 'line',
+            data: dataPolar,
+            options: {
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        bounds: 'data'
+                    }
+                }
+            }
+        };
+
+        const chartPolar = new Chart(
+            canvasPolar,
+            configPolar
+        );
+
+        // function to update the chart 
+        function addDataPolar(chart, label, data) {
+            polarValues.push({x: label, y: data});
+            while(true){
+                var first = polarValues[0];
+                var last = polarValues[polarValues.length-1];
+                if(last.x - first.x > 5000){
+                    polarValues.shift();
+                }else{
+                    break;
+                }
+            }
+            
+        }
+        function updateChartPolar(timestamp, newData) {
+            addDataPolar(chartPolar,timestamp,newData)
+            
+        }
+
+        let buffer = [];
+        function bin2String(array) {
+            var result = "";
+            for (var i = 0; i < array.length; i++) {
+                result += String.fromCharCode(array[i]);
+            }
+            return result;
+        }
+        let num=0;
+        let bangleReadingBuffer = [];
+        async function connectToBangle() {
+            try {
+                connectedToBangle = false;
+                const device = await navigator.bluetooth.requestDevice({
+                    filters: [{ services: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e'] }],
+                });
+                device.addEventListener('gattserverdisconnected', (event)=>{
+                    connectedToBangle = false;
+                    document.getElementById('bangleButton').innerText = "Start Bangle";
+                });
+                const server = await device.gatt.connect();
+                connectedToBangle = true;
+                bangleDevice = device;
+                const service = await server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
+                const characteristic = await service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
+
+                characteristic.addEventListener('characteristicvaluechanged', (event) => {
+                    var data = new Uint8Array(event.target.value.buffer);
+                    
+                    for(var i=0;i<data.length;i++){
+                        var b = data[i];
+                        
+                        if(b == 10){
+                            readings = bin2String(buffer).split(",");
+                            //console.log(readings);
+                            for(var j=0;j<readings.length;j+=2){
+                                sample = {x:parseInt(readings[j]),y:parseInt(readings[j+1])}
+                                if(isRecording){
+                                    bangleSamples.push(sample);
+                                }
+                                if(connectedToPolar){
+                                    bangleReadingBuffer.push(sample);
+                                }else{
+                                    updateChartBangle(sample.x,sample.y);
+                                }
+                            }
+                            if(!connectedToPolar){
+                                chartBangle.update('none');
+                            }
+                            
+                            buffer = [];
+                        }
+                        else{
+                            
+                            buffer.push(b);
+                        }
+                    }
+                
+                    //updateChart(value);
+                });
+
+                await characteristic.startNotifications();
+            } catch (error) {
+                console.error('Error connecting to Bluetooth device:', error);
+            }
+        }
+
+        function readSigned24BitLE(dataView, offset) {
+            // Read three bytes as a little-endian unsigned integer
+            const lowByte = dataView.getUint8(offset);
+            const midByte = dataView.getUint8(offset + 1);
+            const highByte = dataView.getUint8(offset + 2);
+
+            // Combine the three bytes into a 24-bit integer
+            let value = lowByte | (midByte << 8) | (highByte << 16);
+
+            // If the most significant bit is set, it's a negative number
+            if (value & 0x800000) {
+                // Perform sign extension
+                value |= 0xFF000000;
+            }
+
+            return value;
+        }
+
+        async function connectToPolar(){
+            try {
+                connectedToPolar = false;
+                CHAR_HR = "00002a37-0000-1000-8000-00805f9b34fb";
+                SERV_HR = "0000180d-0000-1000-8000-00805f9b34fb";
+                SERV_PMD= "fb005c80-02e7-f387-1cad-8acd2d8df0c8"
+                const device = await navigator.bluetooth.requestDevice({
+                    filters: [{ namePrefix:"Polar H10" }],
+                    optionalServices:[SERV_PMD,SERV_HR]
+                });
+                const server = await device.gatt.connect();
+                connectedToPolar = true;
+                polarDevice = device;
+                const hr_service = await server.getPrimaryService(SERV_HR);
+                const hr_char = await hr_service.getCharacteristic(CHAR_HR);
+                const service = await server.getPrimaryService(SERV_PMD);
+                const control = await service.getCharacteristic('fb005c81-02e7-f387-1cad-8acd2d8df0c8');
+                const data = await service.getCharacteristic('fb005c82-02e7-f387-1cad-8acd2d8df0c8');
+                hr_char.addEventListener('characteristicvaluechanged', (event)=>{
+                    var dv = new DataView(event.target.value.buffer);
+                    
+                    flags = dv.getUint8(0,true);
+                    format = flags & 0x01;
+                    hasRRI = flags & 0x10;
+                    if(format == 0){  //normal, not 16 bit
+                        polar_hr = dv.getUint8(1,true);
+                        rris = [];
+                        for(var i = 2;i<event.target.value.buffer.byteLength;i+=2){
+                            
+                            rris.push(dv.getUint16(i,true)/1024*1000);
+                        }
+                        if(isRecording){
+                            polarHRMSamples.push({t: Date.now(), bpm: polar_hr, rris: rris});
+                        }
+                        document.getElementById("hrm").innerText = "bpm: " + polar_hr + " rris: " + rris;
+                    }
+                });
+                device.addEventListener('gattserverdisconnected', (event)=>{
+                    connectedToPolar = false;
+                    document.getElementById('polarButton').innerText = "Start Polar";
+                });
+                
+                control.addEventListener('characteristicvaluechanged', (event) => {
+                    var value = new Uint8Array(event.target.value.buffer);
+                    //updateChart(value);
+                    console.log("got control");
+                });
+                data.addEventListener('characteristicvaluechanged', (event) => {
+                    var value = event.target.value.buffer;
+                    var dv = new DataView(value);
+
+                    timestamp=Number(dv.getBigUint64(1,true))/1000000.0;
+                    for(var i=0;i<(dv.byteLength-10)/3;i++){
+                        sample = {x: timestamp+i*(1000/130.0), y:readSigned24BitLE(dv,i*3+10)};
+                        if(isRecording){
+                            polarSamples.push(sample);
+                        }
+                        updateChartPolar(sample.x,sample.y)
+                    }
+
+                    chartPolar.update('none');
+                    if(connectedToBangle){
+                        for(var i=0;i<bangleReadingBuffer.length;i++){
+                            updateChartBangle(bangleReadingBuffer[i].x,bangleReadingBuffer[i].y);
+                        }
+                        chartBangle.update('none');
+                        bangleReadingBuffer = [];
+                    }
+                });
+
+                var value = await control.readValue();
+                console.log(value);
+                await data.startNotifications();
+                
+                await control.writeValue(new Uint8Array([0x02,0x00]))
+                await new Promise(r => setTimeout(r, 1000));
+                await control.writeValue(new Uint8Array([0x02, 0x00, 0x00, 0x01, 0x82, 0x00, 0x01, 0x01, 0x0E, 0x00])) 
+                await hr_char.startNotifications();
+                
+            } catch(error) {
+                console.error('Error connecting to Polar device:', error);
+            }
+        }
+
+        function startBangle() {
+            if(connectedToBangle){
+                bangleDevice.gatt.disconnect();
+                return;
+            }
+            document.getElementById('bangleButton').innerText = "Stop Bangle";
+            connectToBangle();
+        }
+
+        function startPolar(){
+            if(connectedToPolar){
+                polarDevice.gatt.disconnect();
+                return;
+            }
+            document.getElementById('polarButton').innerText = "Stop Polar";
+            connectToPolar();
+        }
+
+        function startRecord(){
+            if(!isRecording){
+                bangleSamples = [];
+                polarSamples = [];
+                polarHRMSamples = [];
+                isRecording = true;
+                document.getElementById('recordButton').innerText = "Stop Record";
+            }else{
+                let bangleCSV = "data:text/csv;charset=utf-8,"
+                bangleCSV += "timestamp_ms,value\n";
+                for(var i=0;i<bangleSamples.length;i++){
+                    bangleCSV+=bangleSamples[i].x+","+bangleSamples[i].y+"\n";
+                }
+
+                var encodedUri = encodeURI(bangleCSV);
+                var link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "bangle.csv");
+                document.body.appendChild(link); // Required for FF
+
+                link.click(); // This will download the data file named "my_data.csv"
+
+
+                let polarCSV = "data:text/csv;charset=utf-8,"
+                polarCSV += "timestamp_ms,value\n";
+                for(var i=0;i<polarSamples.length;i++){
+                    polarCSV+=polarSamples[i].x+","+polarSamples[i].y+"\n";
+                }
+
+                var encodedUri = encodeURI(polarCSV);
+                var link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "polar.csv");
+                document.body.appendChild(link); // Required for FF
+
+                link.click(); // This will download the data file named "my_data.csv"
+
+                let polarHRMCSV = "data:text/csv;charset=utf-8,"
+                polarHRMCSV += "timestamp_ms,value,rris\n";
+                for(var i=0;i<polarHRMSamples.length;i++){
+                    polarHRMCSV+=polarHRMSamples[i].t+","+polarHRMSamples[i].bpm +"," + polarHRMSamples[i].rris+"\n";
+                }
+
+                var encodedUri = encodeURI(polarHRMCSV);
+                var link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "polarHRM.csv");
+                document.body.appendChild(link); // Required for FF
+
+                link.click(); // This will download the data file named "my_data.csv"
+
+
+                isRecording = false;
+                document.getElementById('recordButton').innerText = "Start Record";
+            }
+                
+        }
+        
+
+        
+    </script>
+</body>
+</html>
