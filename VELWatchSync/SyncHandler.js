@@ -1,15 +1,67 @@
 
+//Used to convert from arraybuffer to string
+function ab2str(buf) {
+    return String.fromCharCode.apply(null, new Uint8Array(buf));
+}
+var fromTime;
+var buffer = [];
+var sendToServer = false;
+//Used to convert from string to arraybuffer
+function str2ab(str) {
+    var buf = new ArrayBuffer(str.length);
+    var bufView = new Uint8Array(buf);
+    for (var i=0, strLen=str.length; i<strLen; i++) {
+        console.log(str.charCodeAt(i))
+        bufView[i] = str.charCodeAt(i);
+        console.log(bufView[i])
+    }
+    return buf;
+}
 if (typeof navigator == "undefined"){
+    console.log("not working :(");
+}
 
-}var isBusy = false;
+var isBusy = false;
 var d = new Date();
 //instantiating the web bluetooth handler to take care of tx and rx communications and maintain the connection
 function start(){
-    writei()
+    connection = connect(function () {
+        connection.received = "";
+        connection.on('data', function (d) {
+            connection.received += d;
+            connection.hadData = true;
+            if (connection.cb) connection.cb(d);
+        });
+        connection.on('close', function (d) {
+            connection = undefined;
+        });
+        isBusy = true;
+        connection.write(data, onWritten);
+    });
+    console.log(WebBluetooth.isSupported())
 }
 var WebBluetooth = {
     name : "Web Bluetooth",
     description : "Bluetooth LE devices",
+    svg : '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M17.71 7.71L12 2h-1v7.59L6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 11 14.41V22h1l5.71-5.71-4.3-4.29 4.3-4.29zM13 5.83l1.88 1.88L13 9.59V5.83zm1.88 10.46L13 18.17v-3.76l1.88 1.88z" fill="#ffffff"/></svg>',
+    isSupported : function() {
+        if (navigator.platform.indexOf("Win")>=0 &&
+            (navigator.userAgent.indexOf("Chrome/54")>=0 ||
+                navigator.userAgent.indexOf("Chrome/55")>=0 ||
+                navigator.userAgent.indexOf("Chrome/56")>=0)
+        )
+            return "Chrome <56 in Windows has navigator.bluetooth but it's not implemented properly";;
+        if (window && window.location && window.location.protocol=="http:" &&
+            window.location.hostname!="localhost")
+            return "Serving off HTTP (not HTTPS) - Web Bluetooth not enabled";
+        if (navigator.bluetooth) return true;
+        var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if (iOS) {
+            return "To use Web Bluetooth on iOS you'll need the WebBLE App.\nPlease go to https://itunes.apple.com/us/app/webble/id1193531073 to download it.";
+        } else {
+            return "This Web Browser doesn't support Web Bluetooth.\nPlease see https://www.espruino.com/Puck.js+Quick+Start";
+        }
+    },
     connect : function(connection, callback) {
         //Defining general variables and the serial service specific to the bangle.js firmware
         var NORDIC_SERVICE = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
@@ -42,12 +94,11 @@ var WebBluetooth = {
         };
 
         //Function that handles the writing of the data on the tx channel (used after the server variable has been instantiated and the txCharacteristic has been set)
-        connection.write = function (callback) {
+        connection.write = function (val) {
             console.log("write");
             //Adds data used to the txqueue to be sent
             if (connection.isOpen && !connection.txInProgress){
-                writeChunk(7 + Date.now());
-                setTimeout(() => { writeChunk(1); }, 20000);
+                writeChunk(val);
             }
 
             function writeChunk(data) {
@@ -65,7 +116,7 @@ var WebBluetooth = {
                 connection.txInProgress = true;
                 console.log(2, "Sending " + JSON.stringify(chunk));
                 //Writes the saved chunk to the bluetooth server on the corresponding device in the form of an array buffer
-                txCharacteristic.writeValue(str2ab(chunk)).then(function () {
+                txCharacteristic.writeValue(new Uint16Array([1]).buffer).then(function () {
                     console.log(3, "Sent");
                     connection.txInProgress = false;
                 }).catch(function (error) {
@@ -96,6 +147,7 @@ var WebBluetooth = {
         }).then(function(service) {
             console.log(2, "Got service");
             btService = service;
+            console.log(2, "RX characteristic:"+JSON.stringify(btService));
             //Saves the RX Characteristic used in the connection with the server in order to receive on the RX channel for the site
             return btService.getCharacteristic(NORDIC_RX);
         }).then(function (characteristic) {
@@ -103,32 +155,48 @@ var WebBluetooth = {
             console.log(2, "RX characteristic:"+JSON.stringify(rxCharacteristic));
             //Will execute on the reading of a packet in order to parse it for the pause signal to stop the process
             rxCharacteristic.addEventListener('characteristicvaluechanged', function(event) {
-                console.log("rx change")
                 var dataview = event.target.value;
-                const buffer = [];
                     for (var i=0;i<dataview.byteLength;i++) {
                         var ch = dataview.getUint8(i);
-                        if(ch==1){
-                            console.log("packet");
-                            console.log(dataview);
-                            buffer.push(dataview);
-                        }
                         if(ch==2){
                             console.log("finished sync");
                             const file = JSON.stringify(dataview);
-                            buffer.push(dataview);
+                            buffer.push(ch);
+                            sendToServer = true;
                         }
-                        if (ch==17) { // XON
+                        else if(ch == 7){
+                            num1 = dataview.getUint8(i+4)
+                            num2 = dataview.getUint8(i+3)
+                            num3 = dataview.getUint8(i+2)
+                            num4 = dataview.getUint8(i+1)
+                            fromTime = num1.toString() + num2.toString() + num3.toString() + num4.toString()
+                        }
+                        else if(ch==17) { // XON
                             console.log(2,"XON received => resume upload");
                             flowControlXOFF = false;
                         }
-                        if (ch==19) { // XOFF
+                        else if (ch==19) { // XOFF
                             console.log(2,"XOFF received => pause upload");
                             flowControlXOFF = true;
+                        }
+                        else{
+                            buffer.push(ch);
                         }
                     }
                 var str = ab2str(dataview.buffer);
                     //send to server
+                if(sendToServer){
+                    //const xhr = new XMLHttpRequest();
+                    //var link = "https://bbs.ugavel.com/sync?from_time=" + fromTime + "&station_id=none&device_id=none&app_name=hrv_test&app_version=v4&complete=1";
+                    //xhr.open("POST", link);
+                    //xhr.setRequestHeader("Content-Type", "application/octet-stream");
+                    //const body = JSON.stringify({
+                     //   buffer: buffer,
+                      //  buffer_index: 1
+                    //});
+                    //xhr.send(body);
+                    //connection.write(5);
+                }
                 console.log(3, "Received "+JSON.stringify(str));
                 connection.emit('data', str);
             });
@@ -145,12 +213,7 @@ var WebBluetooth = {
             connection.isOpen = true;
             connection.isOpening = false;
             isBusy = false;
-            queue = [];
-            console.log(callback.name);
-            callback(connection);
-            connection.emit('open');
-            // if we had any writes queued, do them now
-            connection.write();
+            connection.write(1);
         }).catch(function(error) {
             console.log(1, 'ERROR: ' + error);
             connection.close();
@@ -158,81 +221,8 @@ var WebBluetooth = {
         return connection;
     }
 };
-//Used to convert from arraybuffer to string
-function ab2str(buf) {
-    return String.fromCharCode.apply(null, new Uint8Array(buf));
-}
-//Used to convert from string to arraybuffer
-function str2ab(str) {
-    var buf = new ArrayBuffer(str.length);
-    var bufView = new Uint8Array(buf);
-    for (var i=0, strLen=str.length; i<strLen; i++)
-        bufView[i] = str.charCodeAt(i);
-    return buf;
-}
-    function writei(data, callback, callbackNewline) {
-        if (isBusy) {
-            setTimeout(writei(data, callback, callbackNewline), 50);
-            return;
-        }
-
-        var cbTimeout;
-
-        function onWritten() {
-            if (callbackNewline) {
-                connection.cb = function (d) {
-                    var newLineIdx = connection.received.indexOf("\n");
-                    if (newLineIdx >= 0) {
-                        var l = connection.received.substr(0, newLineIdx);
-                        connection.received = connection.received.substr(newLineIdx + 1);
-                        connection.cb = undefined;
-                        if (cbTimeout) clearTimeout(cbTimeout);
-                        cbTimeout = undefined;
-                        if (callback)
-                            callback(l);
-                        isBusy = false;
-                    }
-                };
-            }
-            // wait for any received data if we have a callback...
-            var maxTime = 300; // 30 sec - Max time we wait in total, even if getting data
-            var dataWaitTime = callbackNewline ? 100/*10 sec  if waiting for newline*/ : 3/*300ms*/;
-            var maxDataTime = dataWaitTime; // max time we wait after having received data
-            cbTimeout = setTimeout(function timeout() {
-                cbTimeout = undefined;
-                if (maxTime) maxTime--;
-                if (maxDataTime) maxDataTime--;
-                if (connection.hadData) maxDataTime = dataWaitTime;
-                if (maxDataTime && maxTime) {
-                    cbTimeout = setTimeout(timeout, 100);
-                } else {
-                    connection.cb = undefined;
-                    if (callbackNewline)
-                        log(2, "write waiting for newline timed out");
-                    if (callback)
-                        callback(connection.received);
-                    isBusy = false;
-                    connection.received = "";
-                }
-                connection.hadData = false;
-            }, 100);
-        }
 
 
-        connection = connect(function () {
-            connection.received = "";
-            connection.on('data', function (d) {
-                connection.received += d;
-                connection.hadData = true;
-                if (connection.cb) connection.cb(d);
-            });
-            connection.on('close', function (d) {
-                connection = undefined;
-            });
-            isBusy = true;
-            connection.write(onWritten);
-        });
-    }
 function connect(callback) {
     var connection = {
         on : function(evt,cb) { this["on"+evt]=cb; },
