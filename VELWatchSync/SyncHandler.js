@@ -1,10 +1,17 @@
 
 //Used to convert from arraybuffer to string
+function getIPFromAmazon() {
+    fetch("https://checkip.amazonaws.com/").then(res => res.text()).then(data => {station_id = data})
+}
+
 function ab2str(buf) {
     return String.fromCharCode.apply(null, new Uint8Array(buf));
 }
 var fromTime;
 var buffer = [];
+var mac_id;
+var station_id;
+getIPFromAmazon();
 var sendToServer = false;
 //Used to convert from string to arraybuffer
 function str2ab(str) {
@@ -133,6 +140,7 @@ var WebBluetooth = {
             ], optionalServices: [ NORDIC_SERVICE ]}).then(function(device) {
             console.log(1, 'Device Name:       ' + device.name);
             console.log(1, 'Device ID:         ' + device.id);
+            mac_id = device.id;
             //Calls the close function in the event of a gatt server disconnection
             device.addEventListener('gattserverdisconnected', function() {
                 console.log(1, "Disconnected (gattserverdisconnected)");
@@ -186,16 +194,15 @@ var WebBluetooth = {
                 var str = ab2str(dataview.buffer);
                     //send to server
                 if(sendToServer){
-                    //const xhr = new XMLHttpRequest();
-                    //var link = "https://bbs.ugavel.com/sync?from_time=" + fromTime + "&station_id=none&device_id=none&app_name=hrv_test&app_version=v4&complete=1";
-                    //xhr.open("POST", link);
-                    //xhr.setRequestHeader("Content-Type", "application/octet-stream");
-                    //const body = JSON.stringify({
-                     //   buffer: buffer,
-                      //  buffer_index: 1
-                    //});
-                    //xhr.send(body);
-                    //connection.write(5);
+                    const xhr = new XMLHttpRequest();
+                    var link = "https://bbs.ugavel.com/sync?from_time=" + fromTime + "&station_id=" + station_id + "&device_id=" + mac_id + "&app_name=hrv_test&app_version=v4&complete=1";
+                    xhr.open("POST", link);
+                    xhr.setRequestHeader("Content-Type", "application/octet-stream");
+                    const body = JSON.stringify({
+                        buffer
+                    });
+                    xhr.send(body);
+                    connection.write(5);
                 }
                 console.log(3, "Received "+JSON.stringify(str));
                 connection.emit('data', str);
