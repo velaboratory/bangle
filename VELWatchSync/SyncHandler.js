@@ -1,7 +1,7 @@
 
 //Used to convert from arraybuffer to string
 function getIPFromAmazon() {
-    fetch("https://checkip.amazonaws.com/").then(res => res.text()).then(data => {station_id = data})
+    fetch("https://checkip.amazonaws.com/",{mode: 'no-cors'}).then(res => res.text()).then(data => {station_id = data})
 }
 
 function ab2str(buf) {
