@@ -191,8 +191,7 @@ var WebBluetooth = {
                     //xhr.open("POST", link);
                     //xhr.setRequestHeader("Content-Type", "application/octet-stream");
                     //const body = JSON.stringify({
-                     //   buffer: buffer,
-                      //  buffer_index: 1
+                     //   buffer: buffer
                     //});
                     //xhr.send(body);
                     //connection.write(5);

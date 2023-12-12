@@ -3,16 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <script type="text/javascript" src="SyncHandler.js"></script>
-    <script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syncing Page</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
 
-    </script>
-    <link rel="stylesheet" href="style.css">
-    <title>VELWatch Syncing</title>
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #syncButton {
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #4285f4;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #syncButton:hover {
+            background-color: #3367d6;
+        }
+
+        #ugaLogo {
+            max-width: 50%; /* Adjust the percentage to make the logo smaller */
+            height: auto;
+        }
+    </style>
 </head>
 <body>
-<button onclick="start()" >Start Syncing</button>
-
-
-<p id="demo"></p>
+<header>
+    <img id="ugaLogo" src="GEORGIA.png" alt="University of Georgia Logo">
+</header>
+<div>
+    <button onclick="start()" id="syncButton">Sync Now</button>
+</div>
 </body>
 </html>
