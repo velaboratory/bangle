@@ -290,7 +290,10 @@ let openMenu = function(){
       view.setUint32(0, time, false); // byteOffset = 0; litteEndian = false
       view.setUint16(4, delta, false);
       view.setUint16(6, movement, false);
-      view.setUint8(8,0,false); //padding
+      var battery = E.getBattery();
+      var charging = Bangle.isCharging();
+      var combined_battery_charging = charging?(128+battery):battery;
+      view.setUint8(8,combined_battery_charging,false); //padding
       current_movement_file.write(btoa(movement_log_buffer));
       daily_steps = writeSetting("daily_steps",daily_steps+delta);
 
@@ -342,51 +345,51 @@ let openMenu = function(){
   //   }
   // });
   
-  var hrm_log_buffer = new ArrayBuffer(6);
-  Bangle.on("HRM", function(hrm) { 
+  // var hrm_log_buffer = new ArrayBuffer(6);
+  // Bangle.on("HRM", function(hrm) { 
         
-        var view = new DataView(hrm_log_buffer);
-        var time = Math.floor(Date.now() / 1000);
-        view.setUint32(0,time);
-        view.setUint8(4,hrm.bpm); //0 - 100
-        view.setUint8(5,hrm.confidence); // 0-100
-        last_bpm = hrm.bpm;
-        last_conf = hrm.confidence;
-        if(current_hrm_file != null){
-            current_hrm_file.write(btoa(hrm_log_buffer));
-        }
-        drawWidgets();
-  });
+  //       var view = new DataView(hrm_log_buffer);
+  //       var time = Math.floor(Date.now() / 1000);
+  //       view.setUint32(0,time);
+  //       view.setUint8(4,hrm.bpm); //0 - 100
+  //       view.setUint8(5,hrm.confidence); // 0-100
+  //       last_bpm = hrm.bpm;
+  //       last_conf = hrm.confidence;
+  //       if(current_hrm_file != null){
+  //           current_hrm_file.write(btoa(hrm_log_buffer));
+  //       }
+  //       drawWidgets();
+  // });
 
   let last_time = 0;
   var hrm_raw_log_buffer = new ArrayBuffer(3);  //might be able to go down to 3 or even 2
   Bangle.on("HRM-raw", function(hrm) { 
         var time = Date.now()/1000;
-        if((time-last_hrm_reading_time) > 60*3){
+        if(time-last_hrm_reading_time > 10){
             stopHRMonitor();
-            drawWidgets();
+            //drawWidgets();
             return;
         }
-        // var time_delta =  (time-last_time)%256; 
-        // last_time = time;
-        var view = new DataView(hrm_raw_log_buffer);
-        var acc = Bangle.getAccel().diff*200;
-        if(acc > 255){
-            acc = 255; //we don't want to write 255, because that's a special encoded value
-        }
-
-        var time_ms = Date.now();
-        var time_delta = time_ms - last_time;
-        if(time_delta > 255){
-            time_delta = 0; //how often is this happening?
-        }
-        last_time = time_ms;
-        
+        var view = new DataView(hrm_raw_log_buffer)
         view.setUint16(0,hrm.raw);
-        view.setUint8(2, time_delta); 
-        //view.setUint8(2, acc); 
-        if(current_hrmraw_file != null){
-            current_hrmraw_file.write(btoa(hrm_raw_log_buffer)); //add to the buffer
+        if(hrm.isWearing == false){
+            view.setUint8(2,0); //write a 0 to the time delta when not wearing
+            if(current_hrmraw_file != null){
+              current_hrmraw_file.write(btoa(hrm_raw_log_buffer)); //add to the buffer
+            }
+            stopHRMonitor();
+        }else{
+          var time_ms = Date.now();
+          var time_delta = time_ms - last_time;
+          if(time_delta > 254){
+              time_delta = 255; //how often is this happening?
+          }
+          last_time = time_ms;
+          view.setUint8(2, time_delta); 
+          //view.setUint8(2, acc); 
+          if(current_hrmraw_file != null){
+              current_hrmraw_file.write(btoa(hrm_raw_log_buffer)); //add to the buffer
+          }
         }
   });
 
@@ -398,11 +401,11 @@ let openMenu = function(){
     
     tms = Math.floor(Date.now()); //time in milliseconds
     var hrmraw_filename = "hrmraw"+version+"_"+ tms;
-    var hrm_filename = "hrmreg"+version+"_"+ tms;
-    current_hrm_file = require("Storage").open(hrm_filename,"a");
+    //var hrm_filename = "hrmreg"+version+"_"+ tms;
+    //current_hrm_file = require("Storage").open(hrm_filename,"a");
     current_hrmraw_file = require("Storage").open(hrmraw_filename,"a");
     //we write these names to storage, because we have to remember to sync them
-    require("Storage").open(hrm_files_filename,"a").write(hrm_filename+"\n");
+    //require("Storage").open(hrm_files_filename,"a").write(hrm_filename+"\n");
     require("Storage").open(hrm_files_filename,"a").write(hrmraw_filename+"\n");
 
     Bangle.setHRMPower(true,"myapp");
@@ -410,7 +413,7 @@ let openMenu = function(){
     require("Storage").write("last_hrm_time",""+last_hrm_reading_time);
     last_bpm = -1;
     last_conf = -1;
-    drawWidgets();
+    //drawWidgets();
 
   };
 
@@ -605,12 +608,12 @@ let openMenu = function(){
       current_day = writeSetting("current_day",date_string);
       bones_eaten = writeSetting("bones_eaten", 0);
     }
-    /* we are not doing this for now.  Uses too much battery life.
+
     var time = Math.floor(Date.now() / 1000);
-    if(time - last_hrm_reading_time > 60*20){
+    if(time - last_hrm_reading_time > 60*15){ //every 15 minutes, take a 10s hrm reading (really just for wear time)
         startHRMonitor();
     }
-    */
+    
 
     NRF.setAdvertising({0x180F:[E.getBattery()]},{name:"VELWATCH"});
 

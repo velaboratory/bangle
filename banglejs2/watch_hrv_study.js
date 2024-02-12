@@ -50,7 +50,7 @@
   let config = read_config();
   let reading_config = false;
   let reading_firmware = false;
-  let timezone = -4;
+  let timezone = -5;
   let max_chunk = 9000;
   let ble_mtu = 768; 
   let from_time = readSetting("from_time", ""+Math.floor(Date.now() / 1000));
@@ -66,9 +66,13 @@
   let last_bpm = 0;
   let last_conf = 0;
   let polar_hr = 0;
+
+  let addr = NRF.getAddress();
+  let addrlast4 = addr.substring(addr.length-5);
+
   E.setTimeZone(timezone);
-  
-  Bangle.setOptions({"powerSave": true, "hrmPollInterval": 40, "lockTimeout": 10000, "backlightTimeout":10000,"wakeOnBTN1":true,"wakeOnBTN2":true,"wakeOnBTN3":true,"wakeOnFaceUp":false,"wakeOnTouch":false,"wakeOnTwist":false});
+
+  Bangle.setOptions({"hrmGreenAdjust": true, "powerSave": true, "hrmSportMode":0, "hrmPollInterval": 10, "lockTimeout": 10000, "backlightTimeout":10000,"wakeOnBTN1":true,"wakeOnBTN2":true,"wakeOnBTN3":true,"wakeOnFaceUp":false,"wakeOnTouch":false,"wakeOnTwist":false});
   Bangle.setHRMPower(false,"myApp"); //this actually resets the poll interval
   Bangle.setHRMPower(true,"myApp");
   Bangle.setHRMPower(false,"myApp"); 
@@ -78,12 +82,13 @@
   let current_day = readSetting("current_day", date_string);
   
   menu_active = false;
-  
+  stream = false;
 
   var menu = {
 
     "Start HRM":function(){
     if(!Bangle.isHRMOn()){
+      stream = false;
       startHRMonitor();
       closeMenu();
     }
@@ -91,6 +96,16 @@
     "Stop HRM": function(){
       stopHRMonitor();
       closeMenu();
+    },
+    "Start HRM Stream":function(){
+      if(!Bangle.isHRMOn()){
+        stream = true;
+        startHRMonitor();
+
+        closeMenu();
+        g.clearRect(0,0,175,20);
+
+      }
     },
     
     "Exit": function(){
@@ -144,6 +159,7 @@ let openMenu = function(){
 
   };
 
+  /*
   let accel_log_buffer = new ArrayBuffer(18);
   let accumulated_movement = 0;
   let last_diff = 0;
@@ -175,8 +191,10 @@ let openMenu = function(){
         num_samples = 0;
     }
   });
+  */
   
   var hrm_log_buffer = new ArrayBuffer(6);
+  /*
   Bangle.on("HRM", function(hrm) { 
         
         var view = new DataView(hrm_log_buffer);
@@ -191,14 +209,29 @@ let openMenu = function(){
         }
         drawClockFace();
   });
+  */
 
-  let raw_reading_buffer = [];
+  let raw_reading_buffer = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+  let raw_reading_buffer_index = 0;
   let last_time = 0;
   let hrm_raw_log_buffer = new ArrayBuffer(3);  //might be able to go down to 3 or even 2
   let last_pixel = 0;
   let avg_hrm = 0;
-  let hr_max_time = 120;
+  let hr_max_time = 600;
+
+  // Bangle.on("heartrateCollections", function(data){
+  //   const dataView = new DataView(data.raw);
+  //   for(let i=0;i<data.raw.length/2;i++){
+  //     const int16Value = dataView.getInt16(i*2, true);
+  //     raw_reading_buffer[i] = int16Value;
+  //   }
+  //   Bluetooth.write(raw_reading_buffer.join(",")+"\n");
+  //   //raw_reading_buffer = [];
+  // });
+  
   Bangle.on("HRM-raw", function(hrm) { 
+        var time_ms = Date.now();
+
         var time = Date.now()/1000;
         var time_left = hr_max_time - (time-last_hrm_reading_time)
         if(time_left < 0){
@@ -206,48 +239,56 @@ let openMenu = function(){
             drawClockFace();
             return;
         }
-        // var time_delta =  (time-last_time)%256; 
-        // last_time = time;
-        var view = new DataView(hrm_raw_log_buffer);
-        // var acc = Bangle.getAccel().diff*200;
-        // if(acc > 255){
-        //     acc = 255; //we don't want to write 255, because that's a special encoded value
-        // }
 
-        var time_ms = Date.now();
-        var time_delta = time_ms - last_time;
-        if(time_delta > 255){
-            time_delta = 0; //how often is this happening?
-        }
-        last_time = time_ms;
+        if(!stream){
+          var view = new DataView(hrm_raw_log_buffer);
+
+
+          
+          var time_delta = time_ms - last_time;
+          if(time_delta > 255){
+              time_delta = 0; //how often is this happening?
+          }
+          last_time = time_ms;
         
-        view.setUint16(0,hrm.raw);
-        view.setUint8(2, time_delta); 
-        //view.setUint8(2, acc); 
-        if(current_hrmraw_file != null){
-            current_hrmraw_file.write(btoa(hrm_raw_log_buffer)); //add to the buffer
+          view.setUint16(0,hrm.raw);
+          view.setUint8(2, time_delta); 
+
+          if(current_hrmraw_file != null){
+              current_hrmraw_file.write(btoa(hrm_raw_log_buffer)); //add to the buffer
+          }
+        
+          to_draw = (hrm.raw-hrm.avg);
+          
+          g.clearRect(0,0,175,20);
+          polarConnected = PolarServer!=undefined && PolarServer.connected;
+          g.setFontAlign(-1, 0).setFont("6x8",2).drawString(""+Math.floor(time_left)+":"+hrm.bpm+":"+hrm.confidence+":"+(polarConnected?polar_hr:0), 5, 10);
+          // //g.setClipRect(0,125,175,175); //only scroll the bottom of the screen
+          // //g.setColor(g.theme.bg).drawLine(last_pixel,125,last_pixel,175); //should be hrm value
+          g.drawLine(last_pixel,88,last_pixel,88+Math.floor(to_draw)); //should be hrm value
+          last_pixel = (last_pixel+1)%176;
+          if(last_pixel == 0){
+            g.clearRect(0,20,175,175);
+          }
+        }else{
+          raw_reading_buffer[raw_reading_buffer_index++] = Math.floor(time_ms);
+          raw_reading_buffer[raw_reading_buffer_index++] = hrm.raw;
+          
+          
+          if(raw_reading_buffer_index > 19){
+            Bluetooth.write(raw_reading_buffer.join(",")+"\n");
+            raw_reading_buffer_index = 0;
+          }
         }
-        // raw_reading_buffer.push(hrm.raw);
-        // if(raw_reading_buffer.length > 30){
-        //   raw_reading_buffer.shift();
-        // }
-      // min_value = raw_reading_buffer.reduce((a, b) => Math.min(a, b), Infinity);
-      // max_value = raw_reading_buffer.reduce((a, b) => Math.max(a, b), -Infinity);
-      // range = max_value-min_value;
-        to_draw = (hrm.raw-hrm.avg)/2;
-        g.clearRect(0,0,175,20);
-        polarConnected = PolarServer!=undefined && PolarServer.connected;
-        g.setFontAlign(-1, 0).setFont("6x8",2).drawString(""+Math.floor(time_left)+":"+hrm.bpm+":"+hrm.confidence+":"+(polarConnected?polar_hr:0), 5, 10);
-        // //g.setClipRect(0,125,175,175); //only scroll the bottom of the screen
-        // //g.setColor(g.theme.bg).drawLine(last_pixel,125,last_pixel,175); //should be hrm value
-        g.drawLine(last_pixel,88,last_pixel,88+Math.floor(to_draw)); //should be hrm value
-        last_pixel = (last_pixel+1)%176;
-        if(last_pixel == 0){
-          g.clearRect(0,20,175,175);
-        }
+
+
+
         //g.scroll(-1,0);
         //g.setClipRect(0,0,175,175);
+        
+        
   });
+  
 
 let polar_log_buffer = new ArrayBuffer(9);
 let polar_callback = function(event) {
@@ -337,29 +378,30 @@ let startPolar = function(){
     }
     //generate a new filename
     
-    tms = Math.floor(Date.now()); //time in milliseconds
-    var hrmraw_filename = "hrmraw"+version+"_"+ tms;
-    var hrm_filename = "hrmreg"+version+"_"+ tms;
-    current_hrm_file = require("Storage").open(hrm_filename,"a");
-    current_hrmraw_file = require("Storage").open(hrmraw_filename,"a");
-    //we write these names to storage, because we have to remember to sync them
-    require("Storage").open(hrm_files_filename,"a").write(hrm_filename+"\n");
-    require("Storage").open(hrm_files_filename,"a").write(hrmraw_filename+"\n");
+    if(!stream){
+      tms = Math.floor(Date.now()); //time in milliseconds
+      var hrmraw_filename = "hrmraw"+version+"_"+ tms;
+      var hrm_filename = "hrmreg"+version+"_"+ tms;
+      current_hrm_file = require("Storage").open(hrm_filename,"a");
+      current_hrmraw_file = require("Storage").open(hrmraw_filename,"a");
+      //we write these names to storage, because we have to remember to sync them
+      require("Storage").open(hrm_files_filename,"a").write(hrm_filename+"\n");
+      require("Storage").open(hrm_files_filename,"a").write(hrmraw_filename+"\n");
+      require("Storage").write("last_hrm_time",""+last_hrm_reading_time);
+      last_bpm = -1;
+      last_conf = -1;
 
-    Bangle.setHRMPower(true,"myapp");
+      startPolar();
+    }
+
+    Bangle.setHRMPower(true,"myApp");
     last_hrm_reading_time = Math.floor(Date.now()/1000); //time in seconds
-    require("Storage").write("last_hrm_time",""+last_hrm_reading_time);
-    last_bpm = -1;
-    last_conf = -1;
-
-    startPolar();
-    
     drawClockFace();
 
   };
 
   let stopHRMonitor = function(){
-    Bangle.setHRMPower(false,"myapp"); //this should immediately stop raw readings
+    Bangle.setHRMPower(false,"myApp"); //this should immediately stop raw readings
     disconnectFromServer();
     drawClockFace();
     
@@ -461,7 +503,7 @@ let startPolar = function(){
     }
     */
 
-    NRF.setAdvertising({0x180F:[E.getBattery()]},{name:"VELWATCH"});
+    NRF.setAdvertising({0x180F:[E.getBattery()]},{name:"VELWATCH_"+addrlast4});
 
     next_draw = 60000 - (Date.now() % 60000)
     // queue next draw
@@ -530,17 +572,29 @@ let startPolar = function(){
         parts = data.split("\n");
         config_file_temp.write(parts[0]);
         if(parts.length > 1){
+            
+            
+
             var config_file_data = require("Storage").open(config_file_temp_name,"r").read(10000000);
-            require("Storage").open(config_filename,"w").write(config_file_data);
             
-            config = read_config(); 
+            try{
+              JSON.parse(config_file_data);
+              require("Storage").open(config_filename,"w").write(config_file_data);
             
-            if(config.reset == true){
-              daily_steps = writeSetting("daily_steps",0);
+              config = read_config(); 
+              
+              if(config.reset == true){
+                daily_steps = writeSetting("daily_steps",0);
+              }
+              
+              reading_config = false;
+              Bluetooth.write(3); //got all data
             }
+            catch(error){
+              reading_config = false;
+            }
+
             
-            reading_config = false;
-            Bluetooth.write(3); //got all data
             
         }
     }else if(reading_firmware){
