@@ -186,22 +186,19 @@ var WebBluetooth = {
                             num4 = dataview.getUint8(i+1)
                             fromTime = num1.toString() + num2.toString() + num3.toString() + num4.toString()
                         }
-                        else if(ch==17) { // XON
-                            console.log(2,"XON received => resume upload");
-                            flowControlXOFF = false;
-                        }
-                        else if (ch==19) { // XOFF
-                            console.log(2,"XOFF received => pause upload");
-                            flowControlXOFF = true;
+                        else if(ch == 10){
+                            buffer.push("\n")
                         }
                         else{
                             buffer.push(ch);
                         }
+                        connection.write(1);
                     }
                 var str = ab2str(dataview.buffer);
                     //send to server
                 if(sendToServer){
                     const xhr = new XMLHttpRequest();
+                    console.log("Sending data to server")
                     var link = "https://bbs.ugavel.com/sync?from_time=" + fromTime + "&station_id=" + station_id + "&device_id=" + mac_id + "&app_name=hrv_test&app_version=v4&complete=1";
                     xhr.open("POST", link);
                     xhr.setRequestHeader("Content-Type", "application/octet-stream");
