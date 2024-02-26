@@ -106,18 +106,15 @@ var WebBluetooth = {
             console.log("write");
             //Adds data used to the txqueue to be sent
             if (connection.isOpen && !connection.txInProgress){
-                console.log("1");
                 writeChunk(val);
             }
 
             function writeChunk(data) {
-                console.log("2");
                 //Prevents the writing of data if Flow control is set to off (will wait 50 then retry to check if Flow Control has been turned on)
                 if (flowControlXOFF) { // flow control - try again later
                     setTimeout(writeChunk, 50);
                     return;
                 }
-                console.log("3");
                 //Prevents the writing of data and ends the write process if there is nothing in the queue
 
                 //If the next item can be written in one chunk it is set to be sent
@@ -125,18 +122,15 @@ var WebBluetooth = {
                 data = undefined;
                 //Ensures the rest of the program can recognize that the program is sending data over tx, so it does not start any processes that could sabotage the writing
                 connection.txInProgress = true;
-                console.log("4");
                 console.log(2, "Sending " + JSON.stringify(chunk));
                 //Writes the saved chunk to the bluetooth server on the corresponding device in the form of an array buffer
                 txCharacteristic.writeValue(new Uint16Array([1]).buffer).then(function () {
-                    console.log("5");
                     console.log(3, "Sent");
                     connection.txInProgress = false;
                 }).catch(function (error) {
                     console.log(1, 'SEND ERROR: ' + error);
                     connection.close();
                 });
-                console.log("6");
             }
         };
         //Searches for external bluetooth devices with the specified parameters
@@ -174,12 +168,13 @@ var WebBluetooth = {
                     for (var i=0;i<dataview.byteLength;i++) {
                         var ch = dataview.getUint8(i);
                         if(ch==2){
-                            console.log("finished sync");
+                            console.log("2");
                             const file = JSON.stringify(dataview);
                             buffer.push(ch);
                             sendToServer = true;
                         }
                         else if(ch == 7){
+                            console.log("7");
                             num1 = dataview.getUint8(i+4)
                             num2 = dataview.getUint8(i+3)
                             num3 = dataview.getUint8(i+2)
@@ -187,6 +182,7 @@ var WebBluetooth = {
                             fromTime = num1.toString() + num2.toString() + num3.toString() + num4.toString()
                         }
                         else if(ch == 10){
+                            console.log("10");
                             buffer.push("\n")
                         }
                         else{
@@ -206,7 +202,7 @@ var WebBluetooth = {
                         buffer
                     });
                     xhr.send(body);
-                    connection.write(5);
+                    connection.write(2);
                 }
                 console.log(3, "Received "+JSON.stringify(str));
                 connection.emit('data', str);
