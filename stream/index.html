@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bluetooth Data Plotter</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
     <div>
@@ -17,7 +17,10 @@
     </div>
     <button id="bangleButton" onclick="startBangle()">Start Bangle</button>
     <button id="polarButton" onclick="startPolar()">Start Polar</button>
-    <button id="recordButton" onclick="startRecord()">Start Record</button>"
+    <button id="recordButton" onclick="startRecord()">Start Record</button>
+    Name: <input type="text" id="nameText"></input>
+    Location: <input type="text" id="locText"></input>
+    Condition: <input type="text" id="conditionText"></input>
     <script>
         let connectedToBangle = false;
         let connectedToPolar = false;
@@ -59,6 +62,8 @@
             canvasBangle,
             configBangle
         );
+
+
 
         // function to update the chart 
         function addDataBangle(chart, label, data) {
@@ -323,55 +328,52 @@
 
         function startRecord(){
             if(!isRecording){
+                if(document.getElementById("nameText").value == ""){
+                    alert("You must enter a name to start recording");
+                    return;
+                }
                 bangleSamples = [];
                 polarSamples = [];
                 polarHRMSamples = [];
                 isRecording = true;
                 document.getElementById('recordButton').innerText = "Stop Record";
             }else{
-                let bangleCSV = "data:text/csv;charset=utf-8,"
+                var zip = new JSZip();
+                //let bangleCSV = "data:text/csv;charset=utf-8,"
+                let bangleCSV = "";
                 bangleCSV += "timestamp_ms,value\n";
                 for(var i=0;i<bangleSamples.length;i++){
                     bangleCSV+=bangleSamples[i].x+","+bangleSamples[i].y+"\n";
                 }
+                zip.file("bangle.csv",bangleCSV);
+                
 
-                var encodedUri = encodeURI(bangleCSV);
-                var link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", "bangle.csv");
-                document.body.appendChild(link); // Required for FF
-
-                link.click(); // This will download the data file named "my_data.csv"
-
-
-                let polarCSV = "data:text/csv;charset=utf-8,"
-                polarCSV += "timestamp_ms,value\n";
+                let polarCSV = "timestamp_ms,value\n";
                 for(var i=0;i<polarSamples.length;i++){
                     polarCSV+=polarSamples[i].x+","+polarSamples[i].y+"\n";
                 }
+                zip.file("polar.csv",polarCSV);
 
-                var encodedUri = encodeURI(polarCSV);
-                var link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", "polar.csv");
-                document.body.appendChild(link); // Required for FF
+              
 
-                link.click(); // This will download the data file named "my_data.csv"
-
-                let polarHRMCSV = "data:text/csv;charset=utf-8,"
-                polarHRMCSV += "timestamp_ms,value,rris\n";
+                let polarHRMCSV = "timestamp_ms,value,rris\n";
                 for(var i=0;i<polarHRMSamples.length;i++){
                     polarHRMCSV+=polarHRMSamples[i].t+","+polarHRMSamples[i].bpm +"," + polarHRMSamples[i].rris+"\n";
                 }
+                zip.file("polarHRM.csv",polarHRMCSV);
 
-                var encodedUri = encodeURI(polarHRMCSV);
-                var link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", "polarHRM.csv");
-                document.body.appendChild(link); // Required for FF
-
-                link.click(); // This will download the data file named "my_data.csv"
-
+                zip.generateAsync({type:"base64"}).then(function(content){
+                    var encodedUri = encodeURI("data:application/zip;base64,"+content);
+                    var link = document.createElement("a");
+                    link.setAttribute("href", encodedUri);
+                    var name = document.getElementById("nameText").value;
+                    var loc = document.getElementById("locText").value;
+                    var cond = document.getElementById("conditionText").value;
+                    link.setAttribute("download", name+"_"+loc+"_"+cond+".zip");
+                    document.body.appendChild(link); // Required for FF
+                    link.click();
+                    document.getElementById("nameText").value="";
+                });
 
                 isRecording = false;
                 document.getElementById('recordButton').innerText = "Start Record";
